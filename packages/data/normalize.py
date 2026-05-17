@@ -1,25 +1,19 @@
-from shapely.geometry import mapping, shape
-from shapely.validation import make_valid
+from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry.base import BaseGeometry
 
 
-def to_multipolygon(geojson: dict) -> dict:
-    """Convert Polygon to MultiPolygon. Pass through MultiPolygon unchanged."""
-    geom = shape(geojson)
-    if geom.geom_type == "Polygon":
-        from shapely.geometry import MultiPolygon
-        geom = MultiPolygon([geom])
-    elif geom.geom_type != "MultiPolygon":
-        raise ValueError(f"Expected Polygon or MultiPolygon, got {geom.geom_type}")
-    return mapping(geom)
+def to_multipolygon(geom: BaseGeometry) -> MultiPolygon:
+    if isinstance(geom, MultiPolygon):
+        return geom
+    if isinstance(geom, Polygon):
+        return MultiPolygon([geom])
+    raise ValueError(f"Cannot convert {geom.geom_type} to MultiPolygon")
 
 
-def fix_geometry(geojson: dict) -> dict:
-    """Repair invalid geometry, return as MultiPolygon."""
-    geom = make_valid(shape(geojson))
-    return to_multipolygon(mapping(geom))
+def simplify_geom(geom: MultiPolygon, tolerance: float = 0.05) -> MultiPolygon:
+    simplified = geom.simplify(tolerance, preserve_topology=True)
+    return to_multipolygon(simplified)
 
 
-def simplify_geometry(geojson: dict, tolerance: float = 0.1) -> dict:
-    """Simplify geometry for low-zoom rendering. Returns MultiPolygon."""
-    geom = shape(geojson).simplify(tolerance, preserve_topology=True)
-    return to_multipolygon(mapping(geom))
+def validate_geom(geom: BaseGeometry) -> bool:
+    return bool(geom.is_valid)
