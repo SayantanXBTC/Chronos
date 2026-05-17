@@ -32,8 +32,17 @@ def normalize_year(year: int) -> int:
 
 
 def snap_to_snapshot(year: int, snapshots: list[int]) -> int:
-    """Return nearest snapshot year at or below the given year."""
+    """Return nearest snapshot year at or below the given year.
+
+    Raises ValueError if year is below all snapshots.
+    """
+    if not snapshots:
+        raise ValueError("Snapshot list is empty")
     sorted_snaps = sorted(snapshots)
+    if year < sorted_snaps[0]:
+        raise ValueError(
+            f"Year {year} is before the earliest snapshot ({sorted_snaps[0]})"
+        )
     idx = bisect.bisect_right(sorted_snaps, year) - 1
     idx = max(0, min(idx, len(sorted_snaps) - 1))
     return sorted_snaps[idx]

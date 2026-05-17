@@ -21,7 +21,10 @@ class CacheService:
         raw = await self.redis.get(key)
         if raw is None:
             return None
-        return json.loads(raw)
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            return None  # treat corrupt cache entry as miss
 
     async def set_world_state(
         self,

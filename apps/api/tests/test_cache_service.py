@@ -32,10 +32,18 @@ async def test_cache_miss_returns_none():
 
 async def test_cache_hit_returns_parsed_dict():
     mock_redis = AsyncMock()
-    mock_redis.get.return_value = b'{"type":"FeatureCollection","features":[]}'
+    mock_redis.get.return_value = '{"type":"FeatureCollection","features":[]}'  # str, not bytes
     svc = CacheService(redis=mock_redis)
     result = await svc.get_world_state(-264, "political", 4, 8, 3)
     assert result == {"type": "FeatureCollection", "features": []}
+
+
+async def test_cache_corrupt_value_returns_none():
+    mock_redis = AsyncMock()
+    mock_redis.get.return_value = b"not valid json {"
+    svc = CacheService(redis=mock_redis)
+    result = await svc.get_world_state(-264, "political", 4, 8, 3)
+    assert result is None
 
 
 async def test_cache_set_uses_correct_key():

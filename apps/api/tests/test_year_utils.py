@@ -70,6 +70,13 @@ def test_snap_to_snapshot_positive_year():
     assert snap_to_snapshot(100, snapshots) == 100
 
 
+def test_snap_to_snapshot_raises_below_range():
+    snapshots = list(range(-500, 501, 25))
+    snapshots = [y for y in snapshots if y != 0]
+    with pytest.raises(ValueError, match="before the earliest snapshot"):
+        snap_to_snapshot(-600, snapshots)
+
+
 def test_normalize_year_rejects_zero():
     from app.utils.year import normalize_year
     with pytest.raises(ValueError):
