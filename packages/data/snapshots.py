@@ -39,6 +39,7 @@ async def run_snapshot_generation() -> None:
         total = len(SNAPSHOT_YEARS)
         generated = 0
         skipped = 0
+        failed = 0
 
         for year in SNAPSHOT_YEARS:
             output_file = OUTPUT_DIR / f"{year}.json"
@@ -48,14 +49,21 @@ async def run_snapshot_generation() -> None:
                 skipped += 1
                 continue
 
-            snapshot = await compute_snapshot(client, year)
-            with open(output_file, "w") as f:
-                json.dump(snapshot, f)
-            generated += 1
-            print(f"Generated snapshot for year {year}")
+            tmp_file = output_file.with_suffix(".tmp")
+            try:
+                snapshot = await compute_snapshot(client, year)
+                tmp_file.write_text(json.dumps(snapshot))
+                tmp_file.rename(output_file)
+                print(f"  Saved {output_file}")
+                generated += 1
+            except Exception as e:
+                print(f"  ERROR year {year}: {e}")
+                if tmp_file.exists():
+                    tmp_file.unlink()
+                failed += 1
 
         print(
-            f"\nSnapshot generation complete: {generated} generated, {skipped} skipped, {total} total"
+            f"\nSnapshot generation complete: {generated} generated, {skipped} skipped, {failed} failed, {total} total"
         )
 
 

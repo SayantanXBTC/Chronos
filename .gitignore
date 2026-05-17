@@ -13,6 +13,7 @@ build/
 
 # Data
 data/raw/
+data/snapshots/
 
 # Node.js / Frontend
 node_modules/
@@ -27,6 +28,7 @@ venv/
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Test coverage
 .coverage
