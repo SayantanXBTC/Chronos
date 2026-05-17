@@ -16,12 +16,14 @@ dependencies = [
     "pydantic-settings>=2.4",
     "redis>=5.0",
     "shapely>=2.0",
-    "fiona>=1.9",
-    "geopandas>=1.0",
     "orjson>=3.10",
 ]
 
 [project.optional-dependencies]
+ingest = [
+    "fiona>=1.9",
+    "geopandas>=1.0",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
