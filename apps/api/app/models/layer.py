@@ -1,7 +1,7 @@
 import uuid
 
 from geoalchemy2 import Geometry
-from sqlalchemy import Boolean, String, Text
+from sqlalchemy import Boolean, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -23,7 +23,9 @@ class LayerFeature(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    layer_id: Mapped[str] = mapped_column(String(50), nullable=False)
+    layer_id: Mapped[str] = mapped_column(
+        String(50), ForeignKey("layers.id"), nullable=False
+    )
     geom: Mapped[bytes] = mapped_column(Geometry(srid=4326), nullable=False)
     year_start: Mapped[int] = mapped_column(nullable=False)
     year_end: Mapped[int | None] = mapped_column(nullable=True)

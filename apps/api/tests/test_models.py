@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.database import Base
 
+pytestmark = pytest.mark.asyncio
+
 
 async def test_all_tables_registered():
     """All required tables are registered in Base.metadata."""
