@@ -1,0 +1,11 @@
+slug: eastern-roman-empire
+name: Eastern Roman Empire
+type: polity
+color: "#9b59b6"
+year_start: 395
+year_end: 1453
+phases:
+  - geometry: eastern-roman-empire/phase-1.geojson
+    year_start: 395
+    year_end: 1453
+    confidence: approximate

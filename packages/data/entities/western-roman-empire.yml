@@ -1,0 +1,11 @@
+slug: western-roman-empire
+name: Western Roman Empire
+type: polity
+color: "#e67e22"
+year_start: 395
+year_end: 476
+phases:
+  - geometry: western-roman-empire/phase-1.geojson
+    year_start: 395
+    year_end: 476
+    confidence: approximate

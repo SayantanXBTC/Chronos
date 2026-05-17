@@ -1,0 +1,11 @@
+slug: numidia
+name: Numidia
+type: polity
+color: "#d35400"
+year_start: -202
+year_end: 46
+phases:
+  - geometry: numidia/phase-1.geojson
+    year_start: -202
+    year_end: 46
+    confidence: approximate

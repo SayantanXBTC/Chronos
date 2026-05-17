@@ -1,0 +1,15 @@
+slug: parthian-empire
+name: Parthian Empire
+type: polity
+color: "#16a085"
+year_start: -247
+year_end: 224
+phases:
+  - geometry: parthian-empire/phase-1.geojson
+    year_start: -247
+    year_end: -100
+    confidence: approximate
+  - geometry: parthian-empire/phase-2.geojson
+    year_start: -100
+    year_end: 224
+    confidence: approximate

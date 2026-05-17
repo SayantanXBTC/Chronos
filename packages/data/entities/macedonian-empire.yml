@@ -1,0 +1,15 @@
+slug: macedonian-empire
+name: Macedonian Empire
+type: polity
+color: "#3498db"
+year_start: -808
+year_end: -301
+phases:
+  - geometry: macedonian-empire/phase-1.geojson
+    year_start: -500
+    year_end: -336
+    confidence: approximate
+  - geometry: macedonian-empire/phase-2.geojson
+    year_start: -336
+    year_end: -301
+    confidence: approximate

@@ -1,0 +1,23 @@
+slug: roman-empire
+name: Roman Empire
+type: polity
+color: "#e74c3c"
+year_start: -27
+year_end: 395
+phases:
+  - geometry: roman-empire/phase-1.geojson
+    year_start: -27
+    year_end: 14
+    confidence: approximate
+  - geometry: roman-empire/phase-2.geojson
+    year_start: 14
+    year_end: 180
+    confidence: approximate
+  - geometry: roman-empire/phase-3.geojson
+    year_start: 180
+    year_end: 284
+    confidence: approximate
+  - geometry: roman-empire/phase-4.geojson
+    year_start: 284
+    year_end: 395
+    confidence: approximate

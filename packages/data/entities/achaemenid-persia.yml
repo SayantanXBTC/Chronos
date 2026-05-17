@@ -1,0 +1,15 @@
+slug: achaemenid-persia
+name: Achaemenid Persian Empire
+type: polity
+color: "#f39c12"
+year_start: -550
+year_end: -330
+phases:
+  - geometry: achaemenid-persia/phase-1.geojson
+    year_start: -500
+    year_end: -400
+    confidence: approximate
+  - geometry: achaemenid-persia/phase-2.geojson
+    year_start: -400
+    year_end: -330
+    confidence: approximate

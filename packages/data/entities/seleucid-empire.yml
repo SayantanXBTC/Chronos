@@ -1,0 +1,19 @@
+slug: seleucid-empire
+name: Seleucid Empire
+type: polity
+color: "#2980b9"
+year_start: -312
+year_end: -63
+phases:
+  - geometry: seleucid-empire/phase-1.geojson
+    year_start: -301
+    year_end: -200
+    confidence: approximate
+  - geometry: seleucid-empire/phase-2.geojson
+    year_start: -200
+    year_end: -100
+    confidence: approximate
+  - geometry: seleucid-empire/phase-3.geojson
+    year_start: -100
+    year_end: -63
+    confidence: approximate

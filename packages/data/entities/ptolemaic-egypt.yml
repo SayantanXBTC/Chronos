@@ -1,0 +1,15 @@
+slug: ptolemaic-egypt
+name: Ptolemaic Egypt
+type: polity
+color: "#27ae60"
+year_start: -305
+year_end: -30
+phases:
+  - geometry: ptolemaic-egypt/phase-1.geojson
+    year_start: -305
+    year_end: -200
+    confidence: approximate
+  - geometry: ptolemaic-egypt/phase-2.geojson
+    year_start: -200
+    year_end: -30
+    confidence: approximate
