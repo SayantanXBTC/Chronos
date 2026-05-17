@@ -9,7 +9,7 @@ import yaml
 from shapely.geometry import shape
 
 from .loader import Loader
-from .normalize import simplify_geom, to_multipolygon, validate_geom
+from .normalize import coerce_valid, simplify_geom, to_multipolygon, validate_geom
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = _REPO_ROOT / "data" / "raw" / "political"
@@ -55,7 +55,7 @@ def _ingest_entity(loader: Loader, config: dict[str, Any]) -> tuple[int, int]:
         try:
             geojson = _load_geojson(path)
             raw_geom = shape(geojson["geometry"])
-            geom = to_multipolygon(raw_geom)
+            geom = to_multipolygon(coerce_valid(raw_geom))
             if not validate_geom(geom):
                 print(f"    WARNING: invalid geometry in {path}, skipping")
                 skipped += 1
@@ -96,7 +96,7 @@ def _validate_only(configs: list[dict[str, Any]]) -> None:
                 with open(full_path) as f:
                     geojson = json.load(f)
                 raw_geom = shape(geojson["geometry"])
-                geom = to_multipolygon(raw_geom)
+                geom = to_multipolygon(coerce_valid(raw_geom))
                 if not validate_geom(geom):
                     print(f"  ERROR: {slug} — invalid geometry: {path}")
                     phase_err += 1
