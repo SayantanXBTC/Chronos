@@ -12,7 +12,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-history}"]
       interval: 5s
@@ -32,7 +32,7 @@ services:
       retries: 5
 
   neo4j:
-    image: neo4j:5
+    image: neo4j:5.20
     container_name: history_neo4j
     environment:
       NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-history}

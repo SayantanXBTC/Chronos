@@ -11,9 +11,14 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     tmpfs:
       - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U history"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis_test:
     image: redis:7-alpine

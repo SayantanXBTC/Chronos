@@ -8,3 +8,10 @@ dist/
 data/raw/
 node_modules/
 .next/
+.venv/
+venv/
+*.log
+.DS_Store
+*.env
+.coverage
+coverage/
