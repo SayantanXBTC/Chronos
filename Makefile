@@ -1,19 +1,25 @@
-.PHONY: dev dev-build stop migrate seed test lint
+.PHONY: dev dev-build stop migrate seed seed-entity seed-dry test lint
 
 dev:
-	docker compose -f infra/docker-compose.yml up
+	docker compose -f infra/docker-compose.yml --project-directory . up
 
 dev-build:
-	docker compose -f infra/docker-compose.yml up --build
+	docker compose -f infra/docker-compose.yml --project-directory . up --build
 
 stop:
-	docker compose -f infra/docker-compose.yml down
+	docker compose -f infra/docker-compose.yml --project-directory . down
 
 migrate:
-	docker compose -f infra/docker-compose.yml exec api alembic upgrade head
+	docker compose -f infra/docker-compose.yml --project-directory . exec api alembic upgrade head
 
 seed:
-	docker compose -f infra/docker-compose.yml exec api python -m data.ingest
+	DATABASE_URL=postgresql://history:history@localhost:5432/history python -m data
+
+seed-entity:
+	DATABASE_URL=postgresql://history:history@localhost:5432/history python -m data --entity $(ENTITY)
+
+seed-dry:
+	DATABASE_URL=postgresql://history:history@localhost:5432/history python -m data --dry-run
 
 test:
 	docker compose -f infra/docker-compose.test.yml up -d
