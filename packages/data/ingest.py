@@ -1,168 +1,152 @@
-"""
-Data ingestion CLI.
-Usage: python -m data.ingest [--source manual]
-"""
-import argparse
-import asyncio
 import json
 import os
-import uuid
+import sys
+from pathlib import Path
+from typing import Any
 
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+import psycopg2
+import yaml
+from shapely.geometry import shape
 
-from data.normalize import fix_geometry, simplify_geometry, to_multipolygon
-from data.sources.base import EntityRecord, TerritoryRecord
-from data.sources.manual import ManualSource
+from .loader import Loader
+from .normalize import simplify_geom, to_multipolygon, validate_geom
 
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL", "postgresql+asyncpg://history:history@localhost:5432/history"
-)
+_REPO_ROOT = Path(__file__).parent.parent.parent
+DATA_DIR = _REPO_ROOT / "data" / "raw" / "political"
+ENTITIES_DIR = Path(__file__).parent / "entities"
 
 
-async def upsert_entity(session: AsyncSession, rec: EntityRecord) -> uuid.UUID:
-    result = await session.execute(
-        text("SELECT id FROM entities WHERE slug = :slug"), {"slug": rec.slug}
+def _load_configs(entity_filter: str | None) -> list[dict[str, Any]]:
+    configs = []
+    for yml_file in sorted(ENTITIES_DIR.glob("*.yml")):
+        with open(yml_file) as f:
+            configs.append(yaml.safe_load(f))
+    if entity_filter:
+        configs = [c for c in configs if c["slug"] == entity_filter]
+        if not configs:
+            print(f"Entity '{entity_filter}' not found. Available slugs:")
+            for yml_file in sorted(ENTITIES_DIR.glob("*.yml")):
+                print(f"  {yml_file.stem}")
+            sys.exit(1)
+    return configs
+
+
+def _load_geojson(relative_path: str) -> dict[str, Any]:
+    full_path = DATA_DIR / relative_path
+    with open(full_path) as f:
+        return json.load(f)
+
+
+def _ingest_entity(loader: Loader, config: dict[str, Any]) -> tuple[int, int]:
+    slug = config["slug"]
+    entity_id = loader.upsert_entity(slug, config["type"], config["color"])
+    loader.upsert_entity_name(
+        entity_id,
+        config["name"],
+        config["year_start"],
+        config["year_end"],
     )
-    row = result.fetchone()
-    if row:
-        entity_id = uuid.UUID(str(row[0]))
+    loader.delete_territories(entity_id)
+
+    loaded = 0
+    skipped = 0
+    for phase in config["phases"]:
+        path = phase["geometry"]
+        try:
+            geojson = _load_geojson(path)
+            raw_geom = shape(geojson["geometry"])
+            geom = to_multipolygon(raw_geom)
+            if not validate_geom(geom):
+                print(f"    WARNING: invalid geometry in {path}, skipping")
+                skipped += 1
+                continue
+            simplified = simplify_geom(geom)
+            loader.insert_territory(
+                entity_id,
+                geom.wkt,
+                simplified.wkt,
+                phase["year_start"],
+                phase["year_end"],
+                phase.get("confidence", "approximate"),
+            )
+            loaded += 1
+        except Exception as e:
+            print(f"    WARNING: failed to load {path}: {e}")
+            skipped += 1
+
+    return loaded, skipped
+
+
+def _validate_only(configs: list[dict[str, Any]]) -> None:
+    print(f"DRY RUN: validating {len(configs)} entities")
+    errors = 0
+    for config in configs:
+        slug = config["slug"]
+        phase_ok = 0
+        phase_err = 0
+        for phase in config["phases"]:
+            path = phase["geometry"]
+            full_path = DATA_DIR / path
+            if not full_path.exists():
+                print(f"  ERROR: {slug} — file not found: {full_path}")
+                phase_err += 1
+                errors += 1
+                continue
+            try:
+                with open(full_path) as f:
+                    geojson = json.load(f)
+                raw_geom = shape(geojson["geometry"])
+                geom = to_multipolygon(raw_geom)
+                if not validate_geom(geom):
+                    print(f"  ERROR: {slug} — invalid geometry: {path}")
+                    phase_err += 1
+                    errors += 1
+                else:
+                    phase_ok += 1
+            except Exception as e:
+                print(f"  ERROR: {slug} — {path}: {e}")
+                phase_err += 1
+                errors += 1
+        status = "OK" if phase_err == 0 else "ERRORS"
+        print(f"  [{status}] {slug}: {phase_ok} phases valid, {phase_err} errors")
+    if errors:
+        print(f"\n{errors} validation error(s). Fix before ingesting.")
+        sys.exit(1)
     else:
-        entity_id = uuid.uuid4()
-        await session.execute(
-            text(
-                "INSERT INTO entities (id, slug, type, color) "
-                "VALUES (:id, :slug, :type, :color)"
-            ),
-            {"id": str(entity_id), "slug": rec.slug, "type": rec.type, "color": rec.color},
-        )
-
-    await session.execute(
-        text("DELETE FROM entity_names WHERE entity_id = :eid"),
-        {"eid": str(entity_id)},
-    )
-    for name in rec.names:
-        await session.execute(
-            text(
-                "INSERT INTO entity_names "
-                "(id, entity_id, name, language, year_start, year_end, is_primary) "
-                "VALUES (:id, :eid, :name, :lang, :ys, :ye, :primary)"
-            ),
-            {
-                "id": str(uuid.uuid4()),
-                "eid": str(entity_id),
-                "name": name["name"],
-                "lang": name["language"],
-                "ys": name["year_start"],
-                "ye": name.get("year_end"),
-                "primary": name["is_primary"],
-            },
-        )
-    return entity_id
+        print("\nAll files valid.")
 
 
-async def upsert_territory(
-    session: AsyncSession, rec: TerritoryRecord, entity_id: uuid.UUID
-) -> None:
-    await session.execute(
-        text(
-            "DELETE FROM territories WHERE entity_id = :eid AND year_start = :ys"
-        ),
-        {"eid": str(entity_id), "ys": rec.year_start},
-    )
+def run(entity_filter: str | None = None, dry_run: bool = False) -> None:
+    configs = _load_configs(entity_filter)
 
+    if dry_run:
+        _validate_only(configs)
+        return
+
+    db_url = os.environ.get("DATABASE_URL", "")
+    if not db_url:
+        print("ERROR: DATABASE_URL environment variable not set")
+        sys.exit(1)
+    db_url = db_url.replace("+asyncpg", "")
+
+    conn = psycopg2.connect(db_url)
     try:
-        geom = to_multipolygon(rec.geojson)
-    except Exception as e:
-        print(f"    Warning: to_multipolygon failed ({e}), attempting fix_geometry")
-        geom = fix_geometry(rec.geojson)
-
-    try:
-        simplified = simplify_geometry(geom, tolerance=0.1)
+        loader = Loader(conn)
+        total_loaded = 0
+        total_skipped = 0
+        for config in configs:
+            slug = config["slug"]
+            print(f"  {slug}...")
+            loaded, skipped = _ingest_entity(loader, config)
+            conn.commit()
+            total_loaded += loaded
+            total_skipped += skipped
+            print(f"    {loaded} phases inserted, {skipped} skipped")
+        print(f"\nDone: {len(configs)} entities, {total_loaded} territory phases inserted")
+        if total_skipped:
+            print(f"  ({total_skipped} phases skipped due to errors)")
     except Exception:
-        simplified = geom
-
-    geom_json = json.dumps(geom)
-    simplified_json = json.dumps(simplified)
-
-    await session.execute(
-        text(
-            "INSERT INTO territories "
-            "(id, entity_id, geom, simplified_geom, year_start, year_end, confidence, source) "
-            "VALUES (:id, :eid, "
-            "ST_SetSRID(ST_GeomFromGeoJSON(:geom), 4326), "
-            "ST_SetSRID(ST_GeomFromGeoJSON(:simplified), 4326), "
-            ":ys, :ye, :conf, :src)"
-        ),
-        {
-            "id": str(uuid.uuid4()),
-            "eid": str(entity_id),
-            "geom": geom_json,
-            "simplified": simplified_json,
-            "ys": rec.year_start,
-            "ye": rec.year_end,
-            "conf": rec.confidence,
-            "src": rec.source,
-        },
-    )
-
-
-async def seed_layers(session: AsyncSession) -> None:
-    layers = [
-        ("political", "Political Borders", True),
-        ("religious", "Religious Influence", False),
-        ("trade_routes", "Trade Routes", False),
-        ("military", "Military Campaigns", False),
-        ("linguistic", "Linguistic Groups", False),
-        ("migration", "Migration Patterns", False),
-    ]
-    for layer_id, display_name, active in layers:
-        await session.execute(
-            text(
-                "INSERT INTO layers (id, display_name, active) "
-                "VALUES (:id, :name, :active) "
-                "ON CONFLICT (id) DO UPDATE SET display_name = EXCLUDED.display_name, active = EXCLUDED.active"
-            ),
-            {"id": layer_id, "name": display_name, "active": active},
-        )
-
-
-async def run_ingest(source_name: str = "manual") -> None:
-    engine = create_async_engine(DATABASE_URL, echo=False)
-    Session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
-    if source_name not in ("manual",):
-        await engine.dispose()
-        raise ValueError(f"Unknown source: {source_name}")
-
-    if source_name == "manual":
-        source = ManualSource()
-
-    try:
-        async with Session() as session:
-            async with session.begin():
-                print("Seeding layers...")
-                await seed_layers(session)
-
-                for entity_rec in source.get_entities():
-                    print(f"  Upserting entity: {entity_rec.slug}")
-                    entity_id = await upsert_entity(session, entity_rec)
-
-                    for territory_rec in source.get_territories():
-                        if territory_rec.entity_slug == entity_rec.slug:
-                            print(
-                                f"    Upserting territory: "
-                                f"{entity_rec.slug} {territory_rec.year_start}"
-                            )
-                            await upsert_territory(session, territory_rec, entity_id)
+        conn.rollback()
+        raise
     finally:
-        await engine.dispose()
-
-    print("Ingestion complete.")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--source", default="manual")
-    args = parser.parse_args()
-    asyncio.run(run_ingest(args.source))
+        conn.close()
