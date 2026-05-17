@@ -12,7 +12,6 @@ dist/
 build/
 
 # Data
-data/raw/
 data/snapshots/
 
 # Node.js / Frontend
