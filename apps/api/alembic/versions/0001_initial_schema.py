@@ -101,10 +101,10 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["layer_id"], ["layers.id"]),
     )
 
-    # Spatial indexes
-    op.execute("CREATE INDEX idx_territories_geom ON territories USING GIST(geom)")
-    op.execute("CREATE INDEX idx_territories_simplified ON territories USING GIST(simplified_geom)")
-    op.execute("CREATE INDEX idx_layer_features_geom ON layer_features USING GIST(geom)")
+    # Spatial indexes (IF NOT EXISTS: GeoAlchemy2 may auto-create these)
+    op.execute("CREATE INDEX IF NOT EXISTS idx_territories_geom ON territories USING GIST(geom)")
+    op.execute("CREATE INDEX IF NOT EXISTS idx_territories_simplified ON territories USING GIST(simplified_geom)")
+    op.execute("CREATE INDEX IF NOT EXISTS idx_layer_features_geom ON layer_features USING GIST(geom)")
 
     # Temporal indexes
     op.execute("CREATE INDEX idx_territories_years ON territories(year_start, year_end)")

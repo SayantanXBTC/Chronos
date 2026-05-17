@@ -22,6 +22,7 @@ export interface MapViewProps {
 const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MaplibreMap | null>(null)
+  const pendingDataRef = useRef<WorldStateResponse | null>(null)
   // Ref mirror: keeps onEntitySelect fresh inside the one-time map.on('load') closure
   const onEntitySelectRef = useRef(onEntitySelect)
   useEffect(() => { onEntitySelectRef.current = onEntitySelect }, [onEntitySelect])
@@ -29,7 +30,12 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
   useImperativeHandle(ref, () => ({
     updateTerritories(data: WorldStateResponse) {
       const source = mapRef.current?.getSource('territories') as GeoJSONSource | undefined
-      source?.setData(data as unknown as GeoJSON.GeoJSON)
+      if (source) {
+        source.setData(data as unknown as GeoJSON.GeoJSON)
+        pendingDataRef.current = null
+      } else {
+        pendingDataRef.current = data
+      }
     },
   }))
 
@@ -48,9 +54,10 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
     map.on('load', () => {
       map.addSource('territories', {
         type: 'geojson',
-        data: EMPTY_FC,
+        data: (pendingDataRef.current as unknown as GeoJSON.GeoJSON) ?? EMPTY_FC,
         generateId: true,
       })
+      pendingDataRef.current = null
 
       map.addLayer({
         id: 'territories-fill',
