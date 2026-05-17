@@ -73,7 +73,8 @@ async def upsert_territory(
 
     try:
         geom = to_multipolygon(rec.geojson)
-    except Exception:
+    except Exception as e:
+        print(f"    Warning: to_multipolygon failed ({e}), attempting fix_geometry")
         geom = fix_geometry(rec.geojson)
 
     try:
@@ -120,7 +121,7 @@ async def seed_layers(session: AsyncSession) -> None:
             text(
                 "INSERT INTO layers (id, display_name, active) "
                 "VALUES (:id, :name, :active) "
-                "ON CONFLICT (id) DO UPDATE SET display_name = EXCLUDED.display_name"
+                "ON CONFLICT (id) DO UPDATE SET display_name = EXCLUDED.display_name, active = EXCLUDED.active"
             ),
             {"id": layer_id, "name": display_name, "active": active},
         )
@@ -130,30 +131,34 @@ async def run_ingest(source_name: str = "manual") -> None:
     engine = create_async_engine(DATABASE_URL, echo=False)
     Session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-    if source_name == "manual":
-        source = ManualSource()
-    else:
+    if source_name not in ("manual",):
+        await engine.dispose()
         raise ValueError(f"Unknown source: {source_name}")
 
-    async with Session() as session:
-        async with session.begin():
-            print("Seeding layers...")
-            await seed_layers(session)
+    if source_name == "manual":
+        source = ManualSource()
 
-            for entity_rec in source.get_entities():
-                print(f"  Upserting entity: {entity_rec.slug}")
-                entity_id = await upsert_entity(session, entity_rec)
+    try:
+        async with Session() as session:
+            async with session.begin():
+                print("Seeding layers...")
+                await seed_layers(session)
 
-                for territory_rec in source.get_territories():
-                    if territory_rec.entity_slug == entity_rec.slug:
-                        print(
-                            f"    Upserting territory: "
-                            f"{entity_rec.slug} {territory_rec.year_start}"
-                        )
-                        await upsert_territory(session, territory_rec, entity_id)
+                for entity_rec in source.get_entities():
+                    print(f"  Upserting entity: {entity_rec.slug}")
+                    entity_id = await upsert_entity(session, entity_rec)
+
+                    for territory_rec in source.get_territories():
+                        if territory_rec.entity_slug == entity_rec.slug:
+                            print(
+                                f"    Upserting territory: "
+                                f"{entity_rec.slug} {territory_rec.year_start}"
+                            )
+                            await upsert_territory(session, territory_rec, entity_id)
+    finally:
+        await engine.dispose()
 
     print("Ingestion complete.")
-    await engine.dispose()
 
 
 if __name__ == "__main__":

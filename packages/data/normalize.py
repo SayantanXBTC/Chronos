@@ -1,5 +1,3 @@
-from typing import Any
-
 from shapely.geometry import mapping, shape
 from shapely.validation import make_valid
 
