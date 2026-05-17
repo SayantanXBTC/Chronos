@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  postgres_test:
+    image: postgis/postgis:16-3.4
+    container_name: history_postgres_test
+    environment:
+      POSTGRES_DB: history_test
+      POSTGRES_USER: history
+      POSTGRES_PASSWORD: history
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  redis_test:
+    image: redis:7-alpine
+    container_name: history_redis_test
+    ports:
+      - "6380:6379"
