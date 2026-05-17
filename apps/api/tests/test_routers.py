@@ -9,9 +9,16 @@ async def test_health(client):
     assert response.json()["status"] == "ok"
 
 
-async def test_world_state_stub(client):
+async def test_world_state_requires_year(client):
+    """year is now a required query param — missing it returns 422."""
     response = await client.get("/api/v1/world/state")
-    assert response.status_code == 200
+    assert response.status_code == 422
+
+
+async def test_world_state_rejects_year_zero(client):
+    """Year 0 is invalid in historical convention."""
+    response = await client.get("/api/v1/world/state?year=0")
+    assert response.status_code == 422
 
 
 async def test_snapshots_stub(client):
