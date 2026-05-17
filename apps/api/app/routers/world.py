@@ -36,12 +36,15 @@ async def get_world_state(
         return cached
 
     svc = WorldStateService(db=db)
-    result = await svc.get_state(
-        year=year,
-        bbox=(min_x, min_y, max_x, max_y),
-        zoom=zoom,
-        layer=layer,
-    )
+    try:
+        result = await svc.get_state(
+            year=year,
+            bbox=(min_x, min_y, max_x, max_y),
+            zoom=zoom,
+            layer=layer,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     await cache.set_world_state(year, layer, zoom, tile_x, tile_y, result)
     return result
