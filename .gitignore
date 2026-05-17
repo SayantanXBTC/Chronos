@@ -1,17 +1,33 @@
+# Environment variables
 .env
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
 .pytest_cache/
+.ruff_cache/
 *.egg-info/
 dist/
-.ruff_cache/
+build/
+
+# Data
 data/raw/
+
+# Node.js / Frontend
 node_modules/
 .next/
+
+# Virtual environments
 .venv/
 venv/
+
+# Logs
 *.log
+
+# OS
 .DS_Store
-*.env
+
+# Test coverage
 .coverage
 coverage/
