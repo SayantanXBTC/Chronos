@@ -1,14 +1,20 @@
 // apps/web/lib/year.ts
 
 // Snapshot years the backend pre-computes (matches world_state.py SNAPSHOT_YEARS).
-// Range is -500 to 500 CE in 25-year steps, skipping 0.
-export const SNAPSHOT_YEARS: readonly number[] = [
-  -500, -475, -450, -425, -400, -375, -350, -325, -300,
-  -275, -250, -225, -200, -175, -150, -125, -100,  -75,
-   -50,  -25,   25,   50,   75,  100,  125,  150,  175,
-   200,  225,  250,  275,  300,  325,  350,  375,  400,
-   425,  450,  475,  500,
-]
+// Adaptive density: -3000 to 2026 CE with variable intervals by era.
+function buildSnapshotYears(): readonly number[] {
+  const years: number[] = []
+  for (let y = -3000; y <= -1000; y += 250) years.push(y)
+  for (let y = -900; y <= -500; y += 100) years.push(y)
+  for (let y = -475; y <= 500; y += 25) { if (y !== 0) years.push(y) }
+  for (let y = 550; y <= 1500; y += 50) years.push(y)
+  for (let y = 1525; y <= 1900; y += 25) years.push(y)
+  for (let y = 1910; y <= 2020; y += 10) years.push(y)
+  years.push(2026)
+  return Object.freeze([...new Set(years)].sort((a, b) => a - b))
+}
+
+export const SNAPSHOT_YEARS: readonly number[] = buildSnapshotYears()
 
 export function yearToDisplay(year: number): string {
   if (year === 0) throw new RangeError('Year 0 does not exist in this calendar system')

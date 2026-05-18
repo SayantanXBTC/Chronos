@@ -3,9 +3,12 @@ import { describe, it, expect } from 'vitest'
 import { yearToDisplay, sliderToYear, yearToSlider, snapToSnapshot, SNAPSHOT_YEARS } from '@/lib/year'
 
 describe('SNAPSHOT_YEARS', () => {
-  it('has 40 values', () => { expect(SNAPSHOT_YEARS).toHaveLength(40) })
-  it('starts at -500', () => { expect(SNAPSHOT_YEARS[0]).toBe(-500) })
-  it('ends at 500', () => { expect(SNAPSHOT_YEARS[39]).toBe(500) })
+  it('has ~102 values', () => {
+    expect(SNAPSHOT_YEARS.length).toBeGreaterThanOrEqual(90)
+    expect(SNAPSHOT_YEARS.length).toBeLessThanOrEqual(120)
+  })
+  it('starts at -3000', () => { expect(SNAPSHOT_YEARS[0]).toBe(-3000) })
+  it('ends at 2026', () => { expect(SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]).toBe(2026) })
   it('excludes 0', () => { expect(SNAPSHOT_YEARS).not.toContain(0) })
   it('contains -475', () => { expect(SNAPSHOT_YEARS).toContain(-475) })
   it('contains 25', () => { expect(SNAPSHOT_YEARS).toContain(25) })
@@ -51,7 +54,7 @@ describe('snapToSnapshot', () => {
     expect(snapToSnapshot(1)).toBe(-25)
   })
   it('25 snaps to itself', () => { expect(snapToSnapshot(25)).toBe(25) })
-  // Years outside snapshot range clamp to nearest edge
-  it('-3000 snaps to -500 (earliest snapshot)', () => { expect(snapToSnapshot(-3000)).toBe(-500) })
-  it('2026 snaps to 500 (latest snapshot)', () => { expect(snapToSnapshot(2026)).toBe(500) })
+  // Years now in range — expanded list covers -3000 to 2026
+  it('-3000 snaps to itself (now earliest snapshot)', () => { expect(snapToSnapshot(-3000)).toBe(-3000) })
+  it('2026 snaps to itself (now latest snapshot)', () => { expect(snapToSnapshot(2026)).toBe(2026) })
 })

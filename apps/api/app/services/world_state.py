@@ -5,7 +5,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.utils.year import snap_to_snapshot
 
-SNAPSHOT_YEARS: list[int] = [y for y in range(-500, 501, 25) if y != 0]
+def _build_snapshot_years() -> list[int]:
+    years = []
+    # -3000 to -1000 at 250-year intervals
+    years.extend(range(-3000, -1000 + 1, 250))
+    # -1000 to -500 at 100-year intervals (avoid duplicating -1000)
+    years.extend(range(-900, -500 + 1, 100))
+    # -500 to 500 at 25-year intervals (skip year 0, avoid duplicating -500)
+    years.extend(y for y in range(-475, 501, 25) if y != 0)
+    # 500 to 1500 at 50-year intervals (avoid duplicating 500)
+    years.extend(range(550, 1500 + 1, 50))
+    # 1500 to 1900 at 25-year intervals (avoid duplicating 1500)
+    years.extend(range(1525, 1900 + 1, 25))
+    # 1900 to 2026 at 10-year intervals (avoid duplicating 1900)
+    years.extend(range(1910, 2020 + 1, 10))
+    years.append(2026)
+    return sorted(set(years))  # deduplicate and sort
+
+
+SNAPSHOT_YEARS: list[int] = _build_snapshot_years()
 
 WORLD_STATE_SQL = text("""
     SELECT
