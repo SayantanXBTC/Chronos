@@ -4,20 +4,32 @@ type: polity
 color: "#e74c3c"
 year_start: -27
 year_end: 395
+source_name: "Ancient World Mapping Center"
+source_url: "https://awmc.unc.edu/awmc/map_data/"
+source_license: "CC BY 4.0"
+data_version: "2024-01"
+resolution_km: 50
+importance: 10
+map_modes:
+  - political
 phases:
   - geometry: roman-empire/phase-1.geojson
     year_start: -27
     year_end: 14
     confidence: approximate
+    confidence_score: 0.7
   - geometry: roman-empire/phase-2.geojson
     year_start: 14
     year_end: 180
     confidence: approximate
+    confidence_score: 0.75
   - geometry: roman-empire/phase-3.geojson
     year_start: 180
     year_end: 284
     confidence: approximate
+    confidence_score: 0.7
   - geometry: roman-empire/phase-4.geojson
     year_start: 284
     year_end: 395
     confidence: approximate
+    confidence_score: 0.7

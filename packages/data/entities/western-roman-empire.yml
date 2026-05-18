@@ -4,8 +4,17 @@ type: polity
 color: "#e67e22"
 year_start: 395
 year_end: 476
+source_name: "Ancient World Mapping Center"
+source_url: "https://awmc.unc.edu/awmc/map_data/"
+source_license: "CC BY 4.0"
+data_version: "2024-01"
+resolution_km: 50
+importance: 8
+map_modes:
+  - political
 phases:
   - geometry: western-roman-empire/phase-1.geojson
     year_start: 395
     year_end: 476
     confidence: approximate
+    confidence_score: 0.65

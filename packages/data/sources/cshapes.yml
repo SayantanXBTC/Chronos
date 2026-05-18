@@ -1,0 +1,22 @@
+source_name: "cShapes 2.0"
+source_url: "https://icr.ethz.ch/data/cshapes/"
+source_license: "CC BY"
+data_version: "2.0"
+
+fields:
+  slug: CNTRY_NAME
+  name: CNTRY_NAME
+  year_start: GWSYEAR
+  year_end: GWEYEAR
+  type: null
+  color: null
+
+defaults:
+  type: polity
+  color: "#888888"
+  confidence_type: exact
+  confidence_score: 0.9
+  resolution_km: 10
+  importance: 5
+  map_modes:
+    - political

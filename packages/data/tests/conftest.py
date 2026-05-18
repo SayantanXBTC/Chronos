@@ -8,7 +8,7 @@ TEST_DB_URL = "postgresql://history:history@localhost:5433/history_test"
 TEST_DB_URL_ASYNC = "postgresql+asyncpg://history:history@localhost:5433/history_test"
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def migrate_test_db():
     env = os.environ.copy()
     env["DATABASE_URL"] = TEST_DB_URL_ASYNC
@@ -24,7 +24,7 @@ def migrate_test_db():
 
 
 @pytest.fixture(scope="session")
-def db_conn():
+def db_conn(migrate_test_db):
     try:
         conn = psycopg2.connect(TEST_DB_URL)
     except Exception as e:

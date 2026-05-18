@@ -4,8 +4,17 @@ type: polity
 color: "#7f8c8d"
 year_start: 200
 year_end: 500
+source_name: "Ancient World Mapping Center"
+source_url: "https://awmc.unc.edu/awmc/map_data/"
+source_license: "CC BY 4.0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 5
+map_modes:
+  - political
 phases:
   - geometry: germanic-tribes/phase-1.geojson
     year_start: 200
     year_end: 500
-    confidence: approximate
+    confidence: inferred
+    confidence_score: 0.4

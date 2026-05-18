@@ -67,7 +67,15 @@ def _ingest_entity(loader: Loader, config: dict[str, Any]) -> tuple[int, int]:
                 simplified.wkt,
                 phase["year_start"],
                 phase["year_end"],
-                phase.get("confidence", "approximate"),
+                confidence_type=phase.get("confidence", "approximate"),
+                confidence_score=phase.get("confidence_score"),
+                source_name=config.get("source_name"),
+                source_url=config.get("source_url"),
+                source_license=config.get("source_license"),
+                data_version=config.get("data_version"),
+                resolution_km=config.get("resolution_km"),
+                importance=config.get("importance", 5),
+                map_modes=config.get("map_modes", ["political"]),
             )
             loaded += 1
         except Exception as e:

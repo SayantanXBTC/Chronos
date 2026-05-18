@@ -1,0 +1,22 @@
+source_name: "Ancient World Mapping Center"
+source_url: "https://awmc.unc.edu/awmc/map_data/"
+source_license: "CC BY 4.0"
+data_version: "2024-01"
+
+fields:
+  slug: NAME
+  name: NAME
+  year_start: START_YEAR
+  year_end: END_YEAR
+  type: POLITY_TYPE
+  color: null
+
+defaults:
+  type: polity
+  color: "#888888"
+  confidence_type: approximate
+  confidence_score: 0.6
+  resolution_km: 50
+  importance: 5
+  map_modes:
+    - political

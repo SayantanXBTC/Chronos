@@ -4,12 +4,22 @@ type: polity
 color: "#16a085"
 year_start: -247
 year_end: 224
+source_name: "Ancient World Mapping Center"
+source_url: "https://awmc.unc.edu/awmc/map_data/"
+source_license: "CC BY 4.0"
+data_version: "2024-01"
+resolution_km: 100
+importance: 7
+map_modes:
+  - political
 phases:
   - geometry: parthian-empire/phase-1.geojson
     year_start: -247
     year_end: -100
     confidence: approximate
+    confidence_score: 0.55
   - geometry: parthian-empire/phase-2.geojson
     year_start: -100
     year_end: 224
     confidence: approximate
+    confidence_score: 0.6

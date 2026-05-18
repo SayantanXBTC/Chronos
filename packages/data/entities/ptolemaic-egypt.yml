@@ -4,12 +4,22 @@ type: polity
 color: "#27ae60"
 year_start: -305
 year_end: -30
+source_name: "Ancient World Mapping Center"
+source_url: "https://awmc.unc.edu/awmc/map_data/"
+source_license: "CC BY 4.0"
+data_version: "2024-01"
+resolution_km: 75
+importance: 8
+map_modes:
+  - political
 phases:
   - geometry: ptolemaic-egypt/phase-1.geojson
     year_start: -305
     year_end: -200
     confidence: approximate
+    confidence_score: 0.65
   - geometry: ptolemaic-egypt/phase-2.geojson
     year_start: -200
     year_end: -30
     confidence: approximate
+    confidence_score: 0.65
