@@ -16,6 +16,8 @@ def _make_row(**overrides):
         "source_name": "CHGIS",
         "importance": 10,
         "geometry": {"type": "MultiPolygon", "coordinates": []},
+        "year_start": -264,
+        "year_end": None,
     }
     base.update(overrides)
     return base
@@ -162,3 +164,17 @@ class TestFeatureCollectionStructure:
         assert params["min_y"] == 20.0
         assert params["max_x"] == 50.0
         assert params["max_y"] == 60.0
+
+
+# ---------------------------------------------------------------------------
+# year_start / year_end in feature properties
+# ---------------------------------------------------------------------------
+
+class TestYearStartYearEnd:
+    async def test_feature_has_year_start_and_year_end(self):
+        """Territory year_start and year_end must be in feature properties."""
+        row = _make_row(year_start=-27, year_end=476)
+        result = await _call_service([row])
+        props = result["features"][0]["properties"]
+        assert props["year_start"] == -27
+        assert props["year_end"] == 476

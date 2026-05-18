@@ -15,6 +15,8 @@ def _make_territory_row(**overrides):
         "confidence_type": "approximate",
         "source_name": "Ancient World Mapping Center",
         "importance": 7,
+        "year_start": -509,
+        "year_end": -27,
         "geometry": {"type": "MultiPolygon", "coordinates": []},
     }
     base.update(overrides)

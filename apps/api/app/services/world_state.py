@@ -35,6 +35,8 @@ WORLD_STATE_SQL = text("""
         t.confidence_type       AS confidence_type,
         t.source_name           AS source_name,
         COALESCE(t.importance, 5) AS importance,
+        t.year_start            AS year_start,
+        t.year_end              AS year_end,
         ST_AsGeoJSON(
             CASE
                 WHEN :zoom <= 4 THEN COALESCE(t.geom_lo, t.simplified_geom)
@@ -98,6 +100,8 @@ class WorldStateService:
                     "confidence_type": row["confidence_type"],
                     "source_name": row["source_name"],
                     "importance": row["importance"],
+                    "year_start": row["year_start"],
+                    "year_end": row["year_end"],
                 },
             })
 
