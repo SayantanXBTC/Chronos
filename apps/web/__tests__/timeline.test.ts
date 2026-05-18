@@ -64,6 +64,8 @@ describe('useTimelineStore', () => {
         source_name: null,
         importance: 9,
         entity_id: 'abc-123',
+        year_start: -27,
+        year_end: 476,
       },
     }
     useTimelineStore.getState().setSelectedEntity(fakeEntity)
@@ -86,6 +88,8 @@ describe('useTimelineStore', () => {
         source_name: null,
         importance: 9,
         entity_id: 'abc-123',
+        year_start: -27,
+        year_end: 476,
       },
     }
     useTimelineStore.setState({ selectedEntity: fakeEntity })

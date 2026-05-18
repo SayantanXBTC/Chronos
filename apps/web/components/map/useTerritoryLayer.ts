@@ -43,6 +43,7 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
       const cached = isWorldBbox ? snapshotCache.get(yr) : null
       if (cached) {
         mapRef.current?.updateTerritories(cached)
+        useTimelineStore.getState().setCurrentEntities(cached.features)
         return
       }
 
@@ -63,6 +64,7 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
         })
         if (isWorldBbox) snapshotCache.set(yr, data)
         mapRef.current?.updateTerritories(data)
+        useTimelineStore.getState().setCurrentEntities(data.features)
         if (isWorldBbox) preloadAdjacent(yr)
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {

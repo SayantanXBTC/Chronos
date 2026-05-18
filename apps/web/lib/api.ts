@@ -1,5 +1,5 @@
 // apps/web/lib/api.ts
-import type { WorldStateResponse, PlaceNamesResponse, RiversResponse, SourceItem } from '@/types'
+import type { WorldStateResponse, PlaceNamesResponse, RiversResponse, SourceItem, EntityDetail } from '@/types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -70,4 +70,11 @@ export async function fetchSources(): Promise<SourceItem[]> {
   const res = await fetch(`${API_BASE}/api/v1/sources`)
   if (!res.ok) throw new Error(`API error: ${res.status}`)
   return res.json() as Promise<SourceItem[]>
+}
+
+export async function fetchEntityDetail(slug: string): Promise<EntityDetail | null> {
+  const resp = await fetch(`${API_BASE}/api/v1/entities/${slug}`)
+  if (resp.status === 404) return null
+  if (!resp.ok) throw new Error(`fetchEntityDetail: ${resp.status}`)
+  return resp.json() as Promise<EntityDetail>
 }

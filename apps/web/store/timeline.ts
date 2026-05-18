@@ -17,11 +17,13 @@ const DEFAULT_VIEWPORT: Viewport = {
 interface TimelineState {
   year: number
   selectedEntity: EntityFeature | null
+  currentEntities: EntityFeature[]
   isLoading: boolean
   error: string | null
   viewport: Viewport
   setYear: (year: number) => void
   setSelectedEntity: (entity: EntityFeature | null) => void
+  setCurrentEntities: (entities: EntityFeature[]) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   setViewport: (viewport: Viewport) => void
@@ -30,11 +32,13 @@ interface TimelineState {
 export const useTimelineStore = create<TimelineState>((set) => ({
   year: -264,
   selectedEntity: null,
+  currentEntities: [],
   isLoading: false,
   error: null,
   viewport: DEFAULT_VIEWPORT,
   setYear: (year) => set({ year }),
   setSelectedEntity: (selectedEntity) => set({ selectedEntity }),
+  setCurrentEntities: (currentEntities) => set({ currentEntities }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
   setViewport: (viewport) => set({ viewport }),

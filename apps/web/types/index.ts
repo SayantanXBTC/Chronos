@@ -11,6 +11,32 @@ export interface EntityProperties {
   confidence_type: string
   source_name: string | null
   importance: number
+  year_start: number
+  year_end: number | null
+}
+
+export interface LineageEntry {
+  slug: string
+  name: string
+  relationship_type: string
+  year: number
+  notes: string | null
+}
+
+export interface EntityDetail {
+  slug: string
+  name: string
+  type: string
+  color: string
+  year_start: number
+  year_end: number | null
+  source_name: string | null
+  confidence_type: string
+  importance: number
+  lineage: {
+    predecessors: LineageEntry[]
+    successors: LineageEntry[]
+  }
 }
 
 export type EntityFeature = Feature<MultiPolygon, EntityProperties>
