@@ -37,7 +37,7 @@ def _make_conn(cursor_rows=None, rowcount=1):
 class TestLoadLineagesFromYaml:
     def test_load_lineages_from_yaml_parses_all_fields(self):
         lineages = load_lineages_from_yaml(_ALL_YAML)
-        assert len(lineages) == 6
+        assert len(lineages) == 8
         first = lineages[0]
         assert first["parent_slug"] == "roman-republic"
         assert first["child_slug"] == "roman-empire"
