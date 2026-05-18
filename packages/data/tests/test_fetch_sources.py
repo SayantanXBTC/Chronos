@@ -78,7 +78,7 @@ class TestFetchSource:
 
     def test_fetch_source_skips_null_url(self, tmp_path):
         """Test 3: raises ValueError when url is null."""
-        from packages.data.fetch_sources import fetch_source
+        from data.fetch_sources import fetch_source
 
         with pytest.raises(ValueError, match="manual download required"):
             fetch_source(
@@ -89,7 +89,7 @@ class TestFetchSource:
 
     def test_fetch_source_unknown_id_raises(self, tmp_path):
         """Test 7: fetch_source('nonexistent', ...) raises ValueError."""
-        from packages.data.fetch_sources import fetch_source
+        from data.fetch_sources import fetch_source
 
         with pytest.raises(ValueError, match="nonexistent"):
             fetch_source(
@@ -100,7 +100,7 @@ class TestFetchSource:
 
     def test_fetch_source_skip_if_already_downloaded(self, tmp_path):
         """Test 4: file exists + sha256 is null in registry → no HTTP call made."""
-        from packages.data.fetch_sources import fetch_source
+        from data.fetch_sources import fetch_source
 
         # Pre-create the target file so it looks already downloaded
         source_id = "cshapes-2.0"
@@ -121,7 +121,7 @@ class TestFetchSource:
 
     def test_sha256_mismatch_raises(self, tmp_path):
         """Test 5: file exists but sha256 mismatch → raises ValueError."""
-        from packages.data.fetch_sources import fetch_source
+        from data.fetch_sources import fetch_source
 
         # Build a custom registry entry with a known sha256 that won't match
         fake_sha = "a" * 64  # wrong hash
@@ -152,7 +152,7 @@ class TestFetchSource:
         # Confirm our fake_sha is actually different
         assert fake_sha != real_sha
 
-        import packages.data.fetch_sources as fs_mod
+        import data.fetch_sources as fs_mod
 
         with patch.object(fs_mod, "_load_registry", return_value=[fake_entry]):
             with patch("urllib.request.urlretrieve") as mock_retrieve:
@@ -166,7 +166,7 @@ class TestFetchSource:
 
     def test_fetch_source_downloads_and_extracts_zip(self, tmp_path):
         """Successful download of a .zip source is extracted and target_file returned."""
-        from packages.data.fetch_sources import fetch_source
+        from data.fetch_sources import fetch_source
 
         source_id = "cshapes-2.0"
         target_rel = "cshapes/cshapes_2.0.shp"
@@ -191,7 +191,7 @@ class TestFetchSource:
             "notes": "",
         }
 
-        import packages.data.fetch_sources as fs_mod
+        import data.fetch_sources as fs_mod
 
         def fake_urlretrieve(url, dest, reporthook=None):
             # Copy our pre-built zip to the destination
@@ -221,7 +221,7 @@ class TestFetchAllSources:
 
     def test_fetch_all_skips_null_url_sources(self, tmp_path):
         """Test 6: fetch_all skips sources with url=null (awmc-barrington), no error."""
-        from packages.data.fetch_sources import fetch_all_sources
+        from data.fetch_sources import fetch_all_sources
 
         # Create fake entries: one with url, one without
         fake_entries = [
@@ -239,7 +239,7 @@ class TestFetchAllSources:
             },
         ]
 
-        import packages.data.fetch_sources as fs_mod
+        import data.fetch_sources as fs_mod
 
         with patch.object(fs_mod, "_load_registry", return_value=fake_entries):
             # Should not raise — null-url sources are skipped
@@ -252,7 +252,7 @@ class TestFetchAllSources:
 
     def test_fetch_all_returns_paths_for_url_sources(self, tmp_path):
         """fetch_all returns Path objects for sources with URLs that succeed."""
-        from packages.data.fetch_sources import fetch_all_sources
+        from data.fetch_sources import fetch_all_sources
 
         source_id = "natural-earth-physical"
         target_rel = "ne_10m_rivers_lake_centerlines/ne_10m_rivers_lake_centerlines.shp"
@@ -277,7 +277,7 @@ class TestFetchAllSources:
             },
         ]
 
-        import packages.data.fetch_sources as fs_mod
+        import data.fetch_sources as fs_mod
 
         def fake_urlretrieve(url, dest, reporthook=None):
             Path(dest).write_bytes(zip_bytes)

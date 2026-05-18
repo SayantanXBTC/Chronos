@@ -1,0 +1,29 @@
+slug: byzantine-empire
+name: Byzantine Empire
+type: empire
+color: "#6c3483"
+year_start: 330
+year_end: 1453
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 100
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: byzantine-empire/phase-1.geojson
+    year_start: 330
+    year_end: 610
+    confidence: approximate
+    confidence_score: 0.6
+  - geometry: byzantine-empire/phase-2.geojson
+    year_start: 610
+    year_end: 1071
+    confidence: approximate
+    confidence_score: 0.6
+  - geometry: byzantine-empire/phase-3.geojson
+    year_start: 1071
+    year_end: 1453
+    confidence: approximate
+    confidence_score: 0.5

@@ -1,0 +1,24 @@
+slug: mongol-empire
+name: Mongol Empire
+type: nomadic_empire
+color: "#7d6608"
+year_start: 1206
+year_end: 1368
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: mongol-empire/phase-1.geojson
+    year_start: 1206
+    year_end: 1260
+    confidence: approximate
+    confidence_score: 0.6
+  - geometry: mongol-empire/phase-2.geojson
+    year_start: 1260
+    year_end: 1368
+    confidence: approximate
+    confidence_score: 0.6

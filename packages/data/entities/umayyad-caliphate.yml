@@ -1,0 +1,19 @@
+slug: umayyad-caliphate
+name: Umayyad Caliphate
+type: caliphate
+color: "#117a65"
+year_start: 661
+year_end: 750
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: umayyad-caliphate/phase-1.geojson
+    year_start: 661
+    year_end: 750
+    confidence: approximate
+    confidence_score: 0.6

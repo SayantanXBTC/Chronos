@@ -1,0 +1,24 @@
+slug: abbasid-caliphate
+name: Abbasid Caliphate
+type: caliphate
+color: "#1e8449"
+year_start: 750
+year_end: 1258
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 100
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: abbasid-caliphate/phase-1.geojson
+    year_start: 750
+    year_end: 900
+    confidence: approximate
+    confidence_score: 0.6
+  - geometry: abbasid-caliphate/phase-2.geojson
+    year_start: 900
+    year_end: 1258
+    confidence: approximate
+    confidence_score: 0.5

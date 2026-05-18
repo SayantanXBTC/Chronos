@@ -1,0 +1,29 @@
+slug: ottoman-empire
+name: Ottoman Empire
+type: sultanate
+color: "#922b21"
+year_start: 1299
+year_end: 1922
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 100
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: ottoman-empire/phase-1.geojson
+    year_start: 1299
+    year_end: 1453
+    confidence: approximate
+    confidence_score: 0.65
+  - geometry: ottoman-empire/phase-2.geojson
+    year_start: 1453
+    year_end: 1683
+    confidence: approximate
+    confidence_score: 0.7
+  - geometry: ottoman-empire/phase-3.geojson
+    year_start: 1683
+    year_end: 1922
+    confidence: approximate
+    confidence_score: 0.7
