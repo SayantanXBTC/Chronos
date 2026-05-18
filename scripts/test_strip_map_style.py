@@ -1,41 +1,37 @@
 import json
-import subprocess
 import sys
 from pathlib import Path
 
 STYLE_PATH = Path("apps/web/public/map-style/historical.json")
-MODERN_LAYER_PREFIXES = [
-    "road_", "tunnel_", "bridge_", "building",
-    "poi_", "airport", "highway-name", "highway-shield",
-    "road_shield", "road_one_way",
-    "aeroway_", "landuse_residential", "landuse_pitch",
-    "landuse_track", "landuse_cemetery", "landuse_hospital",
-    "landuse_school",
-]
 
-def test_no_modern_layers():
-    style = json.loads(STYLE_PATH.read_text())
-    layer_ids = [l["id"] for l in style["layers"]]
-    violations = [lid for lid in layer_ids
-                  if any(lid.startswith(p) or lid == p.rstrip("_") for p in MODERN_LAYER_PREFIXES)]
-    assert not violations, f"Modern layers still present: {violations}"
+KEEP_LAYERS = {
+    "background", "natural_earth",
+    "park", "park_outline",
+    "landcover_wood", "landcover_grass", "landcover_ice",
+    "landcover_wetland", "landcover_sand",
+    "waterway_tunnel", "waterway_river", "waterway_other",
+    "water",
+}
 
-def test_water_color_muted():
+def test_exact_layer_set():
     style = json.loads(STYLE_PATH.read_text())
-    water = next(l for l in style["layers"] if l["id"] == "water")
-    assert water["paint"]["fill-color"] == "#6e9ab5"
+    actual = {l["id"] for l in style["layers"]}
+    assert actual == KEEP_LAYERS, f"Unexpected: {actual - KEEP_LAYERS}, missing: {KEEP_LAYERS - actual}"
 
-def test_background_parchment():
-    style = json.loads(STYLE_PATH.read_text())
-    bg = next(l for l in style["layers"] if l["id"] == "background")
-    assert bg["paint"]["background-color"] == "#cfc4a8"
+COLOR_OVERRIDES_EXPECTED = {
+    "background":    ("background-color", "#cfc4a8"),
+    "water":         ("fill-color",       "#6e9ab5"),
+    "waterway_river": ("line-color",      "#5d8fa8"),
+    "waterway_other": ("line-color",      "#5d8fa8"),
+    "waterway_tunnel": ("line-color",     "#5d8fa8"),
+}
 
-def test_essential_layers_present():
+def test_all_color_overrides():
     style = json.loads(STYLE_PATH.read_text())
-    layer_ids = {l["id"] for l in style["layers"]}
-    required = {"background", "water", "waterway_river", "natural_earth", "landcover_wood"}
-    missing = required - layer_ids
-    assert not missing, f"Required layers missing: {missing}"
+    layers_by_id = {l["id"]: l for l in style["layers"]}
+    for layer_id, (prop, expected_val) in COLOR_OVERRIDES_EXPECTED.items():
+        actual = layers_by_id[layer_id]["paint"][prop]
+        assert actual == expected_val, f"{layer_id}.{prop}: expected {expected_val}, got {actual}"
 
 if __name__ == "__main__":
     failures = []
