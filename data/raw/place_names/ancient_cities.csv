@@ -1,0 +1,51 @@
+name,name_modern,type,lon,lat,year_start,year_end,importance,label_priority,min_zoom,source_name
+Rome,Rome,city,12.4964,41.9028,-753,2026,10,10,2,Ancient World Mapping Center
+Constantinople,Istanbul,city,28.9784,41.0082,330,1453,10,10,2,Ancient World Mapping Center
+Alexandria,Alexandria,city,29.9187,31.2001,-331,2026,10,9,2,Ancient World Mapping Center
+Athens,Athens,city,23.7275,37.9838,-500,2026,9,9,2,Ancient World Mapping Center
+Carthage,,city,10.3233,36.8625,-814,-146,9,9,2,Ancient World Mapping Center
+Jerusalem,Jerusalem,city,35.2137,31.7683,-1000,2026,9,9,2,Ancient World Mapping Center
+Babylon,,city,44.4275,32.5364,-2300,-539,9,9,2,Ancient World Mapping Center
+Persepolis,,city,52.8907,29.9345,-518,-330,8,8,3,Ancient World Mapping Center
+Antioch,Antakya,city,36.1633,36.2021,-300,1268,8,8,3,Ancient World Mapping Center
+Corinth,,city,22.9292,37.0755,-800,-146,7,7,3,Ancient World Mapping Center
+Syracuse,,city,15.2870,37.0775,-734,2026,7,7,3,Ancient World Mapping Center
+Memphis,,city,31.2519,29.8500,-3100,-640,8,8,3,Ancient World Mapping Center
+Nineveh,,city,43.1549,36.3591,-800,-612,8,8,3,Ancient World Mapping Center
+Sparta,,city,22.4291,37.0758,-800,-146,7,7,3,Ancient World Mapping Center
+Thebes,Luxor,city,32.6549,25.6872,-2000,-30,8,8,3,Ancient World Mapping Center
+Miletus,,city,27.2741,37.5326,-600,-263,6,6,4,Ancient World Mapping Center
+Sardis,,city,28.0468,38.4839,-700,-133,6,6,4,Ancient World Mapping Center
+Ephesus,,city,27.3412,37.9395,-600,263,7,7,3,Ancient World Mapping Center
+Pergamon,,city,27.1842,39.1328,-283,1453,6,6,4,Ancient World Mapping Center
+Tyre,Sur,city,35.2037,33.2705,-1000,1453,7,7,3,Ancient World Mapping Center
+Sidon,Saida,city,35.3680,33.5566,-1000,1453,6,6,4,Ancient World Mapping Center
+Gaza,Gaza,city,34.4669,31.5009,-2000,2026,6,6,4,Ancient World Mapping Center
+Ctesiphon,,city,44.5802,33.0994,130,637,7,7,3,Ancient World Mapping Center
+Taxila,,city,72.8361,33.7463,-600,500,6,6,4,Ancient World Mapping Center
+Pataliputra,Patna,city,85.1376,25.5941,-350,550,7,7,3,Ancient World Mapping Center
+Cyrene,,city,21.8641,32.8248,-631,-96,6,6,4,Ancient World Mapping Center
+Massalia,Marseille,city,5.3698,43.2965,-600,2026,6,6,4,Ancient World Mapping Center
+Lugdunum,Lyon,city,4.8357,45.7640,-43,2026,6,6,4,Ancient World Mapping Center
+Londinium,London,city,-0.1276,51.5074,43,2026,7,7,3,Ancient World Mapping Center
+Aquileia,,city,13.3674,45.7757,-181,452,5,5,4,Ancient World Mapping Center
+Mediolanum,Milan,city,9.1900,45.4654,-222,2026,6,6,4,Ancient World Mapping Center
+Capua,,city,14.2130,41.1067,-424,-211,5,5,4,Ancient World Mapping Center
+Tarentum,Taranto,city,17.2413,40.4773,-706,2026,5,5,4,Ancient World Mapping Center
+Thessalonica,Thessaloniki,city,22.9444,40.6401,-316,2026,7,7,3,Ancient World Mapping Center
+Susa,,city,48.2585,32.2001,-4200,651,7,7,3,Ancient World Mapping Center
+Ecbatana,Hamadan,city,48.5142,34.7990,-700,2026,6,6,4,Ancient World Mapping Center
+Bactra,Balkh,city,66.8978,36.7548,-2500,2026,6,6,4,Ancient World Mapping Center
+Pasargadae,,city,53.1759,30.1926,-559,-330,6,6,4,Ancient World Mapping Center
+Hippo Regius,Annaba,city,7.7666,36.9000,-500,430,5,5,4,Ancient World Mapping Center
+Leptis Magna,,city,14.2965,32.6426,-600,700,5,5,4,Ancient World Mapping Center
+Tingis,Tangier,city,-5.7998,35.7595,-500,2026,5,5,4,Ancient World Mapping Center
+Colonia Claudia,Cologne,city,6.9603,50.9333,50,2026,6,6,4,Ancient World Mapping Center
+Augusta Treverorum,Trier,city,6.6455,49.7490,16,2026,5,5,4,Ancient World Mapping Center
+Carthago Nova,Cartagena,city,-0.9857,37.6057,-223,2026,5,5,4,Ancient World Mapping Center
+Gades,Cadiz,city,-6.2923,36.5298,-1100,2026,5,5,4,Ancient World Mapping Center
+Numantia,,city,-2.4497,41.8136,-150,-133,5,5,4,Ancient World Mapping Center
+Seleucia on Tigris,,city,44.5488,33.0861,-312,165,6,6,4,Ancient World Mapping Center
+Caesarea Maritima,,city,34.8858,32.5005,-22,638,5,5,4,Ancient World Mapping Center
+Dyrrachium,Durres,city,19.4436,41.3234,-627,2026,5,5,4,Ancient World Mapping Center
+Pella,,city,22.5231,40.7631,-400,-168,6,6,4,Ancient World Mapping Center
