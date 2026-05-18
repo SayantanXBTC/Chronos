@@ -1,0 +1,63 @@
+name: Data Validation
+
+on:
+  push:
+    paths:
+      - 'data/raw/**'
+      - 'packages/data/**'
+  pull_request:
+    paths:
+      - 'data/raw/**'
+      - 'packages/data/**'
+
+jobs:
+  validate:
+    name: Validate historical data files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install data pipeline dependencies
+        run: pip install -r packages/data/requirements.txt
+
+      - name: Run entity type audit
+        run: python -m data audit-types
+        working-directory: ${{ github.workspace }}
+
+      - name: Validate all GeoJSON phase files
+        run: python -m data validate --all
+        working-directory: ${{ github.workspace }}
+
+      - name: Validate place names CSV
+        run: python -m data validate --place-names
+        working-directory: ${{ github.workspace }}
+
+  unit-tests:
+    name: Data pipeline unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r packages/data/requirements.txt
+
+      - name: Run unit tests (no DB required)
+        run: |
+          python -m pytest packages/data/tests/ \
+            --ignore=packages/data/tests/test_ingest_m2.py \
+            -v --tb=short
+        working-directory: ${{ github.workspace }}
