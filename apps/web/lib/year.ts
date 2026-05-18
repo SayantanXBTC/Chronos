@@ -44,3 +44,32 @@ export function snapToSnapshot(year: number): number {
   }
   return result
 }
+
+export interface EraMark {
+  year: number
+  label: string
+}
+
+export const ERA_MARKERS: EraMark[] = [
+  { year: -3000, label: 'Ancient' },
+  { year: -500,  label: 'Classical' },
+  { year: 500,   label: 'Medieval' },
+  { year: 1500,  label: 'Early Modern' },
+  { year: 1800,  label: 'Modern' },
+]
+
+export function snapToPrevSnapshot(year: number): number {
+  const idx = SNAPSHOT_YEARS.indexOf(year)
+  if (idx <= 0) return SNAPSHOT_YEARS[0]
+  return SNAPSHOT_YEARS[idx - 1]
+}
+
+export function snapToNextSnapshot(year: number): number {
+  const idx = SNAPSHOT_YEARS.indexOf(year)
+  if (idx < 0) {
+    const above = SNAPSHOT_YEARS.find((y) => y > year)
+    return above ?? SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]
+  }
+  if (idx >= SNAPSHOT_YEARS.length - 1) return SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]
+  return SNAPSHOT_YEARS[idx + 1]
+}
