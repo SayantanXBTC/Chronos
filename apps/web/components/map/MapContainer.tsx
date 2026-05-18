@@ -20,6 +20,7 @@ export function MapContainer() {
   const mapRef = useRef<MapViewHandle | null>(null)
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
   const setViewport = useTimelineStore((s) => s.setViewport)
+  const selectedSlug = useTimelineStore((s) => s.selectedEntity?.properties.slug ?? null)
   const handleViewportChange = useCallback((v: Viewport) => setViewport(v), [setViewport])
 
   useTerritoryLayer(mapRef)
@@ -28,7 +29,12 @@ export function MapContainer() {
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
-      <MapView ref={mapRef} onEntitySelect={setSelectedEntity} onViewportChange={handleViewportChange} />
+      <MapView
+        ref={mapRef}
+        onEntitySelect={setSelectedEntity}
+        onViewportChange={handleViewportChange}
+        selectedSlug={selectedSlug}
+      />
       <LoadingOverlay />
       <EntityPanel />
       <TimelineSlider />

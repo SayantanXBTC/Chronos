@@ -4,6 +4,7 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
+import { yearToDisplay } from '@/lib/year'
 
 // Default to the locally stripped historical style; override via env var.
 const MAP_STYLE =
@@ -23,11 +24,15 @@ import type { Viewport } from '@/store/timeline'
 export interface MapViewProps {
   onEntitySelect: (entity: EntityFeature | null) => void
   onViewportChange?: (viewport: Viewport) => void
+  selectedSlug?: string | null
 }
 
-const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect, onViewportChange }, ref) => {
+const MapView = forwardRef<MapViewHandle, MapViewProps>(
+  ({ onEntitySelect, onViewportChange, selectedSlug }, ref) => {
   const onViewportChangeRef = useRef(onViewportChange)
   useEffect(() => { onViewportChangeRef.current = onViewportChange }, [onViewportChange])
+  const selectedSlugRef = useRef(selectedSlug)
+  useEffect(() => { selectedSlugRef.current = selectedSlug }, [selectedSlug])
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MaplibreMap | null>(null)
   const pendingDataRef = useRef<WorldStateResponse | null>(null)
@@ -216,6 +221,40 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect, onVie
         })
         if (!features.length) onEntitySelectRef.current(null)
       })
+
+      // Hover tooltip
+      const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 8,
+        className: 'history-tooltip',
+      })
+
+      map.on('mousemove', 'territories-fill', (e) => {
+        if (!e.features?.length) return
+        const props = e.features[0].properties as EntityProperties
+        const yearStart = props.year_start
+        const yearEnd = props.year_end
+        let dateStr = ''
+        try {
+          if (yearStart !== undefined && yearStart !== null) {
+            const endLabel = (yearEnd !== null && yearEnd !== undefined) ? yearToDisplay(yearEnd) : 'present'
+            dateStr = `${yearToDisplay(yearStart)} – ${endLabel}`
+          }
+        } catch {
+          // yearToDisplay throws on year 0; skip date display in that case
+        }
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div class="font-semibold">${props.name}</div>${dateStr ? `<div class="text-xs opacity-70 mt-0.5">${dateStr}</div>` : ''}`
+          )
+          .addTo(map)
+      })
+
+      map.on('mouseleave', 'territories-fill', () => {
+        popup.remove()
+      })
     })
 
     mapRef.current = map
@@ -225,6 +264,31 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect, onVie
       mapRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.isStyleLoaded()) return
+
+    if (selectedSlug) {
+      map.setPaintProperty('territories-fill', 'fill-opacity', [
+        'case',
+        ['==', ['get', 'slug'], selectedSlug], 0.78,
+        0.12,
+      ])
+      map.setPaintProperty('territories-border', 'line-opacity', [
+        'case',
+        ['==', ['get', 'slug'], selectedSlug], 1.0,
+        0.2,
+      ])
+    } else {
+      map.setPaintProperty('territories-fill', 'fill-opacity', [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false], 0.65,
+        0.4,
+      ])
+      map.setPaintProperty('territories-border', 'line-opacity', 0.9)
+    }
+  }, [selectedSlug])
 
   return <div ref={containerRef} className="w-full h-full" />
 })
