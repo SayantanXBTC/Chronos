@@ -32,9 +32,11 @@ async def test_place_names_feature_shape():
         {
             "name": "Rome",
             "name_modern": "Rome",
+            "name_local": None,
             "type": "city",
             "importance": 10,
             "label_priority": 10,
+            "date_precision": "approximate",
             "geometry": {"type": "Point", "coordinates": [12.5, 41.9]},
         }
     ]

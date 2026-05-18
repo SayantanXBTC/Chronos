@@ -22,9 +22,9 @@ async def get_stats(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     """))
     row = rows.mappings().one()
     regions = await db.execute(text("""
-        SELECT DISTINCT region FROM region_coverage ORDER BY region
+        SELECT DISTINCT region_name FROM region_coverage ORDER BY region_name
     """))
-    region_list = [r["region"] for r in regions.mappings().all()]
+    region_list = [r["region_name"] for r in regions.mappings().all()]
     return {
         "entities": row["entities"],
         "territories": row["territories"],
@@ -73,9 +73,9 @@ async def get_geometry_stats(
 async def get_coverage(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     """Return region_coverage table as JSON."""
     rows = await db.execute(text("""
-        SELECT region, entity_count, earliest_year, latest_year, notes
+        SELECT region_name, year_start, year_end, completeness, entity_count, primary_source, notes
         FROM region_coverage
-        ORDER BY region
+        ORDER BY region_name
     """))
     records = [dict(r) for r in rows.mappings().all()]
     return {"regions": records}
