@@ -16,12 +16,15 @@ _ENTITY_DETAIL_SQL = text("""
         MAX(t.confidence_type)  AS confidence_type,
         MAX(COALESCE(t.importance, 5)) AS importance
     FROM entities e
-    JOIN entity_names en ON en.entity_id = e.id AND en.is_primary = true
+    JOIN (
+        SELECT DISTINCT ON (entity_id) entity_id, name
+        FROM entity_names
+        WHERE is_primary = true
+        ORDER BY entity_id, year_start DESC
+    ) en ON en.entity_id = e.id
     JOIN territories t ON t.entity_id = e.id
     WHERE e.slug = :slug
     GROUP BY e.id, e.slug, e.type, e.color, en.name
-    ORDER BY en.year_start DESC
-    LIMIT 1
 """)
 
 _PREDECESSORS_SQL = text("""
@@ -39,7 +42,7 @@ _PREDECESSORS_SQL = text("""
         WHERE is_primary = true
         ORDER BY entity_id, year_start DESC
     ) pen ON pen.entity_id = pe.id
-    WHERE el.child_entity_id = :entity_id
+    WHERE el.child_entity_id = :entity_id::uuid
     ORDER BY el.year
 """)
 
@@ -58,7 +61,7 @@ _SUCCESSORS_SQL = text("""
         WHERE is_primary = true
         ORDER BY entity_id, year_start DESC
     ) cen ON cen.entity_id = ce.id
-    WHERE el.parent_entity_id = :entity_id
+    WHERE el.parent_entity_id = :entity_id::uuid
     ORDER BY el.year
 """)
 
