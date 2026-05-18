@@ -1,0 +1,26 @@
+lineages:
+  - parent: roman-republic
+    child: roman-empire
+    relationship: evolved_into
+    year: -27
+    notes: "Transition from Republic to Principate under Augustus"
+  - parent: roman-empire
+    child: western-roman-empire
+    relationship: split_from
+    year: 285
+  - parent: roman-empire
+    child: eastern-roman-empire
+    relationship: continuation
+    year: 285
+  - parent: eastern-roman-empire
+    child: byzantine-empire
+    relationship: continuation
+    year: 330
+  - parent: umayyad-caliphate
+    child: abbasid-caliphate
+    relationship: successor
+    year: 750
+  - parent: mongol-empire
+    child: yuan-dynasty
+    relationship: split_from
+    year: 1271

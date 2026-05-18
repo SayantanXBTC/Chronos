@@ -6,6 +6,58 @@ import sys
 from .ingest import run
 
 
+def _cmd_lineage_declare(args) -> None:
+    from pathlib import Path
+    from .lineage_loader import load_lineages_from_yaml, upsert_lineages
+    yaml_path = Path(args.declare)
+    if not yaml_path.exists():
+        print(f"Error: file not found: {yaml_path}", file=sys.stderr)
+        sys.exit(1)
+    lineages = load_lineages_from_yaml(yaml_path)
+    conn = _get_db_conn()
+    try:
+        count = upsert_lineages(conn, lineages)
+        conn.commit()
+    finally:
+        conn.close()
+    print(f"Lineages inserted: {count}")
+
+
+def _cmd_lineage_show(args) -> None:
+    slug = args.show
+    conn = _get_db_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    p.slug  AS parent_slug,
+                    c.slug  AS child_slug,
+                    el.relationship_type,
+                    el.year,
+                    el.notes
+                FROM entity_lineages el
+                JOIN entities p ON p.id = el.parent_entity_id
+                JOIN entities c ON c.id = el.child_entity_id
+                WHERE p.slug = %s OR c.slug = %s
+                ORDER BY el.year
+                """,
+                (slug, slug),
+            )
+            rows = cur.fetchall()
+    finally:
+        conn.close()
+    if not rows:
+        print(f"No lineage relationships found for '{slug}'.")
+        return
+    for row in rows:
+        parent, child, rel, year, notes = row
+        line = f"  {parent} --[{rel}]--> {child}  (year {year})"
+        if notes:
+            line += f"  | {notes}"
+        print(line)
+
+
 def _get_db_conn():
     """Read DATABASE_URL from env and return a psycopg2 connection."""
     db_url = os.environ.get("DATABASE_URL")
@@ -91,6 +143,19 @@ def main() -> None:
         "--dry-run",
         action="store_true",
         help="Validate configs and GeoJSON files without writing to DB",
+    )
+    # M3-E scaffold: source-based ingest (not yet implemented)
+    ingest_parser.add_argument(
+        "--source",
+        metavar="ID",
+        default=None,
+        help="[M3-E scaffold] Ingest from an external source by ID (not yet implemented)",
+    )
+    ingest_parser.add_argument(
+        "--all-sources",
+        action="store_true",
+        dest="all_sources",
+        help="[M3-E scaffold] Ingest from all external sources (not yet implemented)",
     )
 
     # --- audit-types subcommand ---
@@ -215,6 +280,23 @@ def main() -> None:
         help="Find entities with temporal gaps between consecutive phases",
     )
 
+    # --- lineage subcommand ---
+    lineage_parser = subparsers.add_parser(
+        "lineage",
+        help="Manage entity lineage relationships (requires DATABASE_URL)",
+    )
+    lineage_excl = lineage_parser.add_mutually_exclusive_group(required=True)
+    lineage_excl.add_argument(
+        "--declare",
+        metavar="YAML_PATH",
+        help="Load lineages from a YAML file and upsert into the DB",
+    )
+    lineage_excl.add_argument(
+        "--show",
+        metavar="SLUG",
+        help="Print all lineage relationships for the given entity slug",
+    )
+
     # Also keep top-level --entity / --dry-run for backwards compatibility
     # (when no subcommand is given).
     parser.add_argument("--entity", help="Ingest only this entity slug")
@@ -230,6 +312,12 @@ def main() -> None:
         from .audit_entity_types import run_audit
         sys.exit(run_audit())
     elif args.command == "ingest":
+        if getattr(args, "source", None):
+            print("Source ingest not yet implemented. Use --entity for YAML-based ingest.")
+            sys.exit(0)
+        if getattr(args, "all_sources", False):
+            print("Source ingest not yet implemented. Use --entity for YAML-based ingest.")
+            sys.exit(0)
         run(entity_filter=args.entity, dry_run=args.dry_run)
     elif args.command == "stats":
         _cmd_stats(args)
@@ -324,6 +412,14 @@ def main() -> None:
         finally:
             conn.close()
         sys.exit(exit_code)
+    elif args.command == "lineage":
+        if args.declare:
+            _cmd_lineage_declare(args)
+        elif args.show:
+            _cmd_lineage_show(args)
+        else:
+            lineage_parser.print_help()
+            sys.exit(1)
     else:
         # No subcommand — fall back to ingest (legacy behaviour)
         run(entity_filter=args.entity, dry_run=args.dry_run)

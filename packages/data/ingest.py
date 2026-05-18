@@ -32,7 +32,18 @@ def _load_configs(entity_filter: str | None) -> list[dict[str, Any]]:
 
 
 def _load_geojson(relative_path: str) -> dict[str, Any]:
+    # 1. Try the direct path first (existing behaviour)
     full_path = DATA_DIR / relative_path
+    if full_path.exists():
+        with open(full_path) as f:
+            return json.load(f)
+    # 2. Recursive glob — supports regional subdirectories such as
+    #    data/raw/political/mediterranean/roman-empire/phase-1.geojson
+    matches = list(DATA_DIR.glob(f"**/{relative_path}"))
+    if matches:
+        with open(matches[0]) as f:
+            return json.load(f)
+    # 3. Fall back to the original path so the original FileNotFoundError is raised
     with open(full_path) as f:
         return json.load(f)
 
