@@ -18,6 +18,8 @@ export function SearchBar() {
         .filter((f) => f.properties.name.toLowerCase().includes(trimmed))
         .slice(0, 10)
 
+  const showDropdown = open && trimmed.length > 0
+
   function select(entity: EntityFeature) {
     setSelectedEntity(entity)
     setQuery('')
@@ -39,28 +41,43 @@ export function SearchBar() {
       <input
         type="search"
         value={query}
-        onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
-        onFocus={() => setOpen(true)}
+        onChange={(e) => {
+          const val = e.target.value
+          setQuery(val)
+          setOpen(val.trim().length > 0)
+        }}
+        onFocus={() => { if (trimmed.length > 0) setOpen(true) }}
+        onBlur={(e) => {
+          if (!containerRef.current?.contains(e.relatedTarget as Node)) {
+            setOpen(false)
+          }
+        }}
         placeholder="Search civilizations…"
         className="w-full bg-black/70 backdrop-blur-md text-white placeholder-white/30 rounded-lg px-3 py-2 text-sm border border-white/10 outline-none focus:border-amber-400/50 transition-colors"
         aria-label="Search civilizations"
-        aria-expanded={open && results.length > 0}
+        aria-expanded={open}
         aria-haspopup="listbox"
         role="combobox"
         autoComplete="off"
       />
-      {open && results.length > 0 && (
+      {showDropdown && (
         <ul
           className="mt-1 bg-black/90 backdrop-blur-md rounded-lg border border-white/10 shadow-2xl overflow-hidden"
           role="listbox"
           aria-label="Search results"
         >
-          {results.map((entity) => (
-            <li key={entity.properties.slug}>
-              <button
-                onClick={() => select(entity)}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors text-left"
+          {results.length === 0 ? (
+            <li className="px-3 py-2 text-sm text-white/40 italic">No matches</li>
+          ) : (
+            results.map((entity) => (
+              <li
+                key={entity.properties.slug}
                 role="option"
+                aria-selected={false}
+                tabIndex={0}
+                onClick={() => select(entity)}
+                onKeyDown={(e) => { if (e.key === 'Enter') select(entity) }}
+                className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <div
                   className="w-3 h-3 rounded-sm flex-shrink-0"
@@ -71,9 +88,9 @@ export function SearchBar() {
                 <span className="text-white/30 text-xs flex-shrink-0 capitalize ml-auto">
                   {entity.properties.type}
                 </span>
-              </button>
-            </li>
-          ))}
+              </li>
+            ))
+          )}
         </ul>
       )}
     </div>
