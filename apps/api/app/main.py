@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from app.config import settings
-from app.routers import entities, events, place_names, rivers, sources, world
+from app.routers import admin, entities, events, place_names, rivers, sources, world
 
 
 @asynccontextmanager
@@ -34,6 +34,7 @@ app.include_router(events.router, prefix="/api/v1/events", tags=["events"])
 app.include_router(place_names.router, prefix="/api/v1/place-names", tags=["place-names"])
 app.include_router(rivers.router, prefix="/api/v1/rivers", tags=["rivers"])
 app.include_router(sources.router, prefix="/api/v1/sources", tags=["sources"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 
 
 @app.get("/health")

@@ -2,8 +2,6 @@
 import csv
 import uuid
 from pathlib import Path
-from typing import Any
-
 import psycopg2.extensions
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
@@ -29,22 +27,26 @@ def load_place_names(conn: psycopg2.extensions.connection, csv_path: Path | None
                     importance = int(row.get("importance", 5))
                     label_priority = int(row.get("label_priority", importance))
                     min_zoom = int(row.get("min_zoom", 3))
+                    name_local = row.get("name_local") or None
+                    date_precision = row.get("date_precision") or "approximate"
                     cur.execute(
                         """
                         INSERT INTO place_names
-                            (id, name, name_modern, type, geom,
+                            (id, name, name_modern, name_local, type, geom,
                              year_start, year_end, min_zoom,
-                             source_name, importance, label_priority, map_modes)
+                             source_name, importance, label_priority,
+                             date_precision, map_modes)
                         VALUES (
-                            %s::uuid, %s, %s, %s,
+                            %s::uuid, %s, %s, %s, %s,
                             ST_SetSRID(ST_MakePoint(%s, %s), 4326),
-                            %s, %s, %s, %s, %s, %s, %s
+                            %s, %s, %s, %s, %s, %s, %s, %s
                         )
                         """,
                         (
                             str(uuid.uuid4()),
                             row["name"],
                             row.get("name_modern") or None,
+                            name_local,
                             row.get("type", "city"),
                             lon,
                             lat,
@@ -54,6 +56,7 @@ def load_place_names(conn: psycopg2.extensions.connection, csv_path: Path | None
                             row.get("source_name", "Ancient World Mapping Center"),
                             importance,
                             label_priority,
+                            date_precision,
                             ["political"],
                         ),
                     )

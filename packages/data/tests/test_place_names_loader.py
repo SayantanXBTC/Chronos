@@ -19,10 +19,11 @@ def _make_conn():
 
 def _write_csv(tmp_path: Path, rows: list[dict]) -> Path:
     fields = ["name", "name_modern", "type", "lon", "lat",
-              "year_start", "year_end", "importance", "label_priority", "min_zoom", "source_name"]
+              "year_start", "year_end", "importance", "label_priority",
+              "min_zoom", "source_name", "name_local", "date_precision"]
     p = tmp_path / "cities.csv"
     with open(p, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fields)
+        writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
@@ -96,18 +97,13 @@ def test_load_place_names_raises_if_file_missing(tmp_path):
 
 def test_load_place_names_skips_bad_rows(tmp_path):
     """Row with non-numeric lon is skipped; valid rows still load."""
-    fields = ["name", "name_modern", "type", "lon", "lat",
-              "year_start", "year_end", "importance", "label_priority", "min_zoom", "source_name"]
     p = tmp_path / "cities.csv"
-    with open(p, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fields)
-        writer.writeheader()
-        writer.writerow({"name": "Rome", "name_modern": "Rome", "type": "city",
-                         "lon": "12.5", "lat": "41.9", "year_start": "-753", "year_end": "",
-                         "importance": "10", "label_priority": "10", "min_zoom": "2", "source_name": "AWMC"})
-        writer.writerow({"name": "Bad", "name_modern": "", "type": "city",
-                         "lon": "NOT_A_NUMBER", "lat": "0", "year_start": "-100", "year_end": "",
-                         "importance": "5", "label_priority": "5", "min_zoom": "3", "source_name": "test"})
+    p.write_text(
+        "name,name_modern,type,lon,lat,year_start,year_end,importance,label_priority,min_zoom,source_name,name_local,date_precision\n"
+        "Rome,Rome,city,12.5,41.9,-753,,10,10,2,AWMC,,approximate\n"
+        "Bad,,city,NOT_A_NUMBER,0,-100,,5,5,3,test,,approximate\n",
+        encoding="utf-8",
+    )
 
     conn, _ = _make_conn()
     result = load_place_names(conn, csv_path=p)
@@ -129,5 +125,5 @@ def test_load_place_names_null_year_end(tmp_path):
         c[0][1] for c in cursor.execute.call_args_list
         if "INSERT INTO place_names" in c[0][0]
     )
-    # year_end param (index 7) should be None
-    assert insert_params[7] is None
+    # year_end param (index 8, after name_local added) should be None
+    assert insert_params[8] is None
