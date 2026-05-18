@@ -1,0 +1,21 @@
+slug: aztec-empire
+name: Aztec Empire
+type: empire
+color: "#27ae60"
+year_start: 1428
+year_end: 1521
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: aztec-empire/phase-1.geojson
+    year_start: 1428
+    year_end: 1521
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+    end_event_type: conquest

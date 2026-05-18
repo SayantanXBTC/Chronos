@@ -1,0 +1,28 @@
+slug: mughal-empire
+name: Mughal Empire
+type: empire
+color: "#16a085"
+year_start: 1526
+year_end: 1857
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: mughal-empire/phase-1.geojson
+    year_start: 1526
+    year_end: 1605
+    confidence: approximate
+    confidence_score: 0.6
+    date_precision: approximate
+    end_event_type: internal_change
+  - geometry: mughal-empire/phase-2.geojson
+    year_start: 1605
+    year_end: 1707
+    confidence: approximate
+    confidence_score: 0.6
+    date_precision: approximate
+    end_event_type: internal_change

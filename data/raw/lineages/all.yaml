@@ -39,3 +39,13 @@ lineages:
     relationship: successor
     year: -206
     notes: "Han founded after Qin collapse; Liu Bang established Western Han"
+  - parent: achaemenid-persia
+    child: sasanian-empire
+    relationship: revival
+    year: 224
+    notes: "Ardashir I revived Persian imperial tradition after Parthian interregnum"
+  - parent: mali-empire
+    child: songhai-empire
+    relationship: successor
+    year: 1464
+    notes: "Songhai under Sunni Ali expanded from vassal state to replace declining Mali"

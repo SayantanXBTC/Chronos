@@ -1,0 +1,28 @@
+slug: sasanian-empire
+name: Sasanian Empire
+type: empire
+color: "#8e44ad"
+year_start: 224
+year_end: 651
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: sasanian-empire/phase-1.geojson
+    year_start: 224
+    year_end: 400
+    confidence: approximate
+    confidence_score: 0.6
+    date_precision: approximate
+    end_event_type: internal_change
+  - geometry: sasanian-empire/phase-2.geojson
+    year_start: 400
+    year_end: 651
+    confidence: approximate
+    confidence_score: 0.6
+    date_precision: approximate
+    end_event_type: conquest
