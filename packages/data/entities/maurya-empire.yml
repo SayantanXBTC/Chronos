@@ -1,0 +1,24 @@
+slug: maurya-empire
+name: Maurya Empire
+type: empire
+color: "#f39c12"
+year_start: -322
+year_end: -185
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: maurya-empire/phase-1.geojson
+    year_start: -322
+    year_end: -268
+    confidence: approximate
+    confidence_score: 0.5
+  - geometry: maurya-empire/phase-2.geojson
+    year_start: -268
+    year_end: -185
+    confidence: approximate
+    confidence_score: 0.6

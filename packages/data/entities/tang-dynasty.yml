@@ -1,0 +1,24 @@
+slug: tang-dynasty
+name: Tang Dynasty
+type: dynasty
+color: "#c0392b"
+year_start: 618
+year_end: 907
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: tang-dynasty/phase-1.geojson
+    year_start: 618
+    year_end: 755
+    confidence: approximate
+    confidence_score: 0.6
+  - geometry: tang-dynasty/phase-2.geojson
+    year_start: 755
+    year_end: 907
+    confidence: approximate
+    confidence_score: 0.6

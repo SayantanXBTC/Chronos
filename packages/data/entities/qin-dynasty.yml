@@ -1,0 +1,19 @@
+slug: qin-dynasty
+name: Qin Dynasty
+type: empire
+color: "#2c3e50"
+year_start: -221
+year_end: -206
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: qin-dynasty/phase-1.geojson
+    year_start: -221
+    year_end: -206
+    confidence: approximate
+    confidence_score: 0.6

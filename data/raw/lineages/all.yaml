@@ -34,3 +34,8 @@ lineages:
     relationship: split_from
     year: -305
     notes: "Ptolemy I founded Ptolemaic Kingdom after diadochi wars"
+  - parent: qin-dynasty
+    child: han-dynasty
+    relationship: successor
+    year: -206
+    notes: "Han founded after Qin collapse; Liu Bang established Western Han"

@@ -1,0 +1,24 @@
+slug: gupta-empire
+name: Gupta Empire
+type: empire
+color: "#e67e22"
+year_start: 320
+year_end: 550
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: gupta-empire/phase-1.geojson
+    year_start: 320
+    year_end: 415
+    confidence: approximate
+    confidence_score: 0.5
+  - geometry: gupta-empire/phase-2.geojson
+    year_start: 415
+    year_end: 550
+    confidence: approximate
+    confidence_score: 0.5

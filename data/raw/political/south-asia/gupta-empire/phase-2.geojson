@@ -1,0 +1,61 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [
+            74.0,
+            30.5
+          ],
+          [
+            80.0,
+            30.5
+          ],
+          [
+            84.5,
+            27.5
+          ],
+          [
+            88.0,
+            26.0
+          ],
+          [
+            88.0,
+            22.0
+          ],
+          [
+            84.0,
+            22.0
+          ],
+          [
+            80.0,
+            24.0
+          ],
+          [
+            76.0,
+            26.0
+          ],
+          [
+            74.0,
+            28.0
+          ],
+          [
+            74.0,
+            30.5
+          ]
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "year_start": 415,
+    "year_end": 550,
+    "date_precision": "approximate",
+    "confidence_type": "approximate",
+    "end_event_type": "collapse",
+    "source_name": "Manual trace \u2014 approximate historical boundaries",
+    "source_license": "CC0"
+  }
+}
