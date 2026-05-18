@@ -21,16 +21,23 @@ describe('yearToDisplay', () => {
   it('500 is 500 CE', () => { expect(yearToDisplay(500)).toBe('500 CE') })
 })
 
+// Slider range: 0–5025 → years -3000 to 2026 (skipping 0)
+// Positions 0–2999: BCE years (-3000 to -1)
+// Positions 3000–5025: CE years (1 to 2026)
 describe('sliderToYear / yearToSlider roundtrip', () => {
-  it('slider 0 → year -500', () => { expect(sliderToYear(0)).toBe(-500) })
-  it('slider 499 → year -1', () => { expect(sliderToYear(499)).toBe(-1) })
-  it('slider 500 → year 1', () => { expect(sliderToYear(500)).toBe(1) })
-  it('slider 999 → year 500', () => { expect(sliderToYear(999)).toBe(500) })
-  it('year -500 roundtrips', () => { expect(sliderToYear(yearToSlider(-500))).toBe(-500) })
+  it('slider 0 → year -3000', () => { expect(sliderToYear(0)).toBe(-3000) })
+  it('slider 2999 → year -1', () => { expect(sliderToYear(2999)).toBe(-1) })
+  it('slider 3000 → year 1', () => { expect(sliderToYear(3000)).toBe(1) })
+  it('slider 5025 → year 2026', () => { expect(sliderToYear(5025)).toBe(2026) })
+  it('year -3000 roundtrips', () => { expect(sliderToYear(yearToSlider(-3000))).toBe(-3000) })
   it('year -1 roundtrips', () => { expect(sliderToYear(yearToSlider(-1))).toBe(-1) })
   it('year 1 roundtrips', () => { expect(sliderToYear(yearToSlider(1))).toBe(1) })
+  it('year 2026 roundtrips', () => { expect(sliderToYear(yearToSlider(2026))).toBe(2026) })
+  it('year -500 roundtrips', () => { expect(sliderToYear(yearToSlider(-500))).toBe(-500) })
   it('year 500 roundtrips', () => { expect(sliderToYear(yearToSlider(500))).toBe(500) })
   it('yearToSlider throws on 0', () => { expect(() => yearToSlider(0)).toThrow() })
+  it('yearToSlider(-3000) = 0', () => { expect(yearToSlider(-3000)).toBe(0) })
+  it('yearToSlider(2026) = 5025', () => { expect(yearToSlider(2026)).toBe(5025) })
 })
 
 describe('snapToSnapshot', () => {
@@ -44,4 +51,7 @@ describe('snapToSnapshot', () => {
     expect(snapToSnapshot(1)).toBe(-25)
   })
   it('25 snaps to itself', () => { expect(snapToSnapshot(25)).toBe(25) })
+  // Years outside snapshot range clamp to nearest edge
+  it('-3000 snaps to -500 (earliest snapshot)', () => { expect(snapToSnapshot(-3000)).toBe(-500) })
+  it('2026 snaps to 500 (latest snapshot)', () => { expect(snapToSnapshot(2026)).toBe(500) })
 })

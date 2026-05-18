@@ -3,16 +3,19 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { WorldStateResponse, EntityFeature, EntityProperties } from '@/types'
+import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
 
+// Default to the locally stripped historical style; override via env var.
 const MAP_STYLE =
   process.env.NEXT_PUBLIC_MAP_STYLE ??
-  'https://tiles.openfreemap.org/styles/liberty'
+  '/map-style/historical.json'
 
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
 
 export interface MapViewHandle {
   updateTerritories: (data: WorldStateResponse) => void
+  updateRivers: (data: RiversResponse) => void
+  updatePlaceNames: (data: PlaceNamesResponse) => void
 }
 
 export interface MapViewProps {
@@ -23,6 +26,8 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MaplibreMap | null>(null)
   const pendingDataRef = useRef<WorldStateResponse | null>(null)
+  const pendingRiversRef = useRef<RiversResponse | null>(null)
+  const pendingPlaceNamesRef = useRef<PlaceNamesResponse | null>(null)
   // Ref mirror: keeps onEntitySelect fresh inside the one-time map.on('load') closure
   const onEntitySelectRef = useRef(onEntitySelect)
   useEffect(() => { onEntitySelectRef.current = onEntitySelect }, [onEntitySelect])
@@ -35,6 +40,24 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
         pendingDataRef.current = null
       } else {
         pendingDataRef.current = data
+      }
+    },
+    updateRivers(data: RiversResponse) {
+      const source = mapRef.current?.getSource('rivers') as GeoJSONSource | undefined
+      if (source) {
+        source.setData(data as unknown as GeoJSON.GeoJSON)
+        pendingRiversRef.current = null
+      } else {
+        pendingRiversRef.current = data
+      }
+    },
+    updatePlaceNames(data: PlaceNamesResponse) {
+      const source = mapRef.current?.getSource('place-names') as GeoJSONSource | undefined
+      if (source) {
+        source.setData(data as unknown as GeoJSON.GeoJSON)
+        pendingPlaceNamesRef.current = null
+      } else {
+        pendingPlaceNamesRef.current = data
       }
     },
   }))
@@ -52,6 +75,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
     })
 
     map.on('load', () => {
+      // --- Territories source/layers ---
       map.addSource('territories', {
         type: 'geojson',
         data: (pendingDataRef.current as unknown as GeoJSON.GeoJSON) ?? EMPTY_FC,
@@ -85,6 +109,55 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
         },
       })
 
+      // --- Rivers source/layer (below territories) ---
+      map.addSource('rivers', {
+        type: 'geojson',
+        data: (pendingRiversRef.current as unknown as GeoJSON.GeoJSON) ?? EMPTY_FC,
+      })
+      pendingRiversRef.current = null
+
+      map.addLayer(
+        {
+          id: 'rivers',
+          type: 'line',
+          source: 'rivers',
+          paint: {
+            'line-color': '#4a90d9',
+            'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.8, 8, 2.5],
+            'line-opacity': 0.55,
+          },
+        },
+        'territories-fill' // insert before territories so rivers appear under
+      )
+
+      // --- Place-names source/layer (above territories) ---
+      map.addSource('place-names', {
+        type: 'geojson',
+        data: (pendingPlaceNamesRef.current as unknown as GeoJSON.GeoJSON) ?? EMPTY_FC,
+      })
+      pendingPlaceNamesRef.current = null
+
+      map.addLayer({
+        id: 'place-names',
+        type: 'symbol',
+        source: 'place-names',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 2, 9, 8, 14],
+          'text-anchor': 'center',
+          'text-allow-overlap': false,
+          // Higher label_priority (1=most important) renders on top — negate for ascending sort
+          'symbol-sort-key': ['get', 'label_priority'],
+        },
+        paint: {
+          'text-color': '#f0e6c8',
+          'text-halo-color': '#1a1212',
+          'text-halo-width': 1.2,
+        },
+      })
+
+      // --- Territory hover / click ---
       let hoveredId: number | null = null
 
       map.on('mousemove', 'territories-fill', (e) => {

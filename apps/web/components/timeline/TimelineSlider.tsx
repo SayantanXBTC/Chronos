@@ -4,6 +4,10 @@
 import { useTimelineStore } from '@/store/timeline'
 import { yearToDisplay, sliderToYear, yearToSlider } from '@/lib/year'
 
+// Slider covers -3000 to 2026 CE (skipping 0): 3000 BCE positions + 2026 CE positions = 5026 steps
+const SLIDER_MIN = 0
+const SLIDER_MAX = 5025
+
 export function TimelineSlider() {
   const year = useTimelineStore((s) => s.year)
   const setYear = useTimelineStore((s) => s.setYear)
@@ -20,8 +24,8 @@ export function TimelineSlider() {
         </div>
         <input
           type="range"
-          min={0}
-          max={999}
+          min={SLIDER_MIN}
+          max={SLIDER_MAX}
           step={1}
           value={yearToSlider(year)}
           onChange={handleChange}
@@ -29,9 +33,9 @@ export function TimelineSlider() {
           className="w-full h-1.5 cursor-pointer accent-amber-400 rounded-full"
         />
         <div className="flex justify-between text-white/50 text-xs mt-2 font-mono select-none">
-          <span>500 BCE</span>
+          <span>3000 BCE</span>
           <span>1 BCE / 1 CE</span>
-          <span>500 CE</span>
+          <span>2026 CE</span>
         </div>
       </div>
     </div>

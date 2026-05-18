@@ -7,7 +7,10 @@ import { useTimelineStore } from '@/store/timeline'
 import { TimelineSlider } from '@/components/timeline/TimelineSlider'
 import { EntityPanel } from '@/components/entity/EntityPanel'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
+import { AttributionFooter } from '@/components/ui/AttributionFooter'
 import { useTerritoryLayer } from './useTerritoryLayer'
+import { useRiversLayer } from './useRiversLayer'
+import { usePlaceNamesLayer } from './usePlaceNamesLayer'
 import type { MapViewHandle } from './MapView'
 
 // SSR must be disabled: MapLibre uses browser canvas APIs not available in Node.
@@ -18,6 +21,8 @@ export function MapContainer() {
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
 
   useTerritoryLayer(mapRef)
+  useRiversLayer(mapRef)
+  usePlaceNamesLayer(mapRef)
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
@@ -25,6 +30,7 @@ export function MapContainer() {
       <LoadingOverlay />
       <EntityPanel />
       <TimelineSlider />
+      <AttributionFooter />
     </div>
   )
 }

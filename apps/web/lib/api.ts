@@ -1,5 +1,5 @@
 // apps/web/lib/api.ts
-import type { WorldStateResponse } from '@/types'
+import type { WorldStateResponse, PlaceNamesResponse, RiversResponse, SourceItem } from '@/types'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -27,4 +27,35 @@ export async function fetchSnapshots(): Promise<number[]> {
   if (!res.ok) throw new Error(`API error: ${res.status}`)
   const data = await res.json()
   return (data as { snapshots: number[] }).snapshots
+}
+
+export async function fetchPlaceNames(
+  year: number,
+  options?: { signal?: AbortSignal }
+): Promise<PlaceNamesResponse> {
+  const params = new URLSearchParams({
+    year: String(year),
+    zoom: '4',
+    min_x: '-180',
+    min_y: '-90',
+    max_x: '180',
+    max_y: '90',
+  })
+  const res = await fetch(`${API_BASE}/api/v1/place-names?${params}`, {
+    signal: options?.signal,
+  })
+  if (!res.ok) throw new Error(`API error: ${res.status}`)
+  return res.json() as Promise<PlaceNamesResponse>
+}
+
+export async function fetchRivers(): Promise<RiversResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/rivers`)
+  if (!res.ok) throw new Error(`API error: ${res.status}`)
+  return res.json() as Promise<RiversResponse>
+}
+
+export async function fetchSources(): Promise<SourceItem[]> {
+  const res = await fetch(`${API_BASE}/api/v1/sources`)
+  if (!res.ok) throw new Error(`API error: ${res.status}`)
+  return res.json() as Promise<SourceItem[]>
 }

@@ -3,13 +3,21 @@
 
 import { useTimelineStore } from '@/store/timeline'
 
+const CONFIDENCE_LABELS: Record<string, string> = {
+  exact: 'Exact boundary',
+  approximate: 'Approximate boundary',
+  inferred: 'Inferred boundary',
+  disputed: 'Disputed boundary',
+}
+
 export function EntityPanel() {
   const entity = useTimelineStore((s) => s.selectedEntity)
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
 
   if (!entity) return null
 
-  const { name, type, color, confidence } = entity.properties
+  const { name, type, color, confidence_type, source_name } = entity.properties
+  const confidenceLabel = CONFIDENCE_LABELS[confidence_type] ?? confidence_type
 
   return (
     <div
@@ -38,9 +46,15 @@ export function EntityPanel() {
           <dd className="text-white/80 capitalize">{type}</dd>
         </div>
         <div className="flex gap-2">
-          <dt className="text-white/50 w-20 flex-shrink-0">Data</dt>
-          <dd className="text-white/80 capitalize">{confidence}</dd>
+          <dt className="text-white/50 w-20 flex-shrink-0">Boundary</dt>
+          <dd className="text-white/80">{confidenceLabel}</dd>
         </div>
+        {source_name && (
+          <div className="flex gap-2">
+            <dt className="text-white/50 w-20 flex-shrink-0">Source</dt>
+            <dd className="text-white/60 text-xs leading-relaxed">{source_name}</dd>
+          </div>
+        )}
       </dl>
     </div>
   )
