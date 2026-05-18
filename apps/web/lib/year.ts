@@ -60,7 +60,11 @@ export const ERA_MARKERS: EraMark[] = [
 
 export function snapToPrevSnapshot(year: number): number {
   const idx = SNAPSHOT_YEARS.indexOf(year)
-  if (idx <= 0) return SNAPSHOT_YEARS[0]
+  if (idx < 0) {
+    const below = [...SNAPSHOT_YEARS].reverse().find((y) => y < year)
+    return below ?? SNAPSHOT_YEARS[0]
+  }
+  if (idx === 0) return SNAPSHOT_YEARS[0]
   return SNAPSHOT_YEARS[idx - 1]
 }
 

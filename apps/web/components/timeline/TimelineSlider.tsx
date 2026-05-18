@@ -44,7 +44,7 @@ export function TimelineSlider() {
   }
 
   function startEditing() {
-    setEditValue(String(Math.abs(year)))
+    setEditValue(year < 0 ? `${Math.abs(year)} BCE` : String(year))
     setEditing(true)
   }
 
@@ -100,7 +100,7 @@ export function TimelineSlider() {
           {ERA_MARKERS.map((era) => (
             <button
               key={era.label}
-              onClick={() => setYear(era.year === -3000 ? -3000 : era.year + 1)}
+              onClick={() => setYear(snapToNextSnapshot(era.year))}
               style={{ left: `${eraPercent(era.year)}%` }}
               className="absolute -translate-x-1/2 text-white/35 text-xs hover:text-amber-300 transition-colors leading-none"
               title={`Jump to ${era.label} era`}

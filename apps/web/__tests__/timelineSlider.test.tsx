@@ -1,6 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { TimelineSlider } from '@/components/timeline/TimelineSlider'
 import { useTimelineStore } from '@/store/timeline'
 import { ERA_MARKERS, snapToPrevSnapshot, snapToNextSnapshot } from '@/lib/year'
@@ -29,8 +28,16 @@ describe('ERA_MARKERS', () => {
 
 describe('snapToPrevSnapshot', () => {
   it('moves to previous snapshot year', () => {
+    // -500 is in SNAPSHOT_YEARS; previous should be -600
+    const prev = snapToPrevSnapshot(-500)
+    expect(prev).toBe(-600)
+  })
+
+  it('handles non-snapshot year by finding nearest lower', () => {
+    // -264 is NOT in SNAPSHOT_YEARS; nearest lower snapshot is -275
     const prev = snapToPrevSnapshot(-264)
     expect(prev).toBeLessThan(-264)
+    expect(prev).toBeGreaterThan(-3000)  // should NOT jump to minimum
   })
 
   it('does not go below minimum snapshot', () => {
