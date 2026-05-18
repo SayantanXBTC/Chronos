@@ -7,6 +7,7 @@ import type { MapViewHandle } from './MapView'
 
 export function usePlaceNamesLayer(mapRef: RefObject<MapViewHandle | null>): void {
   const year = useTimelineStore((s) => s.year)
+  const viewport = useTimelineStore((s) => s.viewport)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const abortRef = useRef<AbortController | null>(null)
 
@@ -16,7 +17,14 @@ export function usePlaceNamesLayer(mapRef: RefObject<MapViewHandle | null>): voi
       abortRef.current?.abort()
       abortRef.current = new AbortController()
 
-      fetchPlaceNames(year, { signal: abortRef.current.signal })
+      fetchPlaceNames(year, {
+        signal: abortRef.current.signal,
+        zoom: viewport.zoom,
+        minX: viewport.minX,
+        minY: viewport.minY,
+        maxX: viewport.maxX,
+        maxY: viewport.maxY,
+      })
         .then((data) => {
           mapRef.current?.updatePlaceNames(data)
         })
@@ -29,5 +37,5 @@ export function usePlaceNamesLayer(mapRef: RefObject<MapViewHandle | null>): voi
 
     return () => clearTimeout(debounceRef.current)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year])
+  }, [year, viewport])
 }

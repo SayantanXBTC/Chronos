@@ -36,7 +36,11 @@ WORLD_STATE_SQL = text("""
         t.source_name           AS source_name,
         COALESCE(t.importance, 5) AS importance,
         ST_AsGeoJSON(
-            CASE WHEN :zoom < 7 THEN t.simplified_geom ELSE t.geom END
+            CASE
+                WHEN :zoom <= 4 THEN COALESCE(t.geom_lo, t.simplified_geom)
+                WHEN :zoom <= 8 THEN t.simplified_geom
+                ELSE t.geom
+            END
         )::json                 AS geometry
     FROM territories t
     JOIN entities e ON t.entity_id = e.id

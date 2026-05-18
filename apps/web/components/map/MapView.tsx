@@ -18,11 +18,16 @@ export interface MapViewHandle {
   updatePlaceNames: (data: PlaceNamesResponse) => void
 }
 
+import type { Viewport } from '@/store/timeline'
+
 export interface MapViewProps {
   onEntitySelect: (entity: EntityFeature | null) => void
+  onViewportChange?: (viewport: Viewport) => void
 }
 
-const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref) => {
+const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect, onViewportChange }, ref) => {
+  const onViewportChangeRef = useRef(onViewportChange)
+  useEffect(() => { onViewportChangeRef.current = onViewportChange }, [onViewportChange])
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MaplibreMap | null>(null)
   const pendingDataRef = useRef<WorldStateResponse | null>(null)
@@ -156,6 +161,20 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(({ onEntitySelect }, ref
           'text-halo-width': 1.2,
         },
       })
+
+      // --- Emit initial viewport ---
+      const emitViewport = () => {
+        const b = map.getBounds()
+        onViewportChangeRef.current?.({
+          minX: b.getWest(),
+          minY: b.getSouth(),
+          maxX: b.getEast(),
+          maxY: b.getNorth(),
+          zoom: Math.round(map.getZoom()),
+        })
+      }
+      emitViewport()
+      map.on('moveend', emitViewport)
 
       // --- Territory hover / click ---
       let hoveredId: number | null = null

@@ -3,17 +3,29 @@ import type { WorldStateResponse, PlaceNamesResponse, RiversResponse, SourceItem
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
+interface ViewportOptions {
+  minX?: number
+  minY?: number
+  maxX?: number
+  maxY?: number
+  zoom?: number
+}
+
+interface FetchOptions extends ViewportOptions {
+  signal?: AbortSignal
+}
+
 export async function fetchWorldState(
   year: number,
-  options?: { signal?: AbortSignal }
+  options?: FetchOptions
 ): Promise<WorldStateResponse> {
   const params = new URLSearchParams({
     year: String(year),
-    zoom: '4',
-    min_x: '-180',
-    min_y: '-90',
-    max_x: '180',
-    max_y: '90',
+    zoom: String(options?.zoom ?? 4),
+    min_x: String(options?.minX ?? -180),
+    min_y: String(options?.minY ?? -90),
+    max_x: String(options?.maxX ?? 180),
+    max_y: String(options?.maxY ?? 90),
   })
   const res = await fetch(`${API_BASE}/api/v1/world/state?${params}`, {
     signal: options?.signal,
@@ -31,15 +43,15 @@ export async function fetchSnapshots(): Promise<number[]> {
 
 export async function fetchPlaceNames(
   year: number,
-  options?: { signal?: AbortSignal }
+  options?: FetchOptions
 ): Promise<PlaceNamesResponse> {
   const params = new URLSearchParams({
     year: String(year),
-    zoom: '4',
-    min_x: '-180',
-    min_y: '-90',
-    max_x: '180',
-    max_y: '90',
+    zoom: String(options?.zoom ?? 4),
+    min_x: String(options?.minX ?? -180),
+    min_y: String(options?.minY ?? -90),
+    max_x: String(options?.maxX ?? 180),
+    max_y: String(options?.maxY ?? 90),
   })
   const res = await fetch(`${API_BASE}/api/v1/place-names?${params}`, {
     signal: options?.signal,

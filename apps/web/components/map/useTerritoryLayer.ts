@@ -29,6 +29,7 @@ async function preloadAdjacent(year: number): Promise<void> {
 
 export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void {
   const year = useTimelineStore((s) => s.year)
+  const viewport = useTimelineStore((s) => s.viewport)
   const setLoading = useTimelineStore((s) => s.setLoading)
   const setError = useTimelineStore((s) => s.setError)
 
@@ -36,8 +37,10 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const fetchAndUpdate = useCallback(
-    async (yr: number) => {
-      const cached = snapshotCache.get(yr)
+    async (yr: number, vp: typeof viewport) => {
+      // Viewport-aware cache: bypass cache when viewport changes (not world bbox)
+      const isWorldBbox = vp.minX <= -180 && vp.minY <= -90 && vp.maxX >= 180 && vp.maxY >= 90
+      const cached = isWorldBbox ? snapshotCache.get(yr) : null
       if (cached) {
         mapRef.current?.updateTerritories(cached)
         return
@@ -50,10 +53,17 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
       setError(null)
 
       try {
-        const data = await fetchWorldState(yr, { signal: abortRef.current.signal })
-        snapshotCache.set(yr, data)
+        const data = await fetchWorldState(yr, {
+          signal: abortRef.current.signal,
+          zoom: vp.zoom,
+          minX: vp.minX,
+          minY: vp.minY,
+          maxX: vp.maxX,
+          maxY: vp.maxY,
+        })
+        if (isWorldBbox) snapshotCache.set(yr, data)
         mapRef.current?.updateTerritories(data)
-        preloadAdjacent(yr)
+        if (isWorldBbox) preloadAdjacent(yr)
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           setError('Failed to load world state. Is the API running?')
@@ -68,9 +78,9 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
   useEffect(() => {
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      fetchAndUpdate(year)
+      fetchAndUpdate(year, viewport)
     }, 150)
 
     return () => clearTimeout(debounceRef.current)
-  }, [year, fetchAndUpdate])
+  }, [year, viewport, fetchAndUpdate])
 }

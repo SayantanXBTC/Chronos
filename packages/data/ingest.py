@@ -9,7 +9,10 @@ import yaml
 from shapely.geometry import shape
 
 from .loader import Loader
-from .normalize import coerce_valid, simplify_geom_all, to_multipolygon, validate_geom
+from .normalize import (
+    MAX_VERTICES_LO, coerce_valid, count_vertices, simplify_geom_all,
+    to_multipolygon, validate_geom,
+)
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = _REPO_ROOT / "data" / "raw" / "political"
@@ -72,6 +75,11 @@ def _ingest_entity(loader: Loader, config: dict[str, Any]) -> tuple[int, int]:
                 skipped += 1
                 continue
             geom_hi, geom_med, geom_lo = simplify_geom_all(geom)
+            v_hi = count_vertices(geom_hi)
+            v_lo = count_vertices(geom_lo)
+            if v_lo > MAX_VERTICES_LO:
+                print(f"    WARNING: {path} geom_lo has {v_lo} vertices (budget {MAX_VERTICES_LO})")
+            print(f"    LOD: hi={v_hi} med={count_vertices(geom_med)} lo={v_lo} vertices")
             loader.insert_territory(
                 entity_id,
                 geom_hi.wkt,

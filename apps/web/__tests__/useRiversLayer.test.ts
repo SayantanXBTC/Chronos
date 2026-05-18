@@ -24,11 +24,11 @@ import { fetchRivers } from '@/lib/api'
 
 const mockFetchRivers = vi.mocked(fetchRivers)
 
-function makeMapRef(updateRivers?: ReturnType<typeof vi.fn>) {
+function makeMapRef(updateRivers?: (data: RiversResponse) => void) {
   const handle: MapViewHandle = {
-    updateTerritories: vi.fn(),
-    updateRivers: updateRivers ?? vi.fn(),
-    updatePlaceNames: vi.fn(),
+    updateTerritories: vi.fn() as MapViewHandle['updateTerritories'],
+    updateRivers: updateRivers ?? (vi.fn() as MapViewHandle['updateRivers']),
+    updatePlaceNames: vi.fn() as MapViewHandle['updatePlaceNames'],
   }
   return { current: handle }
 }

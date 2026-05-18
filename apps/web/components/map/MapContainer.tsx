@@ -2,8 +2,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useRef } from 'react'
-import { useTimelineStore } from '@/store/timeline'
+import { useRef, useCallback } from 'react'
+import { useTimelineStore, type Viewport } from '@/store/timeline'
 import { TimelineSlider } from '@/components/timeline/TimelineSlider'
 import { EntityPanel } from '@/components/entity/EntityPanel'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
@@ -19,6 +19,8 @@ const MapView = dynamic(() => import('./MapView'), { ssr: false })
 export function MapContainer() {
   const mapRef = useRef<MapViewHandle | null>(null)
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
+  const setViewport = useTimelineStore((s) => s.setViewport)
+  const handleViewportChange = useCallback((v: Viewport) => setViewport(v), [setViewport])
 
   useTerritoryLayer(mapRef)
   useRiversLayer(mapRef)
@@ -26,7 +28,7 @@ export function MapContainer() {
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
-      <MapView ref={mapRef} onEntitySelect={setSelectedEntity} />
+      <MapView ref={mapRef} onEntitySelect={setSelectedEntity} onViewportChange={handleViewportChange} />
       <LoadingOverlay />
       <EntityPanel />
       <TimelineSlider />

@@ -60,6 +60,9 @@ describe('useTimelineStore', () => {
         type: 'empire',
         color: '#C0392B',
         confidence: 'approximate',
+        confidence_type: 'approximate',
+        source_name: null,
+        importance: 9,
         entity_id: 'abc-123',
       },
     }
@@ -79,6 +82,9 @@ describe('useTimelineStore', () => {
         type: 'empire',
         color: '#C0392B',
         confidence: 'approximate',
+        confidence_type: 'approximate',
+        source_name: null,
+        importance: 9,
         entity_id: 'abc-123',
       },
     }
