@@ -107,14 +107,17 @@ def upgrade() -> None:
         sa.Column("region_name", sa.Text, nullable=False),
         sa.Column("year_start", sa.Integer, nullable=False),
         sa.Column("year_end", sa.Integer, nullable=True),
+        sa.Column(
+            "completeness", sa.Text, nullable=False, server_default="none",
+        ),
+        sa.CheckConstraint(
+            "completeness IN ('complete','partial','sparse','none')",
+            name="region_coverage_completeness_check",
+        ),
         sa.Column("entity_count", sa.Integer, nullable=True, server_default="0"),
         sa.Column("primary_source", sa.Text, nullable=True),
         sa.Column("notes", sa.Text, nullable=True),
-        sa.Column("updated_at", sa.TIMESTAMP(timezone=True), server_default=sa.text("NOW()")),
-    )
-    op.execute(
-        "ALTER TABLE region_coverage ADD COLUMN completeness TEXT NOT NULL DEFAULT 'none' "
-        "CHECK (completeness IN ('complete','partial','sparse','none'))"
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("NOW()")),
     )
 
     # --- Step 7: Add columns to place_names ---
@@ -172,6 +175,10 @@ def downgrade() -> None:
     op.execute("ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_type_check")
 
     # --- Reverse Step 1: Remap entity types back to 'polity' ---
+    # NOTE: The entity type rollback below assumes all 13 entities had type='polity'
+    # before migration 0003 ran. This was the state after migration 0002 (all entities
+    # were seeded with type='polity'). If your DB diverged from that state, roll back
+    # entity types manually before running this downgrade.
     op.execute("UPDATE entities SET type = 'polity' WHERE slug = 'roman-empire'")
     op.execute("UPDATE entities SET type = 'polity' WHERE slug = 'roman-republic'")
     op.execute("UPDATE entities SET type = 'polity' WHERE slug = 'eastern-roman-empire'")

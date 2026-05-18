@@ -13,20 +13,7 @@ from pathlib import Path
 
 import yaml
 
-VALID_ENTITY_TYPES = {
-    "empire",
-    "kingdom",
-    "republic",
-    "dynasty",
-    "caliphate",
-    "sultanate",
-    "tribal_confederation",
-    "nomadic_empire",
-    "city_state",
-    "colony",
-    "protectorate",
-    "confederation",
-}
+from .constants import VALID_ENTITY_TYPES
 
 # Default glob root: packages/data/entities relative to this file's package dir
 _ENTITIES_DIR = Path(__file__).parent / "entities"
@@ -37,7 +24,9 @@ def audit_entity_files(entities_dir: Path = _ENTITIES_DIR) -> tuple[list[dict], 
 
     Returns:
         (conforming, violations) — each element is a dict with keys
-        ``slug``, ``type``, and (for violations) ``file``.
+        ``slug``, ``type``, and ``file``. Conforming entries have a valid
+        taxonomy type; violation entries have either an unrecognised type
+        or ``"<missing>"`` when the ``type`` key is absent from the YAML.
     """
     conforming: list[dict] = []
     violations: list[dict] = []
@@ -47,7 +36,14 @@ def audit_entity_files(entities_dir: Path = _ENTITIES_DIR) -> tuple[list[dict], 
             data = yaml.safe_load(fh)
 
         slug = data.get("slug", yml_path.stem)
-        entity_type = data.get("type", "")
+        entity_type = data.get("type")
+        if entity_type is None:
+            violations.append({
+                "slug": slug,
+                "type": "<missing>",
+                "file": str(yml_path),
+            })
+            continue
 
         entry = {"slug": slug, "type": entity_type, "file": str(yml_path)}
         if entity_type in VALID_ENTITY_TYPES:

@@ -1,5 +1,7 @@
 slug: greek-city-states
 name: Greek City-States
+# 'confederation' represents the loose alliance/system of independent poleis;
+# not a single city-state but a collective political system
 type: confederation
 color: "#2ecc71"
 year_start: -800
