@@ -28,7 +28,7 @@ export function EntityPanel() {
     }
     setDetail(null)
     fetchEntityDetail(entity.properties.slug).then(setDetail).catch(() => {})
-  }, [entity?.properties.slug])
+  }, [entity])
 
   if (!entity) return null
 

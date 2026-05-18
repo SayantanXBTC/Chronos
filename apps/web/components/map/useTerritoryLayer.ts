@@ -53,15 +53,17 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
       setLoading(true)
       setError(null)
 
+      const controller = abortRef.current
       try {
         const data = await fetchWorldState(yr, {
-          signal: abortRef.current.signal,
+          signal: controller.signal,
           zoom: vp.zoom,
           minX: vp.minX,
           minY: vp.minY,
           maxX: vp.maxX,
           maxY: vp.maxY,
         })
+        if (controller.signal.aborted) return
         if (isWorldBbox) snapshotCache.set(yr, data)
         mapRef.current?.updateTerritories(data)
         useTimelineStore.getState().setCurrentEntities(data.features)
