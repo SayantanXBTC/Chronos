@@ -1,0 +1,33 @@
+sources:
+  - id: cshapes-2.0
+    name: "cShapes 2.0"
+    url: "https://icr.ethz.ch/data/cshapes/cshapes_2.0.zip"
+    sha256: null  # unknown until first download — use null
+    license: "CC BY"
+    format: shapefile
+    config: "packages/data/sources/cshapes.yml"
+    target_file: "cshapes/cshapes_2.0.shp"
+    temporal_range: "1886-2019 CE"
+    notes: "Correlates of War / global state borders, modern era"
+
+  - id: awmc-barrington
+    name: "Ancient World Mapping Center — Barrington Atlas"
+    url: null  # manually downloaded from https://awmc.unc.edu/awmc/map_data/
+    sha256: null
+    license: "CC BY 4.0"
+    format: shapefile
+    config: "packages/data/sources/awmc.yml"
+    target_file: null  # multiple files, no single archive
+    temporal_range: "500 BCE – 500 CE"
+    notes: "Mediterranean political boundaries, peer-reviewed"
+
+  - id: natural-earth-physical
+    name: "Natural Earth Physical Vectors"
+    url: "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_rivers_lake_centerlines.zip"
+    sha256: null
+    license: "Public Domain"
+    format: shapefile
+    config: null
+    target_file: "ne_10m_rivers_lake_centerlines/ne_10m_rivers_lake_centerlines.shp"
+    temporal_range: "Modern"
+    notes: "Rivers and coastlines for physical layer"
