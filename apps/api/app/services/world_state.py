@@ -9,15 +9,17 @@ SNAPSHOT_YEARS: list[int] = [y for y in range(-500, 501, 25) if y != 0]
 
 WORLD_STATE_SQL = text("""
     SELECT
-        e.id::text        AS entity_id,
-        e.slug            AS slug,
-        e.type            AS type,
-        e.color           AS color,
-        en.name           AS name,
-        t.confidence      AS confidence,
+        e.id::text              AS entity_id,
+        e.slug                  AS slug,
+        e.type                  AS type,
+        e.color                 AS color,
+        en.name                 AS name,
+        t.confidence_type       AS confidence_type,
+        t.source_name           AS source_name,
+        COALESCE(t.importance, 5) AS importance,
         ST_AsGeoJSON(
             CASE WHEN :zoom < 7 THEN t.simplified_geom ELSE t.geom END
-        )::json           AS geometry
+        )::json                 AS geometry
     FROM territories t
     JOIN entities e ON t.entity_id = e.id
     JOIN entity_names en
@@ -70,7 +72,10 @@ class WorldStateService:
                     "name": row["name"],
                     "type": row["type"],
                     "color": row["color"],
-                    "confidence": row["confidence"],
+                    "confidence": row["confidence_type"],
+                    "confidence_type": row["confidence_type"],
+                    "source_name": row["source_name"],
+                    "importance": row["importance"],
                 },
             })
 

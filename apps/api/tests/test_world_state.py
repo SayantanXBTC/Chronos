@@ -73,7 +73,9 @@ async def test_world_state_feature_shape():
             "type": "empire",
             "color": "#C0392B",
             "name": "Roman Republic",
-            "confidence": "approximate",
+            "confidence_type": "approximate",
+            "source_name": "Ancient World Mapping Center",
+            "importance": 7,
             "geometry": {"type": "MultiPolygon", "coordinates": []},
         }
     ]
