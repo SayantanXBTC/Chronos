@@ -8,6 +8,7 @@ import { TimelineSlider } from '@/components/timeline/TimelineSlider'
 import { EntityPanel } from '@/components/entity/EntityPanel'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { AttributionFooter } from '@/components/ui/AttributionFooter'
+import { SearchBar } from '@/components/ui/SearchBar'
 import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
@@ -36,6 +37,7 @@ export function MapContainer() {
         selectedSlug={selectedSlug}
       />
       <LoadingOverlay />
+      <SearchBar />
       <EntityPanel />
       <TimelineSlider />
       <AttributionFooter />
