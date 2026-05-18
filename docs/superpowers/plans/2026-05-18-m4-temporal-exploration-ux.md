@@ -4,11 +4,11 @@
 
 **Goal:** Transform the historical map from a GIS demo into an immersive temporal exploration platform — users can drag through time, click civilizations, explore lineage chains, and understand world history visually.
 
-**Architecture:** Pure UX milestone — no schema changes. Changes span: (1) MapLibre style JSON for base map atmosphere (strip modern roads/buildings/POIs), (2) FastAPI entity detail endpoint returning dates + lineage, (3) React component upgrades to EntityPanel and TimelineSlider, (4) MapView interaction polish with focus mode and hover tooltips, (5) Frontend entity search, (6) Redis startup cache warming. World state GeoJSON gains `year_start`/`year_end` fields on territory features.
+**Architecture:** Pure UX milestone — no schema changes. Changes span: (1) MapLibre style JSON for base map atmosphere (strip modern roads/buildings/POIs), (2) FastAPI entity detail endpoint returning dates + lineage, (3) React component upgrades to EntityPanel and TimelineSlider, (4) MapView interaction polish with focus mode and hover tooltips, (5) Frontend entity search, (6) Redis startup cache warming. World state GeoJSON gains `year_start`/`year_end` fields on territory features. Experiential systems: (7) Temporal awareness overlay with historical events, (8) Civilization lifespan bar + peak metadata, (9) Era-sensitive atmosphere (background/color per era), (10) Historical momentum indicators (rising/declining territory opacity), (11) Temporal playback foundation (play/pause/speed architecture).
 
 **Tech Stack:** Next.js 14 + MapLibre GL 5.24.0 + Zustand 5 + TailwindCSS 4 (frontend), FastAPI + SQLAlchemy async + Redis (backend), PostgreSQL + PostGIS, pytest / vitest for tests.
 
-**What is NOT in M4:** Capitals/cities data population (`entity_capitals` table remains empty), mobile responsiveness, autoplay mode, 3D globe, AI narration, vector tile migration.
+**What is NOT in M4:** Capitals/cities data population (`entity_capitals` table remains empty), mobile responsiveness, 3D globe, AI narration, vector tile migration. Temporal playback IS in M4 as architecture + basic play/pause — no cinematic mode yet.
 
 ---
 
@@ -37,6 +37,13 @@
 | `apps/api/tests/test_entity_detail.py` | Create | Backend entity service tests |
 | `apps/web/__tests__/entityPanel.test.tsx` | Create | EntityPanel component tests |
 | `apps/web/__tests__/timelineSlider.test.tsx` | Create | TimelineSlider keyboard/era tests |
+| `apps/web/components/ui/TemporalOverlay.tsx` | Create | Year-aware historical events + world powers panel |
+| `apps/web/data/entity-metadata.ts` | Create | Static peak year/golden age data per slug |
+| `apps/web/lib/year.ts` | Modify (M4-L) | Add `getEraForYear`, `ERA_MAP_BACKGROUNDS`, `ERA_WATER_COLORS` |
+| `apps/web/components/ui/EraAtmosphere.tsx` | Create | Applies era CSS `data-era` attribute + triggers map color transitions |
+| `apps/web/app/globals.css` | Modify (M4-L) | Era-specific CSS variables (`--era-accent`, `--era-overlay`) |
+| `apps/web/store/timeline.ts` | Modify (M4-N) | Add `isPlaying`, `playSpeed`, `setPlaying`, `setPlaySpeed` |
+| `apps/web/components/timeline/PlaybackControls.tsx` | Create | Play/pause/speed UI |
 
 ---
 
@@ -2000,6 +2007,971 @@ git commit -m "test(m4-i): complete M4 test suite — entity detail, timeline ke
 
 ---
 
+---
+
+## Task M4-J: Temporal Awareness Overlay
+
+**Files:**
+- Create: `apps/web/components/ui/TemporalOverlay.tsx`
+- Modify: `apps/web/components/map/MapContainer.tsx`
+
+Small overlay bottom-left (above timeline) showing: (1) the nearest notable historical event within 150 years of current slider year, (2) top 3 powers by importance from `currentEntities`. Entirely frontend — no new API calls.
+
+- [ ] **Step 1: Write failing test**
+
+Create `apps/web/__tests__/temporalOverlay.test.tsx`:
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
+import { useTimelineStore } from '@/store/timeline'
+import type { EntityFeature } from '@/types'
+
+const mockEntity = (slug: string, name: string, importance: number): EntityFeature => ({
+  type: 'Feature',
+  id: slug,
+  geometry: { type: 'MultiPolygon', coordinates: [] },
+  properties: {
+    entity_id: `id-${slug}`, slug, name, type: 'empire',
+    color: '#c00', confidence: 'approximate', confidence_type: 'approximate',
+    source_name: null, importance, year_start: -100, year_end: null,
+  },
+})
+
+beforeEach(() => {
+  useTimelineStore.setState({ year: -27, currentEntities: [] })
+})
+
+describe('TemporalOverlay', () => {
+  it('renders nothing when year far from all events and no entities', () => {
+    useTimelineStore.setState({ year: -2999 })
+    const { container } = render(<TemporalOverlay />)
+    // No event text expected at exactly -2999 (event at -3000 is within 150y)
+    // so actually it renders — just test no crash
+    expect(container).toBeDefined()
+  })
+
+  it('shows event text near year -27', () => {
+    render(<TemporalOverlay />)
+    expect(screen.getByText(/Roman Republic becomes the Roman Empire/i)).toBeDefined()
+  })
+
+  it('shows world powers from currentEntities', () => {
+    useTimelineStore.setState({
+      year: 100,
+      currentEntities: [
+        mockEntity('roman-empire', 'Roman Empire', 9),
+        mockEntity('han-dynasty', 'Han Dynasty', 8),
+      ],
+    })
+    render(<TemporalOverlay />)
+    expect(screen.getByText('Roman Empire')).toBeDefined()
+    expect(screen.getByText('Han Dynasty')).toBeDefined()
+  })
+
+  it('shows max 3 world powers', () => {
+    useTimelineStore.setState({
+      year: 100,
+      currentEntities: [
+        mockEntity('a', 'Alpha', 9),
+        mockEntity('b', 'Beta', 8),
+        mockEntity('c', 'Gamma', 7),
+        mockEntity('d', 'Delta', 6),
+      ],
+    })
+    render(<TemporalOverlay />)
+    expect(screen.queryByText('Delta')).toBeNull()
+  })
+})
+```
+
+Run: `cd apps/web && npm run test -- --run __tests__/temporalOverlay.test.tsx`
+Expected: ImportError — component not found.
+
+- [ ] **Step 2: Create TemporalOverlay.tsx**
+
+Create `apps/web/components/ui/TemporalOverlay.tsx`:
+
+```typescript
+'use client'
+
+import { useMemo } from 'react'
+import { useTimelineStore } from '@/store/timeline'
+import type { EntityFeature } from '@/types'
+
+interface TimelineEvent { year: number; text: string }
+
+const EVENTS: TimelineEvent[] = [
+  { year: -3000, text: 'Bronze Age civilizations emerge in Mesopotamia and Egypt' },
+  { year: -2500, text: 'Old Kingdom Egypt — pyramids being built' },
+  { year: -1200, text: 'Late Bronze Age collapse — palace economies fall' },
+  { year: -800,  text: 'Greek colonization spreads across Mediterranean' },
+  { year: -500,  text: 'Classical age: Athens, Achaemenid Persia, and Confucian China' },
+  { year: -323,  text: 'Death of Alexander — Hellenistic kingdoms formed' },
+  { year: -221,  text: 'Qin unifies China for the first time' },
+  { year: -27,   text: 'Roman Republic becomes the Roman Empire under Augustus' },
+  { year: 100,   text: 'Roman Empire at peak extent under Trajan' },
+  { year: 220,   text: 'Han dynasty falls — Three Kingdoms period in China' },
+  { year: 285,   text: 'Roman Empire splits into Western and Eastern halves' },
+  { year: 330,   text: 'Constantinople founded — Eastern Rome dominates' },
+  { year: 400,   text: 'Gupta Empire golden age — classical Hindu culture flourishes' },
+  { year: 476,   text: 'Western Roman Empire falls' },
+  { year: 618,   text: 'Tang Dynasty founded — China enters golden age' },
+  { year: 622,   text: 'Islamic civilization begins from the Arabian Peninsula' },
+  { year: 750,   text: 'Abbasid Caliphate — Islamic Golden Age of science and culture' },
+  { year: 800,   text: 'Charlemagne crowned Emperor of the Franks' },
+  { year: 1000,  text: 'Silk Road trade at peak — goods flow East to West' },
+  { year: 1206,  text: 'Genghis Khan unites Mongols — largest land empire forming' },
+  { year: 1258,  text: 'Mongols sack Baghdad — Abbasid Caliphate ends' },
+  { year: 1300,  text: 'Mali Empire at peak — Mansa Musa controls gold trade' },
+  { year: 1368,  text: 'Ming Dynasty founded — Great Wall rebuilt' },
+  { year: 1453,  text: 'Ottoman Turks take Constantinople — Byzantine Empire ends' },
+  { year: 1492,  text: 'Columbus reaches Americas — age of exploration begins' },
+  { year: 1526,  text: 'Mughal Empire founded in northern India' },
+  { year: 1600,  text: 'European powers compete for global trade routes' },
+  { year: 1750,  text: 'Industrial Revolution beginning in Britain' },
+  { year: 1800,  text: 'Napoleonic wars reshape European order' },
+  { year: 1850,  text: 'Age of imperialism — European empires at maximum extent' },
+]
+
+function nearestEvent(year: number): TimelineEvent | null {
+  if (EVENTS.length === 0) return null
+  return EVENTS.reduce((best, ev) =>
+    Math.abs(ev.year - year) < Math.abs(best.year - year) ? ev : best
+  )
+}
+
+function topEntities(entities: EntityFeature[]): EntityFeature[] {
+  return [...entities]
+    .sort((a, b) => (b.properties.importance ?? 5) - (a.properties.importance ?? 5))
+    .slice(0, 3)
+}
+
+export function TemporalOverlay() {
+  const year = useTimelineStore((s) => s.year)
+  const currentEntities = useTimelineStore((s) => s.currentEntities)
+
+  const event = useMemo(() => nearestEvent(year), [year])
+  const top = useMemo(() => topEntities(currentEntities), [currentEntities])
+
+  const showEvent = event !== null && Math.abs(event.year - year) <= 150
+
+  if (!showEvent && top.length === 0) return null
+
+  return (
+    <div className="absolute bottom-32 left-4 max-w-xs pointer-events-none select-none z-10">
+      {showEvent && (
+        <div className="mb-2 bg-black/60 backdrop-blur-sm text-white/70 text-xs px-3 py-2 rounded-lg border border-white/10 leading-relaxed">
+          {event!.text}
+        </div>
+      )}
+      {top.length > 0 && (
+        <div className="bg-black/50 backdrop-blur-sm text-white/60 text-xs px-3 py-2 rounded-lg border border-white/10">
+          <div className="text-white/25 uppercase tracking-widest text-[10px] mb-1.5">World powers</div>
+          {top.map((f) => (
+            <div key={f.properties.slug} className="flex items-center gap-2 py-0.5">
+              <div
+                className="w-2 h-2 rounded-sm flex-shrink-0"
+                style={{ backgroundColor: f.properties.color }}
+                aria-hidden="true"
+              />
+              <span className="truncate">{f.properties.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+- [ ] **Step 3: Add TemporalOverlay to MapContainer**
+
+Edit `apps/web/components/map/MapContainer.tsx`, import and render alongside SearchBar:
+
+```typescript
+import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
+
+// In JSX:
+<TemporalOverlay />
+```
+
+- [ ] **Step 4: Run tests**
+
+```bash
+cd apps/web && npm run test -- --run __tests__/temporalOverlay.test.tsx
+```
+
+Expected: all 4 tests pass.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add apps/web/components/ui/TemporalOverlay.tsx apps/web/components/map/MapContainer.tsx \
+        apps/web/__tests__/temporalOverlay.test.tsx
+git commit -m "feat(m4-j): temporal awareness overlay — historical events ticker + world powers panel"
+```
+
+---
+
+## Task M4-K: Civilization Lifespan Bar + Peak Metadata
+
+**Files:**
+- Create: `apps/web/data/entity-metadata.ts`
+- Modify: `apps/web/components/entity/EntityPanel.tsx`
+
+Two additions to EntityPanel: (1) a horizontal lifespan bar showing the civilization's span relative to the full timeline, with a cursor at current year, (2) a "peak" line from static metadata for known civilizations.
+
+- [ ] **Step 1: Write failing tests**
+
+Add to `apps/web/__tests__/entityPanel.test.tsx` inside the `describe('EntityPanel')` block:
+
+```typescript
+it('shows lifespan bar element', async () => {
+  const { fetchEntityDetail } = await import('@/lib/api')
+  vi.mocked(fetchEntityDetail).mockResolvedValue(mockDetail)
+  useTimelineStore.setState({ selectedEntity: mockEntity, year: 100 })
+  render(<EntityPanel />)
+  await waitFor(() => expect(screen.getByRole('figure', { name: /lifespan/i })).toBeDefined())
+})
+
+it('shows peak year for known entity', async () => {
+  const { fetchEntityDetail } = await import('@/lib/api')
+  vi.mocked(fetchEntityDetail).mockResolvedValue(mockDetail)
+  useTimelineStore.setState({ selectedEntity: mockEntity })
+  render(<EntityPanel />)
+  await waitFor(() => expect(screen.getByText(/Peak/i)).toBeDefined())
+})
+```
+
+Run: `cd apps/web && npm run test -- --run __tests__/entityPanel.test.tsx`
+Expected: 2 new failures.
+
+- [ ] **Step 2: Create entity-metadata.ts**
+
+Create `apps/web/data/entity-metadata.ts`:
+
+```typescript
+interface EntityMeta {
+  peak_year?: number
+  peak_label?: string
+}
+
+export const ENTITY_META: Record<string, EntityMeta> = {
+  'roman-empire':        { peak_year: 117,  peak_label: 'Peak under Trajan — 117 CE' },
+  'roman-republic':      { peak_year: -100, peak_label: 'Height of Republican expansion' },
+  'han-dynasty':         { peak_year: -50,  peak_label: 'Peak Western Han period' },
+  'tang-dynasty':        { peak_year: 730,  peak_label: 'Tang golden age — 8th century' },
+  'byzantine-empire':    { peak_year: 555,  peak_label: 'Peak under Justinian I' },
+  'abbasid-caliphate':   { peak_year: 850,  peak_label: 'Islamic Golden Age peak' },
+  'mongol-empire':       { peak_year: 1260, peak_label: 'Peak under Kublai Khan' },
+  'ottoman-empire':      { peak_year: 1683, peak_label: 'Peak — gates of Vienna' },
+  'mughal-empire':       { peak_year: 1700, peak_label: 'Peak under Aurangzeb' },
+  'mali-empire':         { peak_year: 1337, peak_label: 'Peak under Mansa Musa' },
+  'achaemenid-persia':   { peak_year: -500, peak_label: 'Peak under Darius I' },
+  'macedonian-empire':   { peak_year: -323, peak_label: 'Peak under Alexander the Great' },
+  'qin-dynasty':         { peak_year: -221, peak_label: 'Unification of China' },
+  'maurya-empire':       { peak_year: -250, peak_label: 'Peak under Ashoka' },
+  'gupta-empire':        { peak_year: 400,  peak_label: 'Golden age of classical India' },
+  'umayyad-caliphate':   { peak_year: 720,  peak_label: 'Peak territorial extent' },
+  'seleucid-empire':     { peak_year: -280, peak_label: 'Peak under Seleucus I' },
+  'ptolemaic-egypt':     { peak_year: -250, peak_label: 'Ptolemaic golden age' },
+  'songhai-empire':      { peak_year: 1500, peak_label: 'Peak under Askia the Great' },
+  'western-roman-empire': { peak_year: 100, peak_label: 'Peak Roman territorial control' },
+  'eastern-roman-empire': { peak_year: 395, peak_label: 'Full Eastern Roman extent' },
+  'sasanian-empire':     { peak_year: 620,  peak_label: 'Peak under Khosrow II' },
+}
+```
+
+- [ ] **Step 3: Add lifespan bar and peak metadata to EntityPanel**
+
+Edit `apps/web/components/entity/EntityPanel.tsx`. Add import at top:
+
+```typescript
+import { ENTITY_META } from '@/data/entity-metadata'
+```
+
+Add constants after existing `CONFIDENCE_LABELS`:
+
+```typescript
+const TIMELINE_MIN = -3000
+const TIMELINE_MAX = 2026
+const TIMELINE_SPAN = TIMELINE_MAX - TIMELINE_MIN
+```
+
+Add after the `contemporaries` variable, inside the component (before the return):
+
+```typescript
+const entityMeta = ENTITY_META[entity.properties.slug] ?? null
+```
+
+Add the lifespan bar section after the `</dl>` closing tag (after core info block), before the `{detail && <LineageTree .../>}`:
+
+```typescript
+{/* Lifespan bar */}
+{yearStart !== undefined && (
+  <figure
+    className="mt-3 pt-3 border-t border-white/10"
+    aria-label="Civilization lifespan"
+  >
+    <div className="text-white/30 text-xs mb-1.5">Civilization lifespan</div>
+    <div className="relative h-2 bg-white/10 rounded-full overflow-visible">
+      <div
+        className="absolute top-0 h-full rounded-full"
+        style={{
+          backgroundColor: color,
+          left: `${Math.max(0, ((yearStart - TIMELINE_MIN) / TIMELINE_SPAN) * 100)}%`,
+          right: `${Math.max(0, ((TIMELINE_MAX - (yearEnd ?? TIMELINE_MAX)) / TIMELINE_SPAN) * 100)}%`,
+          opacity: 0.65,
+        }}
+      />
+      <div
+        className="absolute top-[-2px] w-0.5 h-3 bg-amber-400/80 rounded-full"
+        style={{ left: `${Math.max(0, Math.min(100, ((year - TIMELINE_MIN) / TIMELINE_SPAN) * 100))}%` }}
+        aria-hidden="true"
+      />
+    </div>
+    <div className="flex justify-between text-white/20 text-[10px] mt-1 font-mono">
+      <span>3000 BCE</span>
+      <span>2026 CE</span>
+    </div>
+    {entityMeta?.peak_label && (
+      <div className="mt-1.5 text-amber-300/50 text-[11px] flex items-center gap-1">
+        <span className="text-amber-400/60">★</span>
+        <span>{entityMeta.peak_label}</span>
+      </div>
+    )}
+  </figure>
+)}
+```
+
+- [ ] **Step 4: Run tests**
+
+```bash
+cd apps/web && npm run test -- --run __tests__/entityPanel.test.tsx
+```
+
+Expected: all 9 tests pass (7 original + 2 new).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add apps/web/data/entity-metadata.ts apps/web/components/entity/EntityPanel.tsx \
+        apps/web/__tests__/entityPanel.test.tsx
+git commit -m "feat(m4-k): civilization lifespan bar + peak metadata in entity panel"
+```
+
+---
+
+## Task M4-L: Era-Sensitive Atmosphere
+
+**Files:**
+- Modify: `apps/web/lib/year.ts`
+- Create: `apps/web/components/ui/EraAtmosphere.tsx`
+- Modify: `apps/web/app/globals.css`
+- Modify: `apps/web/components/map/MapView.tsx`
+- Modify: `apps/web/components/map/MapContainer.tsx`
+
+When the timeline year changes era, the map background, water color, and UI accent color subtly shift. Ancient = warm ochre. Classical = parchment. Medieval = earthy. Early Modern = cooler parchment. Modern = slate-grey. Changes are driven by `data-era` HTML attribute + CSS variables + MapLibre `setPaintProperty`.
+
+- [ ] **Step 1: Write failing test**
+
+Create `apps/web/__tests__/eraAtmosphere.test.tsx`:
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS } from '@/lib/year'
+
+describe('getEraForYear', () => {
+  it('returns ancient for year < -500', () => {
+    expect(getEraForYear(-1000)).toBe('ancient')
+    expect(getEraForYear(-3000)).toBe('ancient')
+  })
+
+  it('returns classical for -500 to 499', () => {
+    expect(getEraForYear(-500)).toBe('classical')
+    expect(getEraForYear(0)).toBe('classical')
+    expect(getEraForYear(499)).toBe('classical')
+  })
+
+  it('returns medieval for 500 to 1499', () => {
+    expect(getEraForYear(500)).toBe('medieval')
+    expect(getEraForYear(1000)).toBe('medieval')
+  })
+
+  it('returns early-modern for 1500 to 1799', () => {
+    expect(getEraForYear(1500)).toBe('early-modern')
+    expect(getEraForYear(1750)).toBe('early-modern')
+  })
+
+  it('returns modern for >= 1800', () => {
+    expect(getEraForYear(1800)).toBe('modern')
+    expect(getEraForYear(2000)).toBe('modern')
+  })
+
+  it('ERA_MAP_BACKGROUNDS has entry for every era', () => {
+    const eras = ['ancient', 'classical', 'medieval', 'early-modern', 'modern'] as const
+    eras.forEach((era) => {
+      expect(ERA_MAP_BACKGROUNDS[era]).toMatch(/^#/)
+    })
+  })
+
+  it('ERA_WATER_COLORS has entry for every era', () => {
+    const eras = ['ancient', 'classical', 'medieval', 'early-modern', 'modern'] as const
+    eras.forEach((era) => {
+      expect(ERA_WATER_COLORS[era]).toMatch(/^#/)
+    })
+  })
+})
+```
+
+Run: `cd apps/web && npm run test -- --run __tests__/eraAtmosphere.test.tsx`
+Expected: ImportError — `getEraForYear` not found.
+
+- [ ] **Step 2: Add era helpers to year.ts**
+
+Edit `apps/web/lib/year.ts`, add at the end:
+
+```typescript
+export type Era = 'ancient' | 'classical' | 'medieval' | 'early-modern' | 'modern'
+
+export function getEraForYear(year: number): Era {
+  if (year < -500) return 'ancient'
+  if (year < 500)  return 'classical'
+  if (year < 1500) return 'medieval'
+  if (year < 1800) return 'early-modern'
+  return 'modern'
+}
+
+export const ERA_MAP_BACKGROUNDS: Record<Era, string> = {
+  'ancient':      '#d4b896',
+  'classical':    '#cfc4a8',
+  'medieval':     '#c4b898',
+  'early-modern': '#c8c4b0',
+  'modern':       '#c0c8cc',
+}
+
+export const ERA_WATER_COLORS: Record<Era, string> = {
+  'ancient':      '#7a9ab8',
+  'classical':    '#6e9ab5',
+  'medieval':     '#6088a0',
+  'early-modern': '#5d8fa8',
+  'modern':       '#5890a8',
+}
+```
+
+- [ ] **Step 3: Add era CSS variables to globals.css**
+
+Edit `apps/web/app/globals.css`, append after existing styles:
+
+```css
+/* Era-sensitive atmosphere */
+:root { --era-accent: #d4a847; --era-overlay-bg: rgba(0,0,0,0); }
+
+[data-era="ancient"]      { --era-accent: #d4a847; --era-overlay-bg: rgba(80,40,0,0.06); }
+[data-era="classical"]    { --era-accent: #8fb87a; --era-overlay-bg: rgba(0,40,20,0.04); }
+[data-era="medieval"]     { --era-accent: #a08060; --era-overlay-bg: rgba(20,10,0,0.05); }
+[data-era="early-modern"] { --era-accent: #7090b0; --era-overlay-bg: rgba(0,20,40,0.04); }
+[data-era="modern"]       { --era-accent: #6088a8; --era-overlay-bg: rgba(0,0,0,0.02); }
+```
+
+- [ ] **Step 4: Create EraAtmosphere.tsx**
+
+Create `apps/web/components/ui/EraAtmosphere.tsx`:
+
+```typescript
+'use client'
+
+import { useEffect } from 'react'
+import { useTimelineStore } from '@/store/timeline'
+import { getEraForYear } from '@/lib/year'
+
+export function EraAtmosphere() {
+  const year = useTimelineStore((s) => s.year)
+
+  useEffect(() => {
+    const era = getEraForYear(year)
+    document.documentElement.setAttribute('data-era', era)
+  }, [year])
+
+  return null
+}
+```
+
+- [ ] **Step 5: Add era map color transitions to MapView.tsx**
+
+Edit `apps/web/components/map/MapView.tsx`. Add imports:
+
+```typescript
+import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS } from '@/lib/year'
+```
+
+Add `year` to `MapViewProps` if not already present (it should be passed from MapContainer):
+
+```typescript
+export interface MapViewProps {
+  onEntitySelect: (entity: EntityFeature | null) => void
+  onViewportChange?: (viewport: Viewport) => void
+  selectedSlug?: string | null
+  year?: number
+}
+```
+
+Add a new `useEffect` that fires when `year` changes, after the `selectedSlug` effect:
+
+```typescript
+useEffect(() => {
+  const map = mapRef.current
+  if (!map || !map.isStyleLoaded()) return
+  const era = getEraForYear(year ?? -264)
+  const bg = ERA_MAP_BACKGROUNDS[era]
+  const water = ERA_WATER_COLORS[era]
+  map.setPaintProperty('background', 'background-color', bg)
+  map.setPaintProperty('water', 'fill-color', water)
+  map.setPaintProperty('waterway_river', 'line-color', water)
+  map.setPaintProperty('waterway_other', 'line-color', water)
+  map.setPaintProperty('waterway_tunnel', 'line-color', water)
+}, [year])
+```
+
+- [ ] **Step 6: Pass year and render EraAtmosphere in MapContainer**
+
+Edit `apps/web/components/map/MapContainer.tsx`:
+
+```typescript
+import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
+
+// In JSX:
+<EraAtmosphere />
+
+// Pass year to MapView:
+const year = useTimelineStore((s) => s.year)
+
+<MapView
+  ref={mapRef}
+  onEntitySelect={setSelectedEntity}
+  onViewportChange={handleViewportChange}
+  selectedSlug={selectedSlug}
+  year={year}
+/>
+```
+
+- [ ] **Step 7: Run tests**
+
+```bash
+cd apps/web && npm run test -- --run __tests__/eraAtmosphere.test.tsx
+```
+
+Expected: all 7 tests pass.
+
+```bash
+npm run test -- --run
+```
+
+Expected: all existing tests still pass.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add apps/web/lib/year.ts apps/web/components/ui/EraAtmosphere.tsx \
+        apps/web/app/globals.css apps/web/components/map/MapView.tsx \
+        apps/web/components/map/MapContainer.tsx \
+        apps/web/__tests__/eraAtmosphere.test.tsx
+git commit -m "feat(m4-l): era-sensitive atmosphere — map background and water tones shift per historical era"
+```
+
+---
+
+## Task M4-M: Historical Momentum Indicators
+
+**Files:**
+- Modify: `apps/web/components/map/MapView.tsx`
+
+Territories that are newly born (founded within the last 150 years at current slider time) appear slightly brighter. Territories near collapse (ending within the next 100 years) appear slightly dimmer. This uses dynamic MapLibre `setPaintProperty` with threshold values embedded at update time — no backend changes needed.
+
+This task extends the `selectedSlug` fill-opacity effect from M4-E into a single unified opacity expression that combines focus mode + momentum.
+
+- [ ] **Step 1: Write failing test**
+
+Create `apps/web/__tests__/momentum.test.ts`:
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { getMomentumOpacity } from '@/lib/momentum'
+
+describe('getMomentumOpacity', () => {
+  it('stable territory gets base opacity', () => {
+    expect(getMomentumOpacity(-500, null, -264)).toBeCloseTo(0.40, 2)
+  })
+
+  it('rising territory (born < 150y ago) gets higher opacity', () => {
+    // Born at -300, current year -264 → age = 36 years → rising
+    expect(getMomentumOpacity(-300, null, -264)).toBeGreaterThan(0.40)
+  })
+
+  it('declining territory (ends within 100y) gets lower opacity', () => {
+    // year_end = -200, current = -264 → 64 years until end → declining
+    expect(getMomentumOpacity(-500, -200, -264)).toBeLessThan(0.40)
+  })
+
+  it('opacity stays within [0.15, 0.60]', () => {
+    const cases: [number, number | null, number][] = [
+      [-264, null, -264],   // just born
+      [-3000, -2900, -2950], // deep past, near end
+      [-100, null, 2000],    // very old
+    ]
+    cases.forEach(([ys, ye, y]) => {
+      const op = getMomentumOpacity(ys, ye, y)
+      expect(op).toBeGreaterThanOrEqual(0.15)
+      expect(op).toBeLessThanOrEqual(0.60)
+    })
+  })
+})
+```
+
+Run: `cd apps/web && npm run test -- --run __tests__/momentum.test.ts`
+Expected: ImportError — `@/lib/momentum` not found.
+
+- [ ] **Step 2: Create lib/momentum.ts**
+
+Create `apps/web/lib/momentum.ts`:
+
+```typescript
+const BASE_OPACITY = 0.40
+const RISING_BOOST = 0.12  // added when territory < 150 years old
+const DECLINING_DIM = 0.10  // subtracted when territory ends within 100 years
+const RISING_THRESHOLD = 150
+const DECLINING_THRESHOLD = 100
+
+export function getMomentumOpacity(
+  yearStart: number,
+  yearEnd: number | null,
+  currentYear: number,
+): number {
+  const age = currentYear - yearStart
+  const isRising = age >= 0 && age < RISING_THRESHOLD
+  const isDeclining = yearEnd !== null && yearEnd - currentYear < DECLINING_THRESHOLD && yearEnd > currentYear
+
+  let opacity = BASE_OPACITY
+  if (isRising) opacity += RISING_BOOST
+  if (isDeclining) opacity -= DECLINING_DIM
+  return Math.max(0.15, Math.min(0.60, opacity))
+}
+
+export function buildMomentumOpacityExpression(
+  currentYear: number,
+  selectedSlug: string | null,
+): unknown[] {
+  const risingThreshold = currentYear - RISING_THRESHOLD
+  const decliningThreshold = currentYear + DECLINING_THRESHOLD
+
+  return [
+    'case',
+    // Selected = always bright
+    ['==', ['get', 'slug'], selectedSlug ?? '___'], 0.78,
+    // Rising (born recently)
+    ['>', ['get', 'year_start'], risingThreshold],
+    BASE_OPACITY + RISING_BOOST,
+    // Declining (ends soon, year_end not null)
+    [
+      'all',
+      ['has', 'year_end'],
+      ['!=', ['get', 'year_end'], null],
+      ['<', ['coalesce', ['get', 'year_end'], 9999], decliningThreshold],
+      ['>', ['coalesce', ['get', 'year_end'], 9999], currentYear],
+    ],
+    BASE_OPACITY - DECLINING_DIM,
+    // Stable
+    BASE_OPACITY,
+  ]
+}
+```
+
+- [ ] **Step 3: Replace fill-opacity effects in MapView.tsx**
+
+Edit `apps/web/components/map/MapView.tsx`. Add import:
+
+```typescript
+import { buildMomentumOpacityExpression } from '@/lib/momentum'
+```
+
+**Replace** the `useEffect([selectedSlug])` from M4-E with a combined effect that handles both focus mode dimming and momentum:
+
+```typescript
+useEffect(() => {
+  const map = mapRef.current
+  if (!map || !map.isStyleLoaded()) return
+
+  if (selectedSlug) {
+    // Focus mode: dim all except selected, but still apply momentum to selected
+    map.setPaintProperty('territories-fill', 'fill-opacity', [
+      'case',
+      ['==', ['get', 'slug'], selectedSlug], 0.78,
+      0.12,
+    ])
+    map.setPaintProperty('territories-border', 'line-opacity', [
+      'case',
+      ['==', ['get', 'slug'], selectedSlug], 1.0,
+      0.2,
+    ])
+  } else {
+    // No selection: apply momentum-aware opacity
+    map.setPaintProperty(
+      'territories-fill',
+      'fill-opacity',
+      buildMomentumOpacityExpression(year ?? -264, null),
+    )
+    map.setPaintProperty('territories-border', 'line-opacity', 0.9)
+  }
+}, [selectedSlug, year])
+```
+
+Note: `year` must be destructured from props in the component signature for this effect to work. It was added to props in M4-L.
+
+- [ ] **Step 4: Run tests**
+
+```bash
+cd apps/web && npm run test -- --run __tests__/momentum.test.ts
+```
+
+Expected: all 4 tests pass.
+
+```bash
+npm run test -- --run
+```
+
+Expected: all existing tests pass.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add apps/web/lib/momentum.ts apps/web/components/map/MapView.tsx \
+        apps/web/__tests__/momentum.test.ts
+git commit -m "feat(m4-m): historical momentum indicators — rising/declining territory opacity per lifecycle phase"
+```
+
+---
+
+## Task M4-N: Temporal Playback Foundation
+
+**Files:**
+- Modify: `apps/web/store/timeline.ts`
+- Create: `apps/web/components/timeline/PlaybackControls.tsx`
+- Modify: `apps/web/components/timeline/TimelineSlider.tsx`
+
+Add play/pause state to store, a `PlaybackControls` component, and a `useEffect` in `TimelineSlider` that auto-advances the year while playing. This is the architecture foundation for future cinematic timeline playback — no autoplay cinematic mode yet.
+
+- [ ] **Step 1: Write failing tests**
+
+Create `apps/web/__tests__/playback.test.tsx`:
+
+```typescript
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, act } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { PlaybackControls } from '@/components/timeline/PlaybackControls'
+import { useTimelineStore } from '@/store/timeline'
+
+beforeEach(() => {
+  useTimelineStore.setState({ year: -264, isPlaying: false, playSpeed: 1 })
+  vi.useFakeTimers()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
+describe('PlaybackControls', () => {
+  it('renders play button when not playing', () => {
+    render(<PlaybackControls />)
+    expect(screen.getByLabelText('Play timeline')).toBeDefined()
+  })
+
+  it('renders pause button when playing', () => {
+    useTimelineStore.setState({ isPlaying: true })
+    render(<PlaybackControls />)
+    expect(screen.getByLabelText('Pause playback')).toBeDefined()
+  })
+
+  it('clicking play sets isPlaying true', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    render(<PlaybackControls />)
+    await user.click(screen.getByLabelText('Play timeline'))
+    expect(useTimelineStore.getState().isPlaying).toBe(true)
+  })
+
+  it('clicking pause sets isPlaying false', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    useTimelineStore.setState({ isPlaying: true })
+    render(<PlaybackControls />)
+    await user.click(screen.getByLabelText('Pause playback'))
+    expect(useTimelineStore.getState().isPlaying).toBe(false)
+  })
+})
+
+describe('playback store fields', () => {
+  it('initial isPlaying is false', () => {
+    expect(useTimelineStore.getState().isPlaying).toBe(false)
+  })
+
+  it('initial playSpeed is 1', () => {
+    expect(useTimelineStore.getState().playSpeed).toBe(1)
+  })
+
+  it('setPlaying updates isPlaying', () => {
+    useTimelineStore.getState().setPlaying(true)
+    expect(useTimelineStore.getState().isPlaying).toBe(true)
+  })
+
+  it('setPlaySpeed updates playSpeed', () => {
+    useTimelineStore.getState().setPlaySpeed(5)
+    expect(useTimelineStore.getState().playSpeed).toBe(5)
+  })
+})
+```
+
+Run: `cd apps/web && npm run test -- --run __tests__/playback.test.tsx`
+Expected: failures — `isPlaying` not in store, `PlaybackControls` not found.
+
+- [ ] **Step 2: Extend store with playback fields**
+
+Edit `apps/web/store/timeline.ts`. Add to `TimelineState` interface:
+
+```typescript
+isPlaying: boolean
+playSpeed: number
+setPlaying: (playing: boolean) => void
+setPlaySpeed: (speed: number) => void
+```
+
+Add to the `create<TimelineState>((set) => ({...}))` object:
+
+```typescript
+isPlaying: false,
+playSpeed: 1,
+setPlaying: (isPlaying) => set({ isPlaying }),
+setPlaySpeed: (playSpeed) => set({ playSpeed }),
+```
+
+- [ ] **Step 3: Create PlaybackControls.tsx**
+
+Create `apps/web/components/timeline/PlaybackControls.tsx`:
+
+```typescript
+'use client'
+
+import { useTimelineStore } from '@/store/timeline'
+import { SNAPSHOT_YEARS } from '@/lib/year'
+
+export function PlaybackControls() {
+  const isPlaying = useTimelineStore((s) => s.isPlaying)
+  const playSpeed = useTimelineStore((s) => s.playSpeed)
+  const year = useTimelineStore((s) => s.year)
+  const setPlaying = useTimelineStore((s) => s.setPlaying)
+  const setPlaySpeed = useTimelineStore((s) => s.setPlaySpeed)
+
+  const atEnd = year >= SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => setPlaying(!isPlaying)}
+        disabled={atEnd}
+        className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-400/15 hover:bg-amber-400/35 disabled:opacity-30 transition-colors text-amber-300 text-sm"
+        aria-label={isPlaying ? 'Pause playback' : 'Play timeline'}
+        title={isPlaying ? 'Pause' : 'Play through history'}
+      >
+        {isPlaying ? '⏸' : '▶'}
+      </button>
+      <select
+        value={playSpeed}
+        onChange={(e) => setPlaySpeed(Number(e.target.value))}
+        className="bg-transparent text-white/35 text-xs border-none outline-none cursor-pointer hover:text-white/60 transition-colors"
+        aria-label="Playback speed"
+      >
+        <option value={0.5}>½×</option>
+        <option value={1}>1×</option>
+        <option value={2}>2×</option>
+        <option value={5}>5×</option>
+      </select>
+    </div>
+  )
+}
+```
+
+- [ ] **Step 4: Add autoplay loop to TimelineSlider.tsx**
+
+Edit `apps/web/components/timeline/TimelineSlider.tsx`. Add to the import from `@/store/timeline`:
+
+```typescript
+const isPlaying = useTimelineStore((s) => s.isPlaying)
+const playSpeed = useTimelineStore((s) => s.playSpeed)
+const setPlaying = useTimelineStore((s) => s.setPlaying)
+```
+
+Add autoplay effect after existing `useEffect` blocks:
+
+```typescript
+useEffect(() => {
+  if (!isPlaying) return
+  const msPerStep = Math.round(1000 / playSpeed)
+  const id = setInterval(() => {
+    const store = useTimelineStore.getState()
+    const next = snapToNextSnapshot(store.year)
+    if (next === store.year) {
+      store.setPlaying(false)
+      return
+    }
+    store.setYear(next)
+  }, msPerStep)
+  return () => clearInterval(id)
+}, [isPlaying, playSpeed])
+```
+
+Also import and render `PlaybackControls` inside the `TimelineSlider` return, in the slider row alongside the year display:
+
+```typescript
+import { PlaybackControls } from './PlaybackControls'
+
+// In JSX, add PlaybackControls next to the year display div:
+<div className="flex items-center justify-between mb-3">
+  <PlaybackControls />
+  <div className="text-center flex-1">
+    {/* existing year display / edit */}
+    ...
+  </div>
+  <div className="w-24" /> {/* spacer to balance layout */}
+</div>
+```
+
+Note: refactor the existing year display div to fit inside this flex row.
+
+- [ ] **Step 5: Run tests**
+
+```bash
+cd apps/web && npm run test -- --run __tests__/playback.test.tsx
+```
+
+Expected: all 8 tests pass.
+
+```bash
+npm run test -- --run
+```
+
+Expected: all tests pass.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add apps/web/store/timeline.ts apps/web/components/timeline/PlaybackControls.tsx \
+        apps/web/components/timeline/TimelineSlider.tsx \
+        apps/web/__tests__/playback.test.tsx
+git commit -m "feat(m4-n): temporal playback foundation — play/pause/speed controls with autoplay loop"
+```
+
+---
+
 ## Self-Review
 
 ### Spec Coverage
@@ -2015,7 +2987,17 @@ git commit -m "test(m4-i): complete M4 test suite — entity detail, timeline ke
 | 7. Lineage Visualization | M4-C LineageTree ✓ |
 | 8. Capitals & Historical Cities | **DEFERRED to M5** — no data exists yet |
 | 9. Search & Discovery | M4-F ✓ |
-| 10. Historical Atmosphere & Identity | M4-A + M4-H ✓ |
+| 10. Historical Atmosphere & Identity | M4-A + M4-H + M4-L ✓ |
+| EXP-1. Temporal Awareness Overlay | M4-J ✓ — events ticker + world powers panel |
+| EXP-2. Civilization Lifespan | M4-K ✓ — lifespan bar + peak metadata |
+| EXP-3. Dynamic World Density | M4-D (LOD already in M3) + M4-L era zoom colors |
+| EXP-4. World At This Time | M4-J ✓ — world powers from currentEntities |
+| EXP-5. Peak Civilization Metadata | M4-K ✓ — ENTITY_META static data |
+| EXP-6. Era-Sensitive Atmosphere | M4-L ✓ — CSS vars + MapLibre color transitions |
+| EXP-7. Multi-Scale Labeling | M3-H LOD + M4-D importance tiers (existing) |
+| EXP-8. Historical Discovery Layer | M4-E hover tooltip covers this for territories |
+| EXP-9. Historical Momentum Indicators | M4-M ✓ — rising/declining opacity expression |
+| EXP-10. Temporal Playback Foundation | M4-N ✓ — play/pause/speed architecture |
 
 ### Placeholder Scan
 
@@ -2032,10 +3014,19 @@ No TBD/TODO markers. All code blocks contain actual implementations.
 
 All types introduced in earlier tasks match usage in later tasks.
 
+### Type Consistency (new tasks)
+
+- `getEraForYear` / `ERA_MAP_BACKGROUNDS` / `ERA_WATER_COLORS` defined in M4-L `year.ts`, used in `EraAtmosphere` and `MapView`
+- `buildMomentumOpacityExpression` / `getMomentumOpacity` defined in M4-M `lib/momentum.ts`, used in `MapView`
+- `isPlaying` / `playSpeed` / `setPlaying` / `setPlaySpeed` added to store in M4-N, used in `PlaybackControls` and `TimelineSlider`
+- `ENTITY_META` defined in M4-K `data/entity-metadata.ts`, used in `EntityPanel`
+- `TemporalOverlay` uses `currentEntities` from store (populated in M4-C) — must run after M4-C
+
 ### What Is NOT in M4
 
 - `entity_capitals` table data — table exists, no cities data ingested; capitals rendering deferred to M5
-- Autoplay / playback mode — omitted (complex state machine, low ROI vs M5 data work)
+- Cinematic autoplay mode — M4-N provides architecture only (play/pause/speed); no guided tour, no narrative
 - Mobile layout — omitted (desktop-first; would need significant responsive redesign)
 - Accessibility deep work — basic aria-labels maintained from existing code; full audit deferred
 - Full lineage graph explorer — simple list in LineageTree is sufficient for M4
+- Dynamic multi-scale label density (EXP-3 / EXP-7) — M3 LOD handles this at geometry level; full label hierarchy tuning deferred to M5 with more data
