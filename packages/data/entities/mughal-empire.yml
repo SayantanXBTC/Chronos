@@ -18,11 +18,11 @@ phases:
     confidence: approximate
     confidence_score: 0.6
     date_precision: approximate
-    end_event_type: internal_change
+    end_event_type: succession
   - geometry: mughal-empire/phase-2.geojson
     year_start: 1605
     year_end: 1707
     confidence: approximate
     confidence_score: 0.6
     date_precision: approximate
-    end_event_type: internal_change
+    end_event_type: succession

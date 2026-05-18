@@ -18,7 +18,7 @@ phases:
     confidence: approximate
     confidence_score: 0.5
     date_precision: approximate
-    end_event_type: internal_change
+    end_event_type: succession
   - geometry: inca-empire/phase-2.geojson
     year_start: 1493
     year_end: 1533

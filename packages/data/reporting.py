@@ -78,7 +78,7 @@ def stats(conn: psycopg2.extensions.connection) -> dict:
         }
 
         # --- lineages ---
-        cur.execute("SELECT COUNT(*) FROM lineages")
+        cur.execute("SELECT COUNT(*) FROM entity_lineages")
         result["lineages"] = {"total": cur.fetchone()[0]}
 
         # --- regions ---

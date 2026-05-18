@@ -18,11 +18,11 @@ phases:
     confidence: approximate
     confidence_score: 0.5
     date_precision: approximate
-    end_event_type: internal_change
+    end_event_type: succession
   - geometry: mali-empire/phase-2.geojson
     year_start: 1337
     year_end: 1600
     confidence: approximate
     confidence_score: 0.5
     date_precision: approximate
-    end_event_type: dissolution
+    end_event_type: collapse

@@ -20,10 +20,6 @@ lineages:
     child: abbasid-caliphate
     relationship: successor
     year: 750
-  - parent: mongol-empire
-    child: yuan-dynasty
-    relationship: split_from
-    year: 1271
   - parent: macedonian-empire
     child: seleucid-empire
     relationship: split_from
@@ -41,7 +37,7 @@ lineages:
     notes: "Han founded after Qin collapse; Liu Bang established Western Han"
   - parent: achaemenid-persia
     child: sasanian-empire
-    relationship: revival
+    relationship: successor
     year: 224
     notes: "Ardashir I revived Persian imperial tradition after Parthian interregnum"
   - parent: mali-empire
