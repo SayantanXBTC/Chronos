@@ -9,7 +9,7 @@ import yaml
 from shapely.geometry import shape
 
 from .loader import Loader
-from .normalize import coerce_valid, simplify_geom, to_multipolygon, validate_geom
+from .normalize import coerce_valid, simplify_geom_all, to_multipolygon, validate_geom
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = _REPO_ROOT / "data" / "raw" / "political"
@@ -71,11 +71,11 @@ def _ingest_entity(loader: Loader, config: dict[str, Any]) -> tuple[int, int]:
                 print(f"    WARNING: invalid geometry in {path}, skipping")
                 skipped += 1
                 continue
-            simplified = simplify_geom(geom)
+            geom_hi, geom_med, geom_lo = simplify_geom_all(geom)
             loader.insert_territory(
                 entity_id,
-                geom.wkt,
-                simplified.wkt,
+                geom_hi.wkt,
+                geom_med.wkt,
                 phase["year_start"],
                 phase["year_end"],
                 confidence_type=phase.get("confidence", "approximate"),
@@ -87,6 +87,9 @@ def _ingest_entity(loader: Loader, config: dict[str, Any]) -> tuple[int, int]:
                 resolution_km=config.get("resolution_km"),
                 importance=config.get("importance", 5),
                 map_modes=config.get("map_modes", ["political"]),
+                geom_lo_wkt=geom_lo.wkt,
+                date_precision=phase.get("date_precision", "approximate"),
+                end_event_type=phase.get("end_event_type"),
             )
             loaded += 1
         except Exception as e:

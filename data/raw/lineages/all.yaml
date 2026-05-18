@@ -24,3 +24,13 @@ lineages:
     child: yuan-dynasty
     relationship: split_from
     year: 1271
+  - parent: macedonian-empire
+    child: seleucid-empire
+    relationship: split_from
+    year: -312
+    notes: "Seleucus I founded Seleucid Empire from Macedonian satrapy after diadochi wars"
+  - parent: macedonian-empire
+    child: ptolemaic-egypt
+    relationship: split_from
+    year: -305
+    notes: "Ptolemy I founded Ptolemaic Kingdom after diadochi wars"

@@ -62,6 +62,9 @@ class Loader:
         resolution_km: int | None = None,
         importance: int = 5,
         map_modes: list[str] | None = None,
+        geom_lo_wkt: str | None = None,
+        date_precision: str = "approximate",
+        end_event_type: str | None = None,
     ) -> None:
         if map_modes is None:
             map_modes = ["political"]
@@ -69,20 +72,23 @@ class Loader:
             cur.execute(
                 """
                 INSERT INTO territories (
-                    id, entity_id, geom, simplified_geom,
+                    id, entity_id, geom, simplified_geom, geom_lo,
                     year_start, year_end,
                     confidence_type, confidence_score,
                     source_name, source_url, source_license, data_version,
-                    resolution_km, importance, map_modes
+                    resolution_km, importance, map_modes,
+                    date_precision, end_event_type
                 )
                 VALUES (
                     %s::uuid, %s::uuid,
                     ST_Multi(ST_GeomFromText(%s, 4326)),
                     ST_Multi(ST_GeomFromText(%s, 4326)),
+                    CASE WHEN %s IS NOT NULL THEN ST_Multi(ST_GeomFromText(%s, 4326)) ELSE NULL END,
                     %s, %s,
                     %s, %s,
                     %s, %s, %s, %s,
-                    %s, %s, %s
+                    %s, %s, %s,
+                    %s, %s
                 )
                 """,
                 (
@@ -90,6 +96,8 @@ class Loader:
                     entity_id,
                     geom_wkt,
                     simplified_wkt,
+                    geom_lo_wkt,
+                    geom_lo_wkt,
                     year_start,
                     year_end,
                     confidence_type,
@@ -101,5 +109,7 @@ class Loader:
                     resolution_km,
                     importance,
                     map_modes,
+                    date_precision,
+                    end_event_type,
                 ),
             )

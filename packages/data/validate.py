@@ -173,9 +173,11 @@ def validate_geojson_file(path: Path | str) -> ValidationResult:
             try:
                 shp = shape(geometry)
                 if not shp.is_valid:
+                    import shapely as _shapely
+                    reason = _shapely.is_valid_reason(shp)
                     result.errors.append(
                         f"Feature {idx}: geometry is invalid (self-intersecting or degenerate): "
-                        f"{shp.explain_validity()}"
+                        f"{reason}"
                     )
             except Exception as exc:
                 result.errors.append(
