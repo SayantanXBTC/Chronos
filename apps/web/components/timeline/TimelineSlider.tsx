@@ -70,6 +70,8 @@ export function TimelineSlider() {
       setYear(sliderToYear(Math.round(current)))
       if (Math.abs(vel) > 0.1) {
         inertiaRafRef.current = requestAnimationFrame(step)
+      } else {
+        inertiaRafRef.current = null
       }
     }
     if (Math.abs(vel) > 0.2) {
