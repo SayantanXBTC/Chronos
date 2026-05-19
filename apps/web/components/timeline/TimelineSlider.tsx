@@ -51,7 +51,7 @@ export function TimelineSlider() {
     const delta = (mx / width) * SLIDER_MAX
 
     if (dragging) {
-      const base = yearToSlider(year)
+      const base = yearToSlider(useTimelineStore.getState().year)
       const next = clampSlider(base + delta)
       setYear(sliderToYear(Math.round(next)))
       return
@@ -62,7 +62,7 @@ export function TimelineSlider() {
     const sliderPerMs = (pxPerMs / width) * SLIDER_MAX
     let vel = sliderPerMs * 16.67  // convert to per-frame
 
-    let current = yearToSlider(year)
+    let current = yearToSlider(useTimelineStore.getState().year)
 
     function step() {
       vel = decayVelocity(vel, 16.67)
