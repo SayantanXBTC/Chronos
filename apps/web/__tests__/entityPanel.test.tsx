@@ -135,6 +135,6 @@ describe('EntityPanel', () => {
     vi.mocked(fetchEntityDetail).mockResolvedValue(mockDetail)
     useTimelineStore.setState({ selectedEntity: mockEntity })
     render(<EntityPanel />)
-    await waitFor(() => expect(screen.getByText(/Peak/i)).toBeDefined())
+    await waitFor(() => expect(screen.getByText(/Peak under Trajan/i)).toBeDefined())
   })
 })

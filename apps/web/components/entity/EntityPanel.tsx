@@ -110,8 +110,8 @@ export function EntityPanel() {
               className="absolute top-0 h-full rounded-full"
               style={{
                 backgroundColor: color,
-                left: `${Math.max(0, ((detail.year_start - TIMELINE_MIN) / TIMELINE_SPAN) * 100)}%`,
-                right: `${Math.max(0, ((TIMELINE_MAX - (detail.year_end ?? TIMELINE_MAX)) / TIMELINE_SPAN) * 100)}%`,
+                left: `${Math.max(0, Math.min(100, ((detail.year_start - TIMELINE_MIN) / TIMELINE_SPAN) * 100))}%`,
+                right: `${Math.max(0, Math.min(100, ((TIMELINE_MAX - (detail.year_end ?? TIMELINE_MAX)) / TIMELINE_SPAN) * 100))}%`,
                 opacity: 0.65,
               }}
             />

@@ -1,4 +1,4 @@
-interface EntityMeta {
+export interface EntityMeta {
   peak_year?: number
   peak_label?: string
 }
