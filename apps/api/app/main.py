@@ -10,7 +10,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from app.config import settings
 from app.database import AsyncSessionLocal
 from app.routers import admin, entities, events, place_names, rivers, sources, world
-from app.services.cache_service import WARM_YEARS, CacheService
+from app.services.cache_service import FULL_WORLD_TILE, WARM_YEARS, CacheService
 from app.services.world_state import SNAPSHOT_YEARS, WorldStateService
 
 logger = logging.getLogger(__name__)
@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 async def _warm_cache_task() -> None:
     """Background task: pre-populate Redis for common snapshot years. Non-fatal."""
+    await asyncio.sleep(2)  # let app fully start
+    redis = None
     try:
-        await asyncio.sleep(2)  # let app fully start
-
         redis = aioredis.from_url(settings.redis_url, decode_responses=True)
         cache = CacheService(redis)
 
@@ -33,18 +33,27 @@ async def _warm_cache_task() -> None:
                 if await cache.is_world_state_cached(year, "political", 4):
                     continue
                 result = await svc.get_state(year=year, bbox=(-180, -90, 180, 90), zoom=4)
-                await cache.set_world_state(year, "political", 4, -18, -9, result)
+                tile_x, tile_y = FULL_WORLD_TILE
+                await cache.set_world_state(year, "political", 4, tile_x, tile_y, result)
                 warmed += 1
-
-        await redis.aclose()
-        logger.info("[startup] Cache warmed: %d snapshots", warmed)
+            logger.info("[startup] Cache warmed: %d snapshots", warmed)
+    except aioredis.exceptions.ConnectionError:
+        logger.warning("[startup] Redis unavailable, skipping cache warm")
     except Exception:
         logger.exception("[startup] Cache warming failed (non-fatal)")
+    finally:
+        if redis is not None:
+            await redis.aclose()
+
+
+_background_tasks: set = set()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(_warm_cache_task())
+    t = asyncio.create_task(_warm_cache_task())
+    _background_tasks.add(t)
+    t.add_done_callback(_background_tasks.discard)
     yield
 
 
