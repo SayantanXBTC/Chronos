@@ -26,6 +26,7 @@ export class FPSCounter {
 
   start(onUpdate?: (fps: number) => void): void {
     const tick = (now: number) => {
+      if (this.rafId === null) return  // stop() was called; bail out
       this.frames.push(now)
       const cutoff = now - 1000
       while (this.frames.length > 0 && this.frames[0] < cutoff) {

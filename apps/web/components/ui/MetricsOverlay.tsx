@@ -9,8 +9,10 @@ export function MetricsOverlay() {
 
   useEffect(() => {
     const counter = new FPSCounter()
+    let isActive = true
 
     const handleKey = (e: KeyboardEvent) => {
+      if (!isActive) return
       if (e.shiftKey && e.key === 'M') {
         setVisible((v) => {
           if (!v) counter.start(setFps)
@@ -22,6 +24,7 @@ export function MetricsOverlay() {
 
     window.addEventListener('keydown', handleKey)
     return () => {
+      isActive = false
       window.removeEventListener('keydown', handleKey)
       counter.stop()
     }
