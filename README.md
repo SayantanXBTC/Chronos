@@ -1,81 +1,66 @@
 # Chronos
 
-An interactive world history map where you scrub a timeline from 3000 BCE to 2026 CE and watch civilizations rise and fall in real time. Click any empire to explore its lineage, dates, and contemporaries. Built with FastAPI, PostGIS, and MapLibre GL.
+An interactive world history map. Scrub through time from 3000 BCE to 2026 CE and watch civilizations rise and fall. Click any empire to see its lineage, lifespan, and what else existed at the same time.
 
-## Prerequisites
+Stack: FastAPI, PostGIS, Next.js, MapLibre GL.
 
-- Docker and Docker Compose
-- Python 3.12 or higher
-- Node.js 20 or higher
+---
 
-## Quick Start
+## Setup
 
-1. Copy environment file:
-   ```bash
-   cp .env.example .env
-   ```
+**Requirements:** Docker, Python 3.12+, Node.js 20+
 
-2. Build and start services:
-   ```bash
-   make dev-build
-   ```
+```bash
+cp .env.example .env
+make dev-build
+make migrate
+make seed
+```
 
-3. Run database migrations:
-   ```bash
-   make migrate
-   ```
-
-4. Seed initial data:
-   ```bash
-   make seed
-   ```
-
-## Verify Installation
-
-Check that the API is running:
+Verify it's running:
 
 ```bash
 curl http://localhost:8000/health
+# {"status": "ok", "env": "development"}
 ```
 
-Expected response:
-```json
-{"status": "ok", "env": "development"}
-```
+---
 
-Query historical world state for 264 BCE at zoom level 4:
+## Years
 
-```bash
-curl "http://localhost:8000/api/v1/world/state?year=-264&zoom=4"
-```
+Stored as signed integers. `-264` = 264 BCE, `117` = 117 CE. Year 0 does not exist.
 
-## Year Convention
+---
 
-Years are stored as signed integers. Negative values represent BCE, positive values represent CE. Year 0 does not exist — the calendar jumps from -1 to 1.
+## Commands
 
-## Development Commands
+| Command | What it does |
+|---------|-------------|
+| `make dev` | Start services |
+| `make dev-build` | Rebuild and start |
+| `make stop` | Stop everything |
+| `make migrate` | Run migrations |
+| `make seed` | Load data |
+| `make test` | Run tests |
+| `make lint` | Lint with ruff |
 
-| Command | Purpose |
-|---------|---------|
-| `make dev` | Start services without rebuilding |
-| `make dev-build` | Build and start services |
-| `make stop` | Stop all services |
-| `make migrate` | Run database migrations |
-| `make seed` | Load initial data |
-| `make test` | Run test suite |
-| `make lint` | Check code style with ruff |
+---
 
 ## Services
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| API | 8000 | FastAPI backend |
-| PostgreSQL/PostGIS | 5432 | Spatial-temporal database |
-| Redis | 6379 | World state cache |
+| Service | Port |
+|---------|------|
+| API | 8000 |
+| PostgreSQL/PostGIS | 5432 |
+| Redis | 6379 |
 
-## Project Structure
+---
 
-- `apps/api/` — FastAPI backend (Python 3.12, SQLAlchemy 2, Alembic, PostGIS, Redis)
-- `apps/web/` — Next.js 14 frontend (MapLibre GL, Zustand, Tailwind CSS)
-- `packages/data/` — Data ingestion pipeline (Shapely, Fiona, GeoPandas)
-- `infra/docker-compose.yml` — Docker service definitions
+## Structure
+
+```
+apps/api/        FastAPI backend
+apps/web/        Next.js frontend
+packages/data/   Data ingestion pipeline
+infra/           Docker config
+```
