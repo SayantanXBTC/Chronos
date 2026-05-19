@@ -1,15 +1,50 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 
+import redis.asyncio as aioredis
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from app.config import settings
+from app.database import AsyncSessionLocal
 from app.routers import admin, entities, events, place_names, rivers, sources, world
+from app.services.cache_service import WARM_YEARS, CacheService
+from app.services.world_state import SNAPSHOT_YEARS, WorldStateService
+
+logger = logging.getLogger(__name__)
+
+
+async def _warm_cache_task() -> None:
+    """Background task: pre-populate Redis for common snapshot years. Non-fatal."""
+    try:
+        await asyncio.sleep(2)  # let app fully start
+
+        redis = aioredis.from_url(settings.redis_url, decode_responses=True)
+        cache = CacheService(redis)
+
+        async with AsyncSessionLocal() as db:
+            svc = WorldStateService(db)
+            warmed = 0
+            for year in WARM_YEARS:
+                if year not in SNAPSHOT_YEARS:
+                    continue
+                if await cache.is_world_state_cached(year, "political", 4):
+                    continue
+                result = await svc.get_state(year=year, bbox=(-180, -90, 180, 90), zoom=4)
+                await cache.set_world_state(year, "political", 4, -18, -9, result)
+                warmed += 1
+
+        await redis.aclose()
+        logger.info("[startup] Cache warmed: %d snapshots", warmed)
+    except Exception:
+        logger.exception("[startup] Cache warming failed (non-fatal)")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    asyncio.create_task(_warm_cache_task())
     yield
 
 
