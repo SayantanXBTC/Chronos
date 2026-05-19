@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion } from 'motion/react'
 import { useTimelineStore } from '@/store/timeline'
 import { fetchEntityDetail } from '@/lib/api'
 import { yearToDisplay } from '@/lib/year'
@@ -49,10 +50,14 @@ export function EntityPanel() {
   const yearEnd = detail?.year_end ?? entity.properties.year_end
 
   return (
-    <div
+    <motion.div
       className="absolute top-4 right-4 w-80 max-h-[calc(100vh-6rem)] overflow-y-auto bg-black/85 backdrop-blur-md text-white rounded-xl p-5 border border-white/10 shadow-2xl"
       role="complementary"
       aria-label={`Entity: ${name}`}
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 24 }}
+      transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <button
         onClick={() => setSelectedEntity(null)}
@@ -165,6 +170,6 @@ export function EntityPanel() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }

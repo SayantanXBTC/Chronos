@@ -3,6 +3,7 @@
 
 import dynamic from 'next/dynamic'
 import { useRef, useCallback } from 'react'
+import { AnimatePresence } from 'motion/react'
 import { useTimelineStore, type Viewport } from '@/store/timeline'
 import { TimelineSlider } from '@/components/timeline/TimelineSlider'
 import { EntityPanel } from '@/components/entity/EntityPanel'
@@ -46,7 +47,9 @@ export function MapContainer() {
       <LoadingOverlay />
       <SearchBar />
       <TemporalOverlay />
-      <EntityPanel />
+      <AnimatePresence>
+        {selectedSlug && <EntityPanel key={selectedSlug} />}
+      </AnimatePresence>
       <TimelineSlider />
       <AttributionFooter />
     </div>
