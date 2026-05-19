@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { useTimelineStore } from '@/store/timeline'
 import type { EntityFeature } from '@/types'
 
@@ -54,20 +55,20 @@ function topEntities(entities: EntityFeature[]): EntityFeature[] {
 
 export function TemporalOverlay() {
   const year = useTimelineStore((s) => s.year)
-  const currentEntities = useTimelineStore((s) => s.currentEntities)
+  const currentEntities = useTimelineStore(useShallow((s) => s.currentEntities))
 
   const event = useMemo(() => nearestEvent(year), [year])
   const top = useMemo(() => topEntities(currentEntities), [currentEntities])
 
-  const showEvent = event !== null && Math.abs(event.year - year) <= 150
+  const nearEnough = event !== null && Math.abs(event.year - year) <= 150
 
-  if (!showEvent && top.length === 0) return null
+  if (!nearEnough && top.length === 0) return null
 
   return (
     <div className="absolute bottom-32 left-4 max-w-xs pointer-events-none select-none z-10">
-      {showEvent && (
+      {event !== null && Math.abs(event.year - year) <= 150 && (
         <div className="mb-2 bg-black/60 backdrop-blur-sm text-white/70 text-xs px-3 py-2 rounded-lg border border-white/10 leading-relaxed">
-          {event!.text}
+          {event.text}
         </div>
       )}
       {top.length > 0 && (
