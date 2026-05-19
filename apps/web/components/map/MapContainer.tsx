@@ -9,6 +9,7 @@ import { EntityPanel } from '@/components/entity/EntityPanel'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { AttributionFooter } from '@/components/ui/AttributionFooter'
 import { SearchBar } from '@/components/ui/SearchBar'
+import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
 import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
@@ -38,6 +39,7 @@ export function MapContainer() {
       />
       <LoadingOverlay />
       <SearchBar />
+      <TemporalOverlay />
       <EntityPanel />
       <TimelineSlider />
       <AttributionFooter />
