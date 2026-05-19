@@ -209,6 +209,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 
       // --- Territory hover / click ---
       let hoveredId: number | null = null
+      let tooltipTimer: ReturnType<typeof setTimeout> | null = null
 
       // Hover tooltip
       const popup = new maplibregl.Popup({
@@ -221,35 +222,42 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       map.on('mousemove', 'territories-fill', (e) => {
         if (!e.features?.length) return
         map.getCanvas().style.cursor = 'pointer'
-        // Feature-state hover
+
+        // Feature-state hover (immediate — affects opacity)
         if (hoveredId !== null) {
           map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: false })
         }
         hoveredId = e.features[0].id as number
         map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: true })
-        // Popup
+
+        // Tooltip only shows after 220ms dwell — prevents flicker on mouse transit
+        if (tooltipTimer) clearTimeout(tooltipTimer)
+        const lngLat = e.lngLat
         const props = e.features[0].properties as EntityProperties
-        const yearStart = props.year_start
-        const yearEnd = props.year_end
-        let dateStr = ''
-        try {
-          if (yearStart !== undefined && yearStart !== null) {
-            const endLabel = (yearEnd !== null && yearEnd !== undefined) ? yearToDisplay(yearEnd) : 'present'
-            dateStr = `${yearToDisplay(yearStart)} – ${endLabel}`
+        tooltipTimer = setTimeout(() => {
+          const yearStart = props.year_start
+          const yearEnd = props.year_end
+          let dateStr = ''
+          try {
+            if (yearStart !== undefined && yearStart !== null) {
+              const endLabel = (yearEnd !== null && yearEnd !== undefined) ? yearToDisplay(yearEnd) : 'present'
+              dateStr = `${yearToDisplay(yearStart)} – ${endLabel}`
+            }
+          } catch {
+            // yearToDisplay throws on year 0
           }
-        } catch {
-          // yearToDisplay throws on year 0
-        }
-        popup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div class="font-semibold">${props.name}</div>${dateStr ? `<div class="text-xs opacity-70 mt-0.5">${dateStr}</div>` : ''}`
-          )
-          .addTo(map)
+          popup
+            .setLngLat(lngLat)
+            .setHTML(
+              `<div class="font-semibold">${props.name}</div>${dateStr ? `<div class="text-xs opacity-70 mt-0.5">${dateStr}</div>` : ''}`
+            )
+            .addTo(map)
+        }, 220)
       })
 
       map.on('mouseleave', 'territories-fill', () => {
         map.getCanvas().style.cursor = ''
+        if (tooltipTimer) { clearTimeout(tooltipTimer); tooltipTimer = null }
         if (hoveredId !== null) {
           map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: false })
           hoveredId = null
