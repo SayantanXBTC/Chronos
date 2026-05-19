@@ -1,6 +1,8 @@
 """Tests for entity_service.py."""
+import os
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from app.services.entity_service import EntityService
 
 
@@ -129,3 +131,24 @@ class TestEntityDetailRouter:
         assert resp.status_code == 200
         assert resp.json()["slug"] == "roman-empire"
         assert "lineage" in resp.json()
+
+
+@pytest.mark.skipif(
+    not os.environ.get("HISTORY_TEST_DB"),
+    reason="requires live DB"
+)
+def test_roman_empire_detail_live():
+    """Smoke test against live DB: roman-empire must have lineage predecessors."""
+    import asyncio
+    from app.database import async_session_factory
+    from app.services.entity_service import EntityService
+
+    async def run():
+        async with async_session_factory() as db:
+            svc = EntityService(db=db)
+            return await svc.get_entity_detail("roman-empire")
+
+    result = asyncio.get_event_loop().run_until_complete(run())
+    assert result is not None
+    assert result["name"] == "Roman Empire"
+    assert len(result["lineage"]["predecessors"]) >= 1
