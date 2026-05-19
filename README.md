@@ -1,4 +1,4 @@
-# Kleio
+# Chronos
 
 An interactive world history map where you scrub a timeline from 3000 BCE to 2026 CE and watch civilizations rise and fall in real time. Click any empire to explore its lineage, dates, and contemporaries. Built with FastAPI, PostGIS, and MapLibre GL.
 
