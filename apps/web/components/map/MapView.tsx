@@ -108,6 +108,32 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         },
       })
 
+      // Outer glow — wide, blurred, low opacity. Creates soft territory edge.
+      map.addLayer({
+        id: 'territories-border-glow',
+        type: 'line',
+        source: 'territories',
+        paint: {
+          'line-color': ['coalesce', ['get', 'color'], '#888888'],
+          'line-width': 12,
+          'line-opacity': 0.10,
+          'line-blur': 8,
+        },
+      })
+
+      // Mid border — medium weight, slight blur. Carries color identity.
+      map.addLayer({
+        id: 'territories-border-mid',
+        type: 'line',
+        source: 'territories',
+        paint: {
+          'line-color': ['coalesce', ['get', 'color'], '#888888'],
+          'line-width': 3.5,
+          'line-opacity': 0.40,
+          'line-blur': 1.5,
+        },
+      })
+
       map.addLayer({
         id: 'territories-border',
         type: 'line',
