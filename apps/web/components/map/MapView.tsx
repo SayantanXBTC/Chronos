@@ -45,6 +45,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
   useEffect(() => { onEntitySelectRef.current = onEntitySelect }, [onEntitySelect])
   const yearRef = useRef(year)
   useEffect(() => { yearRef.current = year }, [year])
+  const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useImperativeHandle(ref, () => ({
     updateTerritories(data: WorldStateResponse) {
@@ -209,7 +210,6 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 
       // --- Territory hover / click ---
       let hoveredId: number | null = null
-      let tooltipTimer: ReturnType<typeof setTimeout> | null = null
 
       // Hover tooltip
       const popup = new maplibregl.Popup({
@@ -231,10 +231,11 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: true })
 
         // Tooltip only shows after 220ms dwell — prevents flicker on mouse transit
-        if (tooltipTimer) clearTimeout(tooltipTimer)
+        if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current)
         const lngLat = e.lngLat
         const props = e.features[0].properties as EntityProperties
-        tooltipTimer = setTimeout(() => {
+        tooltipTimerRef.current = setTimeout(() => {
+          if (!mapRef.current) return  // component unmounted during dwell
           const yearStart = props.year_start
           const yearEnd = props.year_end
           let dateStr = ''
@@ -257,7 +258,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
 
       map.on('mouseleave', 'territories-fill', () => {
         map.getCanvas().style.cursor = ''
-        if (tooltipTimer) { clearTimeout(tooltipTimer); tooltipTimer = null }
+        if (tooltipTimerRef.current) { clearTimeout(tooltipTimerRef.current); tooltipTimerRef.current = null }
         if (hoveredId !== null) {
           map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: false })
           hoveredId = null
@@ -314,6 +315,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
     mapRef.current = map
 
     return () => {
+      if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current)
       map.remove()
       mapRef.current = null
     }
