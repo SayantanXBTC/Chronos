@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useTimelineStore } from '@/store/timeline'
 import {
   yearToDisplay,
@@ -102,14 +103,22 @@ export function TimelineSlider() {
               aria-label="Enter year"
             />
           ) : (
-            <button
-              onClick={startEditing}
-              className="text-white text-3xl font-bold tracking-widest drop-shadow-lg hover:text-amber-300 transition-colors"
-              aria-label={`Current year: ${yearToDisplay(year)}. Click to jump to year.`}
-              title="Click to jump to year"
-            >
-              {yearToDisplay(year)}
-            </button>
+            <AnimatePresence mode="wait">
+              <motion.button
+                key={yearToDisplay(year)}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                onClick={startEditing}
+                className="text-white text-3xl font-bold tracking-widest drop-shadow-lg hover:text-amber-300 transition-colors"
+                style={{ fontFamily: 'var(--font-cinzel), serif' }}
+                aria-label={`Current year: ${yearToDisplay(year)}. Click to jump to year.`}
+                title="Click to jump to year"
+              >
+                {yearToDisplay(year)}
+              </motion.button>
+            </AnimatePresence>
           )}
         </div>
 
