@@ -107,7 +107,7 @@ export function TemporalOverlay() {
       <AnimatePresence mode="wait">
         {event !== null && Math.abs(event.year - year) <= 150 && (
           <motion.div
-            key={event.year}
+            key={`${event.year}-${event.text.substring(0, 20)}`}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
