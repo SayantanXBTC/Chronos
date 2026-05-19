@@ -5,6 +5,7 @@ import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
 import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS, ERA_TRANSITION_DURATION } from '@/lib/year'
+import { ENTITY_META } from '@/data/entity-metadata'
 import { buildMomentumOpacityExpression } from '@/lib/momentum'
 
 // Default to the locally stripped historical style; override via env var.
@@ -310,6 +311,72 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       trySetTransition('waterway_river', 'line-color-transition')
       trySetTransition('waterway_other', 'line-color-transition')
       trySetTransition('waterway_tunnel', 'line-color-transition')
+
+      // --- Capital markers ---
+      const capitalsGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: Object.entries(ENTITY_META)
+          .filter(([, meta]) => meta.capital)
+          .map(([slug, meta]) => ({
+            type: 'Feature' as const,
+            geometry: { type: 'Point' as const, coordinates: [meta.capital!.lon, meta.capital!.lat] },
+            properties: { slug, name: meta.capital!.name },
+          })),
+      }
+
+      map.addSource('capitals', { type: 'geojson', data: capitalsGeoJSON })
+
+      // Outer pulse ring
+      map.addLayer({
+        id: 'capitals-pulse',
+        type: 'circle',
+        source: 'capitals',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 5, 8, 12],
+          'circle-color': '#f8e0a0',
+          'circle-opacity': 0.20,
+          'circle-stroke-width': 0,
+        },
+        minzoom: 2,
+      })
+
+      // Core dot
+      map.addLayer({
+        id: 'capitals-dot',
+        type: 'circle',
+        source: 'capitals',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 2, 8, 5],
+          'circle-color': '#f8e0a0',
+          'circle-opacity': 0.85,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#1a1212',
+          'circle-stroke-opacity': 0.6,
+        },
+        minzoom: 2,
+      })
+
+      // Capital name labels
+      map.addLayer({
+        id: 'capitals-label',
+        type: 'symbol',
+        source: 'capitals',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 3, 8, 8, 11],
+          'text-anchor': 'top',
+          'text-offset': [0, 0.6],
+          'text-allow-overlap': false,
+        },
+        paint: {
+          'text-color': '#f0e6c8',
+          'text-halo-color': '#1a1212',
+          'text-halo-width': 1.0,
+          'text-opacity': 0.70,
+        },
+        minzoom: 3,
+      })
     })
 
     mapRef.current = map
