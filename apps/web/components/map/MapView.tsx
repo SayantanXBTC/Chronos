@@ -4,7 +4,7 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
-import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS } from '@/lib/year'
+import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS, ERA_TRANSITION_DURATION } from '@/lib/year'
 import { buildMomentumOpacityExpression } from '@/lib/momentum'
 
 // Default to the locally stripped historical style; override via env var.
@@ -286,6 +286,21 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       map.setPaintProperty('waterway_river', 'line-color', initialWater)
       map.setPaintProperty('waterway_other', 'line-color', initialWater)
       map.setPaintProperty('waterway_tunnel', 'line-color', initialWater)
+
+      // Register paint transitions for era atmosphere layers — MapLibre animates subsequent setPaintProperty calls
+      const ERA_TRANSITION = { duration: ERA_TRANSITION_DURATION, delay: 0 }
+      const trySetTransition = (layerId: string, property: string) => {
+        try {
+          map.setPaintProperty(layerId, property, ERA_TRANSITION)
+        } catch {
+          // Layer may not exist in all base styles — skip silently
+        }
+      }
+      trySetTransition('background', 'background-color-transition')
+      trySetTransition('water', 'fill-color-transition')
+      trySetTransition('waterway_river', 'line-color-transition')
+      trySetTransition('waterway_other', 'line-color-transition')
+      trySetTransition('waterway_tunnel', 'line-color-transition')
     })
 
     mapRef.current = map

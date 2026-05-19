@@ -103,3 +103,5 @@ export const ERA_WATER_COLORS: Record<Era, string> = {
   'early-modern': '#5d8fa8',
   'modern':       '#5890a8',
 }
+
+export const ERA_TRANSITION_DURATION = 800

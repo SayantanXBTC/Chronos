@@ -1,6 +1,6 @@
 // apps/web/__tests__/year.test.ts
 import { describe, it, expect } from 'vitest'
-import { yearToDisplay, sliderToYear, yearToSlider, snapToSnapshot, SNAPSHOT_YEARS } from '@/lib/year'
+import { yearToDisplay, sliderToYear, yearToSlider, snapToSnapshot, SNAPSHOT_YEARS, ERA_TRANSITION_DURATION } from '@/lib/year'
 
 describe('SNAPSHOT_YEARS', () => {
   it('has ~102 values', () => {
@@ -57,4 +57,10 @@ describe('snapToSnapshot', () => {
   // Years now in range — expanded list covers -3000 to 2026
   it('-3000 snaps to itself (now earliest snapshot)', () => { expect(snapToSnapshot(-3000)).toBe(-3000) })
   it('2026 snaps to itself (now latest snapshot)', () => { expect(snapToSnapshot(2026)).toBe(2026) })
+})
+
+describe('ERA_TRANSITION_DURATION', () => {
+  it('is exported and equals 800', () => {
+    expect(ERA_TRANSITION_DURATION).toBe(800)
+  })
 })
