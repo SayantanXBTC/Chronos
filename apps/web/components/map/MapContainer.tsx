@@ -10,6 +10,7 @@ import { EntityPanel } from '@/components/entity/EntityPanel'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { AttributionFooter } from '@/components/ui/AttributionFooter'
 import { SearchBar } from '@/components/ui/SearchBar'
+import { MetricsOverlay } from '@/components/ui/MetricsOverlay'
 import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
 import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
 import { AtmosphericOverlay } from '@/components/ui/AtmosphericOverlay'
@@ -52,6 +53,7 @@ export function MapContainer() {
       </AnimatePresence>
       <TimelineSlider />
       <AttributionFooter />
+      <MetricsOverlay />
     </div>
   )
 }
