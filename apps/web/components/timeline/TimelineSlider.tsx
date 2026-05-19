@@ -11,6 +11,7 @@ import {
   snapToNextSnapshot,
   SNAPSHOT_YEARS,
 } from '@/lib/year'
+import { PlaybackControls } from './PlaybackControls'
 
 const SLIDER_MIN = 0
 const SLIDER_MAX = 5025
@@ -25,9 +26,26 @@ function eraPercent(year: number): number {
 export function TimelineSlider() {
   const year = useTimelineStore((s) => s.year)
   const setYear = useTimelineStore((s) => s.setYear)
+  const isPlaying = useTimelineStore((s) => s.isPlaying)
+  const playSpeed = useTimelineStore((s) => s.playSpeed)
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!isPlaying) return
+    const msPerStep = Math.round(1000 / playSpeed)
+    const id = setInterval(() => {
+      const store = useTimelineStore.getState()
+      const next = snapToNextSnapshot(store.year)
+      if (next === store.year) {
+        store.setPlaying(false)
+        return
+      }
+      store.setYear(next)
+    }, msPerStep)
+    return () => clearInterval(id)
+  }, [isPlaying, playSpeed])
 
   function handleSliderChange(e: React.ChangeEvent<HTMLInputElement>) {
     setYear(sliderToYear(Number(e.target.value)))
@@ -108,6 +126,11 @@ export function TimelineSlider() {
               {era.label}
             </button>
           ))}
+        </div>
+
+        {/* Playback controls */}
+        <div className="flex justify-center mb-2">
+          <PlaybackControls />
         </div>
 
         {/* Slider */}
