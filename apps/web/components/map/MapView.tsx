@@ -5,6 +5,7 @@ import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
 import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS } from '@/lib/year'
+import { buildMomentumOpacityExpression } from '@/lib/momentum'
 
 // Default to the locally stripped historical style; override via env var.
 const MAP_STYLE =
@@ -289,14 +290,14 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         0.2,
       ])
     } else {
-      map.setPaintProperty('territories-fill', 'fill-opacity', [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false], 0.65,
-        0.4,
-      ])
+      map.setPaintProperty(
+        'territories-fill',
+        'fill-opacity',
+        buildMomentumOpacityExpression(year, null),
+      )
       map.setPaintProperty('territories-border', 'line-opacity', 0.9)
     }
-  }, [selectedSlug])
+  }, [selectedSlug, year])
 
   useEffect(() => {
     const map = mapRef.current
