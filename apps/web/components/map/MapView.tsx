@@ -103,12 +103,8 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         source: 'territories',
         paint: {
           'fill-color': ['coalesce', ['get', 'color'], '#888888'],
-          'fill-opacity': [
-            'case',
-            ['boolean', ['feature-state', 'hover'], false],
-            0.65,
-            0.4,
-          ],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          'fill-opacity': buildMomentumOpacityExpression(yearRef.current) as any,
         },
       })
 
@@ -293,7 +289,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       map.setPaintProperty(
         'territories-fill',
         'fill-opacity',
-        buildMomentumOpacityExpression(year, null),
+        buildMomentumOpacityExpression(year),
       )
       map.setPaintProperty('territories-border', 'line-opacity', 0.9)
     }

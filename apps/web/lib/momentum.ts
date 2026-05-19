@@ -21,27 +21,24 @@ export function getMomentumOpacity(
 
 export function buildMomentumOpacityExpression(
   currentYear: number,
-  selectedSlug: string | null,
 ): unknown[] {
   const risingThreshold = currentYear - RISING_THRESHOLD
   const decliningThreshold = currentYear + DECLINING_THRESHOLD
 
+  // Hover-aware outer wrapper + momentum inner expression
   return [
     'case',
-    // Selected = always bright
-    ['==', ['get', 'slug'], selectedSlug ?? '___'], 0.78,
+    // Hover = always bright (feature-state)
+    ['boolean', ['feature-state', 'hover'], false], 0.65,
     // Rising (born recently)
-    ['>', ['get', 'year_start'], risingThreshold],
-    BASE_OPACITY + RISING_BOOST,
-    // Declining (ends soon)
+    ['>', ['get', 'year_start'], risingThreshold], BASE_OPACITY + RISING_BOOST,
+    // Declining (year_end is a number AND ends within threshold AND after currentYear)
     [
       'all',
-      ['has', 'year_end'],
-      ['!=', ['get', 'year_end'], null],
-      ['<', ['coalesce', ['get', 'year_end'], 9999], decliningThreshold],
-      ['>', ['coalesce', ['get', 'year_end'], 9999], currentYear],
-    ],
-    BASE_OPACITY - DECLINING_DIM,
+      ['==', ['typeof', ['get', 'year_end']], 'number'],
+      ['<', ['get', 'year_end'], decliningThreshold],
+      ['>', ['get', 'year_end'], currentYear],
+    ], BASE_OPACITY - DECLINING_DIM,
     // Stable
     BASE_OPACITY,
   ]
