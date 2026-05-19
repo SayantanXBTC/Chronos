@@ -1,12 +1,12 @@
-# History Platform Backend
+# Kleio
 
-A spatial-temporal historical database platform for querying world state snapshots across centuries.
+An interactive world history map where you scrub a timeline from 3000 BCE to 2026 CE and watch civilizations rise and fall in real time. Click any empire to explore its lineage, dates, and contemporaries. Built with FastAPI, PostGIS, and MapLibre GL.
 
 ## Prerequisites
 
-- **Docker & Docker Compose** (for running services)
-- **Python 3.12+** (for local development)
-- **Node.js 20+** (for frontend, if applicable)
+- Docker and Docker Compose
+- Python 3.12 or higher
+- Node.js 20 or higher
 
 ## Quick Start
 
@@ -49,19 +49,9 @@ Query historical world state for 264 BCE at zoom level 4:
 curl "http://localhost:8000/api/v1/world/state?year=-264&zoom=4"
 ```
 
-This returns a GeoJSON FeatureCollection representing geopolitical boundaries at that time.
-
 ## Year Convention
 
-Years are stored as signed integers:
-
-- **Negative values** = BCE (Before Common Era)
-- **Positive values** = CE (Common Era)
-- **Year 0 does not exist** (jumps from -1 to 1)
-
-Examples:
-- `-264` = 264 BCE
-- `117` = 117 CE
+Years are stored as signed integers. Negative values represent BCE, positive values represent CE. Year 0 does not exist — the calendar jumps from -1 to 1.
 
 ## Development Commands
 
@@ -82,15 +72,10 @@ Examples:
 | API | 8000 | FastAPI backend |
 | PostgreSQL/PostGIS | 5432 | Spatial-temporal database |
 | Redis | 6379 | World state cache |
-| Neo4j | 7474, 7687 | Entity relationship graph |
 
 ## Project Structure
 
-- `apps/api/` — FastAPI backend (Python 3.12, SQLAlchemy 2.x async, Alembic, PostGIS, Redis)
-- `packages/data/` — Data ingestion package (Shapely, Fiona, GeoPandas)
+- `apps/api/` — FastAPI backend (Python 3.12, SQLAlchemy 2, Alembic, PostGIS, Redis)
+- `apps/web/` — Next.js 14 frontend (MapLibre GL, Zustand, Tailwind CSS)
+- `packages/data/` — Data ingestion pipeline (Shapely, Fiona, GeoPandas)
 - `infra/docker-compose.yml` — Docker service definitions
-- `data/` — GIS data storage
-
-## Documentation
-
-For additional documentation, see the `docs/` directory.
