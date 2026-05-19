@@ -1,4 +1,3 @@
-// apps/web/components/map/useTerritoryLayer.ts
 import { useEffect, useRef, useCallback } from 'react'
 import type { RefObject } from 'react'
 import { useTimelineStore } from '@/store/timeline'
@@ -15,6 +14,12 @@ async function preloadAdjacent(year: number): Promise<void> {
     SNAPSHOT_YEARS[idx + 1],
     SNAPSHOT_YEARS[idx - 2],
     SNAPSHOT_YEARS[idx + 2],
+    SNAPSHOT_YEARS[idx - 3],
+    SNAPSHOT_YEARS[idx + 3],
+    SNAPSHOT_YEARS[idx - 4],
+    SNAPSHOT_YEARS[idx + 4],
+    SNAPSHOT_YEARS[idx - 5],
+    SNAPSHOT_YEARS[idx + 5],
   ].filter((y): y is number => y !== undefined && !snapshotCache.has(y))
 
   for (const y of candidates) {
@@ -35,10 +40,11 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
 
   const abortRef = useRef<AbortController | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  // Delay the loading indicator to avoid flashes for cached/fast loads
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const fetchAndUpdate = useCallback(
     async (yr: number, vp: typeof viewport) => {
-      // Viewport-aware cache: bypass cache when viewport changes (not world bbox)
       const isWorldBbox = vp.minX <= -180 && vp.minY <= -90 && vp.maxX >= 180 && vp.maxY >= 90
       const cached = isWorldBbox ? snapshotCache.get(yr) : null
       if (cached) {
@@ -50,10 +56,13 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
       abortRef.current?.abort()
       abortRef.current = new AbortController()
 
-      setLoading(true)
-      setError(null)
+      // Only show loading indicator after 500ms — hidden for fast/cached loads
+      clearTimeout(loadingTimerRef.current)
+      loadingTimerRef.current = setTimeout(() => setLoading(true), 500)
 
+      setError(null)
       const controller = abortRef.current
+
       try {
         const data = await fetchWorldState(yr, {
           signal: controller.signal,
@@ -73,6 +82,7 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
           setError('Failed to load world state. Is the API running?')
         }
       } finally {
+        clearTimeout(loadingTimerRef.current)
         setLoading(false)
       }
     },
@@ -83,8 +93,12 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       fetchAndUpdate(year, viewport)
-    }, 150)
+    }, 50)  // Reduced from 150ms to 50ms for snappier response
 
-    return () => clearTimeout(debounceRef.current)
+    return () => {
+      clearTimeout(debounceRef.current)
+      clearTimeout(loadingTimerRef.current)
+      abortRef.current?.abort()
+    }
   }, [year, viewport, fetchAndUpdate])
 }

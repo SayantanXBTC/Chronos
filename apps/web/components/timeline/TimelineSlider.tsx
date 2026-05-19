@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useDrag } from '@use-gesture/react'
 import { useTimelineStore } from '@/store/timeline'
 import {
   yearToDisplay,
@@ -11,10 +13,8 @@ import {
   snapToNextSnapshot,
   SNAPSHOT_YEARS,
 } from '@/lib/year'
+import { clampSlider, decayVelocity, SLIDER_MAX, SLIDER_MIN } from '@/lib/easing'
 import { PlaybackControls } from './PlaybackControls'
-
-const SLIDER_MIN = 0
-const SLIDER_MAX = 5025
 
 const YEAR_MIN = SNAPSHOT_YEARS[0]
 const YEAR_MAX = SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]
@@ -31,6 +31,53 @@ export function TimelineSlider() {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const sliderContainerRef = useRef<HTMLDivElement>(null)
+  const inertiaRafRef = useRef<number | null>(null)
+
+  function stopInertia() {
+    if (inertiaRafRef.current !== null) {
+      cancelAnimationFrame(inertiaRafRef.current)
+      inertiaRafRef.current = null
+    }
+  }
+
+  const bindSlider = useDrag(({ movement: [mx], velocity: [vx], dragging, event }) => {
+    event?.preventDefault()
+    stopInertia()
+
+    const el = sliderContainerRef.current
+    if (!el) return
+    const width = el.getBoundingClientRect().width
+    const delta = (mx / width) * SLIDER_MAX
+
+    if (dragging) {
+      const base = yearToSlider(useTimelineStore.getState().year)
+      const next = clampSlider(base + delta)
+      setYear(sliderToYear(Math.round(next)))
+      return
+    }
+
+    // Released: apply inertia using last velocity
+    const pxPerMs = vx  // use-gesture gives px/ms
+    const sliderPerMs = (pxPerMs / width) * SLIDER_MAX
+    let vel = sliderPerMs * 16.67  // convert to per-frame
+
+    let current = yearToSlider(useTimelineStore.getState().year)
+
+    function step() {
+      vel = decayVelocity(vel, 16.67)
+      current = clampSlider(current + vel)
+      setYear(sliderToYear(Math.round(current)))
+      if (Math.abs(vel) > 0.1) {
+        inertiaRafRef.current = requestAnimationFrame(step)
+      } else {
+        inertiaRafRef.current = null
+      }
+    }
+    if (Math.abs(vel) > 0.2) {
+      inertiaRafRef.current = requestAnimationFrame(step)
+    }
+  }, { axis: 'x', filterTaps: true })
 
   useEffect(() => {
     if (!isPlaying) return
@@ -85,6 +132,11 @@ export function TimelineSlider() {
     if (e.key === 'Escape') setEditing(false)
   }
 
+  useEffect(() => {
+    return () => stopInertia()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <div className="absolute bottom-0 left-0 right-0 px-8 pb-6 pt-12 bg-gradient-to-t from-black/90 to-transparent pointer-events-none select-none">
       <div className="max-w-3xl mx-auto pointer-events-auto">
@@ -102,14 +154,22 @@ export function TimelineSlider() {
               aria-label="Enter year"
             />
           ) : (
-            <button
-              onClick={startEditing}
-              className="text-white text-3xl font-bold tracking-widest drop-shadow-lg hover:text-amber-300 transition-colors"
-              aria-label={`Current year: ${yearToDisplay(year)}. Click to jump to year.`}
-              title="Click to jump to year"
-            >
-              {yearToDisplay(year)}
-            </button>
+            <AnimatePresence mode="wait">
+              <motion.button
+                key={yearToDisplay(year)}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                onClick={startEditing}
+                className="text-white text-3xl font-bold tracking-widest drop-shadow-lg hover:text-amber-300 transition-colors"
+                style={{ fontFamily: 'var(--font-cinzel), serif' }}
+                aria-label={`Current year: ${yearToDisplay(year)}. Click to jump to year.`}
+                title="Click to jump to year"
+              >
+                {yearToDisplay(year)}
+              </motion.button>
+            </AnimatePresence>
           )}
         </div>
 
@@ -133,18 +193,37 @@ export function TimelineSlider() {
           <PlaybackControls />
         </div>
 
-        {/* Slider */}
-        <div className="relative">
+        {/* Inertial drag slider */}
+        <div
+          ref={sliderContainerRef}
+          className="relative h-6 flex items-center cursor-ew-resize touch-none"
+          {...bindSlider()}
+          role="none"
+        >
+          {/* Track */}
+          <div className="w-full h-1.5 bg-white/15 rounded-full" />
+          {/* Fill */}
+          <div
+            className="absolute h-1.5 bg-amber-400/60 rounded-full left-0"
+            style={{ width: `${(yearToSlider(year) / SLIDER_MAX) * 100}%` }}
+          />
+          {/* Thumb */}
+          <div
+            className="absolute w-3 h-3 bg-amber-400 rounded-full shadow-lg -translate-x-1/2 transition-transform hover:scale-125"
+            style={{ left: `${(yearToSlider(year) / SLIDER_MAX) * 100}%` }}
+          />
+          {/* Accessible hidden range input for keyboard users */}
           <input
             type="range"
-            min={SLIDER_MIN}
+            min={0}
             max={SLIDER_MAX}
             step={1}
             value={yearToSlider(year)}
             onChange={handleSliderChange}
             onKeyDown={handleSliderKeyDown}
             aria-label="Timeline year"
-            className="w-full h-1.5 cursor-pointer accent-amber-400 rounded-full"
+            className="absolute inset-0 opacity-0 cursor-ew-resize"
+            tabIndex={0}
           />
         </div>
 

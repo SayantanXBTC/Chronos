@@ -4,7 +4,8 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
-import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS } from '@/lib/year'
+import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS, ERA_TRANSITION_DURATION } from '@/lib/year'
+import { ENTITY_META } from '@/data/entity-metadata'
 import { buildMomentumOpacityExpression } from '@/lib/momentum'
 
 // Default to the locally stripped historical style; override via env var.
@@ -45,6 +46,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
   useEffect(() => { onEntitySelectRef.current = onEntitySelect }, [onEntitySelect])
   const yearRef = useRef(year)
   useEffect(() => { yearRef.current = year }, [year])
+  const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useImperativeHandle(ref, () => ({
     updateTerritories(data: WorldStateResponse) {
@@ -105,6 +107,32 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
           'fill-color': ['coalesce', ['get', 'color'], '#888888'],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           'fill-opacity': buildMomentumOpacityExpression(yearRef.current) as any,
+        },
+      })
+
+      // Outer glow — wide, blurred, low opacity. Creates soft territory edge.
+      map.addLayer({
+        id: 'territories-border-glow',
+        type: 'line',
+        source: 'territories',
+        paint: {
+          'line-color': ['coalesce', ['get', 'color'], '#888888'],
+          'line-width': 12,
+          'line-opacity': 0.10,
+          'line-blur': 8,
+        },
+      })
+
+      // Mid border — medium weight, slight blur. Carries color identity.
+      map.addLayer({
+        id: 'territories-border-mid',
+        type: 'line',
+        source: 'territories',
+        paint: {
+          'line-color': ['coalesce', ['get', 'color'], '#888888'],
+          'line-width': 3.5,
+          'line-opacity': 0.40,
+          'line-blur': 1.5,
         },
       })
 
@@ -195,35 +223,43 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       map.on('mousemove', 'territories-fill', (e) => {
         if (!e.features?.length) return
         map.getCanvas().style.cursor = 'pointer'
-        // Feature-state hover
+
+        // Feature-state hover (immediate — affects opacity)
         if (hoveredId !== null) {
           map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: false })
         }
         hoveredId = e.features[0].id as number
         map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: true })
-        // Popup
+
+        // Tooltip only shows after 220ms dwell — prevents flicker on mouse transit
+        if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current)
+        const lngLat = e.lngLat
         const props = e.features[0].properties as EntityProperties
-        const yearStart = props.year_start
-        const yearEnd = props.year_end
-        let dateStr = ''
-        try {
-          if (yearStart !== undefined && yearStart !== null) {
-            const endLabel = (yearEnd !== null && yearEnd !== undefined) ? yearToDisplay(yearEnd) : 'present'
-            dateStr = `${yearToDisplay(yearStart)} – ${endLabel}`
+        tooltipTimerRef.current = setTimeout(() => {
+          if (!mapRef.current) return  // component unmounted during dwell
+          const yearStart = props.year_start
+          const yearEnd = props.year_end
+          let dateStr = ''
+          try {
+            if (yearStart !== undefined && yearStart !== null) {
+              const endLabel = (yearEnd !== null && yearEnd !== undefined) ? yearToDisplay(yearEnd) : 'present'
+              dateStr = `${yearToDisplay(yearStart)} – ${endLabel}`
+            }
+          } catch {
+            // yearToDisplay throws on year 0
           }
-        } catch {
-          // yearToDisplay throws on year 0
-        }
-        popup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div class="font-semibold">${props.name}</div>${dateStr ? `<div class="text-xs opacity-70 mt-0.5">${dateStr}</div>` : ''}`
-          )
-          .addTo(map)
+          popup
+            .setLngLat(lngLat)
+            .setHTML(
+              `<div class="font-semibold">${props.name}</div>${dateStr ? `<div class="text-xs opacity-70 mt-0.5">${dateStr}</div>` : ''}`
+            )
+            .addTo(map)
+        }, 220)
       })
 
       map.on('mouseleave', 'territories-fill', () => {
         map.getCanvas().style.cursor = ''
+        if (tooltipTimerRef.current) { clearTimeout(tooltipTimerRef.current); tooltipTimerRef.current = null }
         if (hoveredId !== null) {
           map.setFeatureState({ source: 'territories', id: hoveredId }, { hover: false })
           hoveredId = null
@@ -260,11 +296,93 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       map.setPaintProperty('waterway_river', 'line-color', initialWater)
       map.setPaintProperty('waterway_other', 'line-color', initialWater)
       map.setPaintProperty('waterway_tunnel', 'line-color', initialWater)
+
+      // Register paint transitions for era atmosphere layers — MapLibre animates subsequent setPaintProperty calls
+      const ERA_TRANSITION = { duration: ERA_TRANSITION_DURATION, delay: 0 }
+      const trySetTransition = (layerId: string, property: string) => {
+        try {
+          map.setPaintProperty(layerId, property, ERA_TRANSITION)
+        } catch {
+          // Layer may not exist in all base styles — skip silently
+        }
+      }
+      trySetTransition('background', 'background-color-transition')
+      trySetTransition('water', 'fill-color-transition')
+      trySetTransition('waterway_river', 'line-color-transition')
+      trySetTransition('waterway_other', 'line-color-transition')
+      trySetTransition('waterway_tunnel', 'line-color-transition')
+
+      // --- Capital markers ---
+      const capitalsGeoJSON: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: Object.entries(ENTITY_META)
+          .filter(([, meta]) => meta.capital)
+          .map(([slug, meta]) => ({
+            type: 'Feature' as const,
+            geometry: { type: 'Point' as const, coordinates: [meta.capital!.lon, meta.capital!.lat] },
+            properties: { slug, name: meta.capital!.name },
+          })),
+      }
+
+      map.addSource('capitals', { type: 'geojson', data: capitalsGeoJSON })
+
+      // Outer pulse ring
+      map.addLayer({
+        id: 'capitals-pulse',
+        type: 'circle',
+        source: 'capitals',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 5, 8, 12],
+          'circle-color': '#f8e0a0',
+          'circle-opacity': 0.20,
+          'circle-stroke-width': 0,
+        },
+        minzoom: 2,
+      })
+
+      // Core dot
+      map.addLayer({
+        id: 'capitals-dot',
+        type: 'circle',
+        source: 'capitals',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 2, 8, 5],
+          'circle-color': '#f8e0a0',
+          'circle-opacity': 0.85,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#1a1212',
+          'circle-stroke-opacity': 0.6,
+        },
+        minzoom: 2,
+      })
+
+      // Capital name labels
+      map.addLayer({
+        id: 'capitals-label',
+        type: 'symbol',
+        source: 'capitals',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 3, 8, 8, 11],
+          'text-anchor': 'top',
+          'text-offset': [0, 0.6],
+          'text-allow-overlap': false,
+        },
+        paint: {
+          'text-color': '#f0e6c8',
+          'text-halo-color': '#1a1212',
+          'text-halo-width': 1.0,
+          'text-opacity': 0.70,
+        },
+        minzoom: 3,
+      })
     })
 
     mapRef.current = map
 
     return () => {
+      if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current)
       map.remove()
       mapRef.current = null
     }
