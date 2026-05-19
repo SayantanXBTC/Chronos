@@ -24,12 +24,13 @@ export function PlaybackControls() {
       >
         {isPlaying ? '⏸' : '▶'}
       </button>
-      <div className="flex gap-1" role="group" aria-label="Playback speed">
+      <div className="flex gap-1" role="radiogroup" aria-label="Playback speed">
         {SPEEDS.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => setPlaySpeed(value)}
-            aria-pressed={playSpeed === value}
+            role="radio"
+            aria-checked={playSpeed === value}
             className={`text-xs px-1.5 py-0.5 rounded transition-colors ${
               playSpeed === value
                 ? 'bg-amber-400/80 text-black'
