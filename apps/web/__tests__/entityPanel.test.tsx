@@ -121,4 +121,20 @@ describe('EntityPanel', () => {
     await user.click(screen.getByLabelText('Close entity panel'))
     expect(useTimelineStore.getState().selectedEntity).toBeNull()
   })
+
+  it('shows lifespan bar element', async () => {
+    const { fetchEntityDetail } = await import('@/lib/api')
+    vi.mocked(fetchEntityDetail).mockResolvedValue(mockDetail)
+    useTimelineStore.setState({ selectedEntity: mockEntity, year: 100 })
+    render(<EntityPanel />)
+    await waitFor(() => expect(screen.getByRole('figure', { name: /lifespan/i })).toBeDefined())
+  })
+
+  it('shows peak year for known entity', async () => {
+    const { fetchEntityDetail } = await import('@/lib/api')
+    vi.mocked(fetchEntityDetail).mockResolvedValue(mockDetail)
+    useTimelineStore.setState({ selectedEntity: mockEntity })
+    render(<EntityPanel />)
+    await waitFor(() => expect(screen.getByText(/Peak/i)).toBeDefined())
+  })
 })

@@ -5,6 +5,7 @@ import { useTimelineStore } from '@/store/timeline'
 import { fetchEntityDetail } from '@/lib/api'
 import { yearToDisplay } from '@/lib/year'
 import { LineageTree } from './LineageTree'
+import { ENTITY_META } from '@/data/entity-metadata'
 import type { EntityDetail } from '@/types'
 
 const CONFIDENCE_LABELS: Record<string, string> = {
@@ -13,6 +14,10 @@ const CONFIDENCE_LABELS: Record<string, string> = {
   inferred: 'Inferred boundary',
   disputed: 'Disputed boundary',
 }
+
+const TIMELINE_MIN = -3000
+const TIMELINE_MAX = 2026
+const TIMELINE_SPAN = TIMELINE_MAX - TIMELINE_MIN
 
 export function EntityPanel() {
   const entity = useTimelineStore((s) => s.selectedEntity)
@@ -34,6 +39,7 @@ export function EntityPanel() {
 
   const { name, type, color, confidence_type, source_name } = entity.properties
   const confidenceLabel = CONFIDENCE_LABELS[confidence_type] ?? confidence_type
+  const entityMeta = ENTITY_META[entity.properties.slug] ?? null
 
   const contemporaries = currentEntities.filter(
     (f) => f.properties.slug !== entity.properties.slug
@@ -91,6 +97,42 @@ export function EntityPanel() {
           </div>
         )}
       </dl>
+
+      {/* Lifespan bar */}
+      {detail && (
+        <figure
+          className="mt-3 pt-3 border-t border-white/10"
+          aria-label="Civilization lifespan"
+        >
+          <div className="text-white/30 text-xs mb-1.5">Civilization lifespan</div>
+          <div className="relative h-2 bg-white/10 rounded-full overflow-visible">
+            <div
+              className="absolute top-0 h-full rounded-full"
+              style={{
+                backgroundColor: color,
+                left: `${Math.max(0, ((detail.year_start - TIMELINE_MIN) / TIMELINE_SPAN) * 100)}%`,
+                right: `${Math.max(0, ((TIMELINE_MAX - (detail.year_end ?? TIMELINE_MAX)) / TIMELINE_SPAN) * 100)}%`,
+                opacity: 0.65,
+              }}
+            />
+            <div
+              className="absolute top-[-2px] w-0.5 h-3 bg-amber-400/80 rounded-full"
+              style={{ left: `${Math.max(0, Math.min(100, ((year - TIMELINE_MIN) / TIMELINE_SPAN) * 100))}%` }}
+              aria-hidden="true"
+            />
+          </div>
+          <div className="flex justify-between text-white/20 text-[10px] mt-1 font-mono">
+            <span>3000 BCE</span>
+            <span>2026 CE</span>
+          </div>
+          {entityMeta?.peak_label && (
+            <div className="mt-1.5 text-amber-300/50 text-[11px] flex items-center gap-1">
+              <span className="text-amber-400/60">★</span>
+              <span>{entityMeta.peak_label}</span>
+            </div>
+          )}
+        </figure>
+      )}
 
       {/* Lineage */}
       {detail && (
