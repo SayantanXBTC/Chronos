@@ -10,6 +10,7 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { AttributionFooter } from '@/components/ui/AttributionFooter'
 import { SearchBar } from '@/components/ui/SearchBar'
 import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
+import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
 import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
@@ -23,6 +24,7 @@ export function MapContainer() {
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
   const setViewport = useTimelineStore((s) => s.setViewport)
   const selectedSlug = useTimelineStore((s) => s.selectedEntity?.properties.slug ?? null)
+  const year = useTimelineStore((s) => s.year)
   const handleViewportChange = useCallback((v: Viewport) => setViewport(v), [setViewport])
 
   useTerritoryLayer(mapRef)
@@ -31,11 +33,13 @@ export function MapContainer() {
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
+      <EraAtmosphere />
       <MapView
         ref={mapRef}
         onEntitySelect={setSelectedEntity}
         onViewportChange={handleViewportChange}
         selectedSlug={selectedSlug}
+        year={year}
       />
       <LoadingOverlay />
       <SearchBar />

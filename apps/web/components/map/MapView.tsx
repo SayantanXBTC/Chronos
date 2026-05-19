@@ -4,7 +4,7 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
-import { yearToDisplay } from '@/lib/year'
+import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS } from '@/lib/year'
 
 // Default to the locally stripped historical style; override via env var.
 const MAP_STYLE =
@@ -25,10 +25,11 @@ export interface MapViewProps {
   onEntitySelect: (entity: EntityFeature | null) => void
   onViewportChange?: (viewport: Viewport) => void
   selectedSlug?: string | null
+  year?: number
 }
 
 const MapView = forwardRef<MapViewHandle, MapViewProps>(
-  ({ onEntitySelect, onViewportChange, selectedSlug }, ref) => {
+  ({ onEntitySelect, onViewportChange, selectedSlug, year }, ref) => {
   const onViewportChangeRef = useRef(onViewportChange)
   useEffect(() => { onViewportChangeRef.current = onViewportChange }, [onViewportChange])
   const selectedSlugRef = useRef(selectedSlug)
@@ -284,6 +285,19 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       map.setPaintProperty('territories-border', 'line-opacity', 0.9)
     }
   }, [selectedSlug])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.isStyleLoaded()) return
+    const era = getEraForYear(year ?? -264)
+    const bg = ERA_MAP_BACKGROUNDS[era]
+    const water = ERA_WATER_COLORS[era]
+    map.setPaintProperty('background', 'background-color', bg)
+    map.setPaintProperty('water', 'fill-color', water)
+    map.setPaintProperty('waterway_river', 'line-color', water)
+    map.setPaintProperty('waterway_other', 'line-color', water)
+    map.setPaintProperty('waterway_tunnel', 'line-color', water)
+  }, [year])
 
   return <div ref={containerRef} className="w-full h-full" />
 })

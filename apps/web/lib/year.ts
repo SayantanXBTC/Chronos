@@ -77,3 +77,29 @@ export function snapToNextSnapshot(year: number): number {
   if (idx >= SNAPSHOT_YEARS.length - 1) return SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]
   return SNAPSHOT_YEARS[idx + 1]
 }
+
+export type Era = 'ancient' | 'classical' | 'medieval' | 'early-modern' | 'modern'
+
+export function getEraForYear(year: number): Era {
+  if (year < -500) return 'ancient'
+  if (year < 500)  return 'classical'
+  if (year < 1500) return 'medieval'
+  if (year < 1800) return 'early-modern'
+  return 'modern'
+}
+
+export const ERA_MAP_BACKGROUNDS: Record<Era, string> = {
+  'ancient':      '#d4b896',
+  'classical':    '#cfc4a8',
+  'medieval':     '#c4b898',
+  'early-modern': '#c8c4b0',
+  'modern':       '#c0c8cc',
+}
+
+export const ERA_WATER_COLORS: Record<Era, string> = {
+  'ancient':      '#7a9ab8',
+  'classical':    '#6e9ab5',
+  'medieval':     '#6088a0',
+  'early-modern': '#5d8fa8',
+  'modern':       '#5890a8',
+}

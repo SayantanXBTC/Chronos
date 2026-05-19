@@ -38,3 +38,12 @@ body {
 .history-tooltip .maplibregl-popup-tip {
   border-top-color: rgba(0, 0, 0, 0.85);
 }
+
+/* Era-sensitive atmosphere */
+:root { --era-accent: #d4a847; --era-overlay-bg: rgba(0,0,0,0); }
+
+[data-era="ancient"]      { --era-accent: #d4a847; --era-overlay-bg: rgba(80,40,0,0.06); }
+[data-era="classical"]    { --era-accent: #8fb87a; --era-overlay-bg: rgba(0,40,20,0.04); }
+[data-era="medieval"]     { --era-accent: #a08060; --era-overlay-bg: rgba(20,10,0,0.05); }
+[data-era="early-modern"] { --era-accent: #7090b0; --era-overlay-bg: rgba(0,20,40,0.04); }
+[data-era="modern"]       { --era-accent: #6088a8; --era-overlay-bg: rgba(0,0,0,0.02); }
