@@ -45,5 +45,5 @@ class CacheService:
     async def is_world_state_cached(self, year: int, layer: str, zoom: int) -> bool:
         """Check if full-world snapshot is cached at given zoom."""
         tile_x, tile_y = FULL_WORLD_TILE
-        key = f"worldstate:{year}:{layer}:{zoom}:{tile_x}:{tile_y}"
+        key = make_world_state_key(year, layer, zoom, tile_x, tile_y)
         return await self.redis.exists(key) == 1
