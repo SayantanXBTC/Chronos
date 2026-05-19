@@ -11,6 +11,7 @@ import { AttributionFooter } from '@/components/ui/AttributionFooter'
 import { SearchBar } from '@/components/ui/SearchBar'
 import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
 import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
+import { AtmosphericOverlay } from '@/components/ui/AtmosphericOverlay'
 import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
@@ -41,6 +42,7 @@ export function MapContainer() {
         selectedSlug={selectedSlug}
         year={year}
       />
+      <AtmosphericOverlay />
       <LoadingOverlay />
       <SearchBar />
       <TemporalOverlay />
