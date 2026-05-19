@@ -10,6 +10,7 @@ export function EraAtmosphere() {
   useEffect(() => {
     const era = getEraForYear(year)
     document.documentElement.setAttribute('data-era', era)
+    return () => document.documentElement.removeAttribute('data-era')
   }, [year])
 
   return null

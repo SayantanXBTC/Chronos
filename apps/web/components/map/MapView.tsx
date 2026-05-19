@@ -25,7 +25,7 @@ export interface MapViewProps {
   onEntitySelect: (entity: EntityFeature | null) => void
   onViewportChange?: (viewport: Viewport) => void
   selectedSlug?: string | null
-  year?: number
+  year: number
 }
 
 const MapView = forwardRef<MapViewHandle, MapViewProps>(
@@ -42,6 +42,8 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
   // Ref mirror: keeps onEntitySelect fresh inside the one-time map.on('load') closure
   const onEntitySelectRef = useRef(onEntitySelect)
   useEffect(() => { onEntitySelectRef.current = onEntitySelect }, [onEntitySelect])
+  const yearRef = useRef(year)
+  useEffect(() => { yearRef.current = year }, [year])
 
   useImperativeHandle(ref, () => ({
     updateTerritories(data: WorldStateResponse) {
@@ -251,6 +253,16 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         })
         if (!features.length) onEntitySelectRef.current(null)
       })
+
+      // Apply initial era atmosphere
+      const initialEra = getEraForYear(yearRef.current)
+      const initialBg = ERA_MAP_BACKGROUNDS[initialEra]
+      const initialWater = ERA_WATER_COLORS[initialEra]
+      map.setPaintProperty('background', 'background-color', initialBg)
+      map.setPaintProperty('water', 'fill-color', initialWater)
+      map.setPaintProperty('waterway_river', 'line-color', initialWater)
+      map.setPaintProperty('waterway_other', 'line-color', initialWater)
+      map.setPaintProperty('waterway_tunnel', 'line-color', initialWater)
     })
 
     mapRef.current = map
@@ -289,7 +301,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
   useEffect(() => {
     const map = mapRef.current
     if (!map || !map.isStyleLoaded()) return
-    const era = getEraForYear(year ?? -264)
+    const era = getEraForYear(year)
     const bg = ERA_MAP_BACKGROUNDS[era]
     const water = ERA_WATER_COLORS[era]
     map.setPaintProperty('background', 'background-color', bg)
