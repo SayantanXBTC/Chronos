@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { generateJourneyStory } from '@/lib/journey'
+import { STORIES } from '@/data/stories'
 import type { EntityDetail } from '@/types'
 
 const ROME: EntityDetail = {
@@ -30,9 +31,9 @@ const UNKNOWN: EntityDetail = {
 
 describe('generateJourneyStory', () => {
   it('returns an existing STORY if one exists for the slug', () => {
+    const existing = STORIES.find(s => s.slug === 'roman-empire')!
     const story = generateJourneyStory(ROME)
-    expect(story.slug).toBe('roman-empire')
-    expect(story.chapters.length).toBeGreaterThan(3)
+    expect(story).toBe(existing)
   })
 
   it('generates a 2-chapter story for entity without ENTITY_META peak', () => {
@@ -51,8 +52,8 @@ describe('generateJourneyStory', () => {
     expect(story.chapters[story.chapters.length - 1].title).toBe('End of an Era')
   })
 
-  it('chapter years are in ascending order', () => {
-    const story = generateJourneyStory(ROME)
+  it('chapter years are in ascending order for generated stories', () => {
+    const story = generateJourneyStory(UNKNOWN)
     const years = story.chapters.map((c) => c.year)
     for (let i = 1; i < years.length; i++) {
       expect(years[i]).toBeGreaterThanOrEqual(years[i - 1])
@@ -62,9 +63,9 @@ describe('generateJourneyStory', () => {
   it('every chapter has required fields', () => {
     const story = generateJourneyStory(UNKNOWN)
     for (const ch of story.chapters) {
-      expect(ch.year).toBeDefined()
-      expect(ch.title).toBeTruthy()
-      expect(ch.description).toBeTruthy()
+      expect(typeof ch.year).toBe('number')
+      expect(ch.title.length).toBeGreaterThan(0)
+      expect(ch.description).toContain(UNKNOWN.name)
       expect(ch.focusSlug).toBe(UNKNOWN.slug)
     }
   })
