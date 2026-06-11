@@ -30,6 +30,10 @@ function makeMapRef(updatePlaceNames?: (data: PlaceNamesResponse) => void) {
     updateTerritories: vi.fn() as MapViewHandle['updateTerritories'],
     updateRivers: vi.fn() as MapViewHandle['updateRivers'],
     updatePlaceNames: updatePlaceNames ?? (vi.fn() as MapViewHandle['updatePlaceNames']),
+    updateRoutes: vi.fn() as MapViewHandle['updateRoutes'],
+    flyTo: vi.fn() as MapViewHandle['flyTo'],
+    showTimeLens: vi.fn() as MapViewHandle['showTimeLens'],
+    hideTimeLens: vi.fn() as MapViewHandle['hideTimeLens'],
   }
   return { current: handle }
 }
