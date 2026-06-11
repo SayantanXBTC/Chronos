@@ -17,6 +17,9 @@ import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
 import type { MapViewHandle } from './MapView'
+import { useTimeLens } from '@/hooks/useTimeLens'
+import { yearToDisplay } from '@/lib/year'
+import { AnimatePresence, motion } from 'motion/react'
 
 // SSR must be disabled: MapLibre uses browser canvas APIs not available in Node.
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
@@ -32,6 +35,7 @@ export function MapContainer() {
   useTerritoryLayer(mapRef)
   useRiversLayer(mapRef)
   usePlaceNamesLayer(mapRef)
+  const { previewYear } = useTimeLens(mapRef)
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
@@ -57,6 +61,34 @@ export function MapContainer() {
       </div>
       <TimelineSlider />
       <AttributionFooter />
+      {/* Time lens year label — appears when Alt is held */}
+      <AnimatePresence>
+        {previewYear !== null && (
+          <motion.div
+            key="time-lens-label"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none"
+          >
+            <div
+              className="px-3 py-1.5 rounded-lg backdrop-blur-md border font-cinzel text-[10px] tracking-widest"
+              style={{
+                background: 'rgba(16,10,4,0.88)',
+                borderColor: 'rgba(190,148,68,0.35)',
+                color: 'rgba(255,210,100,0.85)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.60)',
+              }}
+            >
+              {(() => {
+                try { return `⟳ +50 years · ${yearToDisplay(previewYear)}` }
+                catch { return `⟳ +50 years · ${previewYear}` }
+              })()}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
