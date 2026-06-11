@@ -11,6 +11,7 @@ import { AttributionFooter } from '@/components/ui/AttributionFooter'
 import { SearchBar } from '@/components/ui/SearchBar'
 import { TemporalOverlay } from '@/components/ui/TemporalOverlay'
 import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
+import { WhatElseExisted } from '@/components/ui/WhatElseExisted'
 import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
@@ -45,6 +46,10 @@ export function MapContainer() {
       <SearchBar />
       <TemporalOverlay />
       <EntityPanel />
+      {/* What Else Existed — bottom-right signature overlay */}
+      <div className="pointer-events-auto">
+        <WhatElseExisted />
+      </div>
       <TimelineSlider />
       <AttributionFooter />
     </div>
