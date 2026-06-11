@@ -1,0 +1,78 @@
+// apps/web/data/entity-regions.ts
+
+export const ENTITY_REGIONS: Record<string, string> = {
+  // Mediterranean / Europe
+  'roman-empire':          'Mediterranean',
+  'roman-republic':        'Mediterranean',
+  'byzantine-empire':      'Mediterranean',
+  'eastern-roman-empire':  'Mediterranean',
+  'western-roman-empire':  'Mediterranean',
+  'macedonian-empire':     'Mediterranean',
+  'seleucid-empire':       'Mediterranean',
+  'ptolemaic-egypt':       'Mediterranean',
+  'carthage':              'Mediterranean',
+  'athens':                'Mediterranean',
+  'sparta':                'Mediterranean',
+  'british-empire':        'Europe',
+  'french-empire':         'Europe',
+  'holy-roman-empire':     'Europe',
+  'spanish-empire':        'Europe',
+  'portuguese-empire':     'Europe',
+  'kingdom-of-france':     'Europe',
+  'kingdom-of-england':    'Europe',
+  'dutch-republic':        'Europe',
+  'viking-expansion':      'Europe',
+  // Middle East / Central Asia
+  'achaemenid-persia':     'Middle East',
+  'sasanian-empire':       'Middle East',
+  'abbasid-caliphate':     'Middle East',
+  'umayyad-caliphate':     'Middle East',
+  'ottoman-empire':        'Middle East',
+  'babylonian-empire':     'Middle East',
+  'assyrian-empire':       'Middle East',
+  'timurid-empire':        'Middle East',
+  'safavid-empire':        'Middle East',
+  'mongol-empire':         'Central Asia',
+  'golden-horde':          'Central Asia',
+  'ilkhanate':             'Central Asia',
+  // East Asia
+  'han-dynasty':           'East Asia',
+  'tang-dynasty':          'East Asia',
+  'song-dynasty':          'East Asia',
+  'qin-dynasty':           'East Asia',
+  'ming-dynasty':          'East Asia',
+  'qing-dynasty':          'East Asia',
+  'yuan-dynasty':          'East Asia',
+  'japanese-empire':       'East Asia',
+  'khmer-empire':          'East Asia',
+  // South Asia
+  'maurya-empire':         'South Asia',
+  'gupta-empire':          'South Asia',
+  'mughal-empire':         'South Asia',
+  'delhi-sultanate':       'South Asia',
+  'maratha-empire':        'South Asia',
+  // Africa
+  'mali-empire':           'Africa',
+  'songhai-empire':        'Africa',
+  'ghana-empire':          'Africa',
+  'egyptian-empire':       'Africa',
+  'axum':                  'Africa',
+  'zulu-kingdom':          'Africa',
+  // Americas
+  'aztec-empire':          'Americas',
+  'inca-empire':           'Americas',
+  'maya-civilization':     'Americas',
+  'usa-expansion':         'Americas',
+}
+
+/** Display order — roughly west to east */
+export const REGION_ORDER: string[] = [
+  'Europe',
+  'Mediterranean',
+  'Middle East',
+  'Africa',
+  'Central Asia',
+  'South Asia',
+  'East Asia',
+  'Americas',
+]

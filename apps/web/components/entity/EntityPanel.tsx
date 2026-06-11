@@ -8,6 +8,8 @@ import { yearToDisplay } from '@/lib/year'
 import { LineageTree } from './LineageTree'
 import { ENTITY_META } from '@/data/entity-metadata'
 import type { EntityDetail } from '@/types'
+import { generateJourneyStory } from '@/lib/journey'
+import { useStoryStore } from '@/store/story'
 
 const CONFIDENCE_LABELS: Record<string, string> = {
   exact: 'Exact boundary',
@@ -26,6 +28,8 @@ export function EntityPanel() {
   const currentEntities = useTimelineStore((s) => s.currentEntities)
   const year = useTimelineStore((s) => s.year)
   const [detail, setDetail] = useState<EntityDetail | null>(null)
+  const startStory = useStoryStore((s) => s.startStory)
+  const activeStory = useStoryStore((s) => s.activeStory)
 
   useEffect(() => {
     if (!entity) {
@@ -145,6 +149,29 @@ export function EntityPanel() {
           predecessors={detail.lineage.predecessors}
           successors={detail.lineage.successors}
         />
+      )}
+
+      {/* Begin Journey */}
+      {detail && !activeStory && (
+        <button
+          onClick={() => startStory(generateJourneyStory(detail))}
+          className="w-full mt-3 mb-1 py-2 rounded-lg font-cinzel text-[11px] tracking-widest transition-colors"
+          style={{
+            background: `linear-gradient(135deg, ${color}22, ${color}11)`,
+            border: `1px solid ${color}40`,
+            color: `${color}cc`,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = `linear-gradient(135deg, ${color}35, ${color}20)`
+            e.currentTarget.style.color = color
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = `linear-gradient(135deg, ${color}22, ${color}11)`
+            e.currentTarget.style.color = `${color}cc`
+          }}
+        >
+          ▶ Begin Journey
+        </button>
       )}
 
       {/* Contemporaries */}

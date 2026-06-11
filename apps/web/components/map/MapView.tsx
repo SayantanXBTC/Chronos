@@ -4,6 +4,7 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl, { Map as MaplibreMap, GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { WorldStateResponse, EntityFeature, EntityProperties, RiversResponse, PlaceNamesResponse } from '@/types'
+import type { FeatureCollection, LineString } from 'geojson'
 import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS, ERA_TRANSITION_DURATION } from '@/lib/year'
 import { ENTITY_META } from '@/data/entity-metadata'
 import { buildMomentumOpacityExpression } from '@/lib/momentum'
@@ -19,6 +20,10 @@ export interface MapViewHandle {
   updateTerritories: (data: WorldStateResponse) => void
   updateRivers: (data: RiversResponse) => void
   updatePlaceNames: (data: PlaceNamesResponse) => void
+  updateRoutes: (data: FeatureCollection<LineString>) => void
+  flyTo: (center: [number, number], zoom?: number) => void
+  showTimeLens: (data: WorldStateResponse, previewYear: number) => void
+  hideTimeLens: () => void
 }
 
 import type { Viewport } from '@/store/timeline'
@@ -75,6 +80,33 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       } else {
         pendingPlaceNamesRef.current = data
       }
+    },
+    updateRoutes(data: FeatureCollection<LineString>) {
+      const source = mapRef.current?.getSource('routes') as GeoJSONSource | undefined
+      if (source) {
+        source.setData(data as unknown as GeoJSON.GeoJSON)
+      }
+    },
+    flyTo(center: [number, number], zoom = 4) {
+      mapRef.current?.flyTo({ center, zoom, duration: 1200, essential: true })
+    },
+    showTimeLens(data: WorldStateResponse, _previewYear: number) {
+      const map = mapRef.current
+      if (!map) return
+      const source = map.getSource('time-lens-territories') as GeoJSONSource | undefined
+      if (source) {
+        source.setData(data as unknown as GeoJSON.GeoJSON)
+        map.setPaintProperty('time-lens-fill', 'fill-opacity', 0.28)
+        map.setPaintProperty('time-lens-border', 'line-opacity', 0.55)
+      }
+    },
+    hideTimeLens() {
+      const map = mapRef.current
+      if (!map) return
+      try {
+        map.setPaintProperty('time-lens-fill', 'fill-opacity', 0)
+        map.setPaintProperty('time-lens-border', 'line-opacity', 0)
+      } catch { /* layers may not exist yet */ }
     },
   }))
 
@@ -376,6 +408,36 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
           'text-opacity': 0.70,
         },
         minzoom: 3,
+      })
+
+      // Time-lens ghost overlay — hidden by default, activated by useTimeLens hook
+      map.addSource('time-lens-territories', {
+        type: 'geojson',
+        data: EMPTY_FC,
+      })
+
+      map.addLayer({
+        id: 'time-lens-fill',
+        type: 'fill',
+        source: 'time-lens-territories',
+        paint: {
+          'fill-color': ['coalesce', ['get', 'color'], '#888888'],
+          'fill-opacity': 0,
+          'fill-opacity-transition': { duration: 200, delay: 0 },
+        },
+      })
+
+      map.addLayer({
+        id: 'time-lens-border',
+        type: 'line',
+        source: 'time-lens-territories',
+        paint: {
+          'line-color': ['coalesce', ['get', 'color'], '#888888'],
+          'line-width': 1.2,
+          'line-opacity': 0,
+          'line-dasharray': [4, 3],
+          'line-opacity-transition': { duration: 200, delay: 0 },
+        },
       })
     })
 
