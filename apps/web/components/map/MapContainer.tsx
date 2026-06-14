@@ -44,13 +44,16 @@ export function MapContainer() {
   usePlaceNamesLayer(mapRef)
   const { previewYear } = useTimeLens(mapRef)
 
-  // AAA: fly to selected entity centroid unless selection was a map click
+  // AAA: fly to selected entity centroid ONLY when selection came from a panel.
+  // Map clicks (cursor already on target) and unsourced selections never fly.
   useEffect(() => {
     if (!AAA_POLISH) return
     const unsub = useTimelineStore.subscribe((state, prev) => {
       if (state.selectedEntity === prev.selectedEntity) return
       if (!state.selectedEntity) return
-      if (state._selectionSource === 'map') {
+      const source = state._selectionSource
+      // Always clear the tag after observing it, regardless of fly outcome.
+      if (source !== 'panel') {
         useTimelineStore.setState({ _selectionSource: null })
         return
       }

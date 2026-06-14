@@ -8,6 +8,7 @@ import type { FeatureCollection, LineString } from 'geojson'
 import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS, ERA_TRANSITION_DURATION } from '@/lib/year'
 import { ENTITY_META } from '@/data/entity-metadata'
 import { buildMomentumOpacityExpression } from '@/lib/momentum'
+import { FLY_TO_DURATION_MS } from '@/lib/motion'
 
 // Default to the locally stripped historical style; override via env var.
 const MAP_STYLE =
@@ -90,7 +91,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       }
     },
     flyTo(center: [number, number], zoom = 4) {
-      mapRef.current?.flyTo({ center, zoom, duration: 1200, essential: true })
+      mapRef.current?.flyTo({ center, zoom, duration: FLY_TO_DURATION_MS, essential: true })
     },
     showTimeLens(data: WorldStateResponse, _previewYear: number) {
       const map = mapRef.current
