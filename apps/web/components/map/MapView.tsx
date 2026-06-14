@@ -8,6 +8,7 @@ import type { FeatureCollection, LineString } from 'geojson'
 import { yearToDisplay, getEraForYear, ERA_MAP_BACKGROUNDS, ERA_WATER_COLORS, ERA_TRANSITION_DURATION } from '@/lib/year'
 import { ENTITY_META } from '@/data/entity-metadata'
 import { buildMomentumOpacityExpression } from '@/lib/momentum'
+import { FLY_TO_DURATION_MS } from '@/lib/motion'
 
 // Default to the locally stripped historical style; override via env var.
 const MAP_STYLE =
@@ -24,9 +25,11 @@ export interface MapViewHandle {
   flyTo: (center: [number, number], zoom?: number) => void
   showTimeLens: (data: WorldStateResponse, previewYear: number) => void
   hideTimeLens: () => void
+  setShimmerOpacity: (slug: string | null, opacity: number) => void
 }
 
 import type { Viewport } from '@/store/timeline'
+import { useTimelineStore } from '@/store/timeline'
 
 export interface MapViewProps {
   onEntitySelect: (entity: EntityFeature | null) => void
@@ -88,7 +91,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
       }
     },
     flyTo(center: [number, number], zoom = 4) {
-      mapRef.current?.flyTo({ center, zoom, duration: 1200, essential: true })
+      mapRef.current?.flyTo({ center, zoom, duration: FLY_TO_DURATION_MS, essential: true })
     },
     showTimeLens(data: WorldStateResponse, _previewYear: number) {
       const map = mapRef.current
@@ -107,6 +110,21 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         map.setPaintProperty('time-lens-fill', 'fill-opacity', 0)
         map.setPaintProperty('time-lens-border', 'line-opacity', 0)
       } catch { /* layers may not exist yet */ }
+    },
+    setShimmerOpacity(slug, opacity) {
+      const map = mapRef.current
+      if (!map) return
+      try {
+        if (slug) {
+          map.setPaintProperty('territories-fill', 'fill-opacity', [
+            'case',
+            ['==', ['get', 'slug'], slug], opacity,
+            0.12,
+          ])
+        }
+      } catch {
+        /* layer not ready */
+      }
     },
   }))
 
@@ -309,6 +327,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
           geometry: feature.geometry as GeoJSON.MultiPolygon,
           properties: props,
         }
+        useTimelineStore.setState({ _selectionSource: 'map' })
         onEntitySelectRef.current(entity)
       })
 
@@ -316,7 +335,10 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         const features = map.queryRenderedFeatures(e.point, {
           layers: ['territories-fill'],
         })
-        if (!features.length) onEntitySelectRef.current(null)
+        if (!features.length) {
+          useTimelineStore.setState({ _selectionSource: 'map' })
+          onEntitySelectRef.current(null)
+        }
       })
 
       // Apply initial era atmosphere

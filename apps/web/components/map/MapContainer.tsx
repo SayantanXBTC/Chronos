@@ -2,7 +2,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTimelineStore, type Viewport } from '@/store/timeline'
 import { TimelineSlider } from '@/components/timeline/TimelineSlider'
@@ -16,12 +16,17 @@ import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
 import { AtmosphericOverlay } from '@/components/ui/AtmosphericOverlay'
 import { WhatElseExisted } from '@/components/ui/WhatElseExisted'
 import { DiscoveryEngine } from '@/components/ui/DiscoveryEngine'
+import { AudioToggle } from '@/components/ui/AudioToggle'
+import { ParchmentDust } from '@/components/fx/ParchmentDust'
+import { ViewportFrame } from './ViewportFrame'
 import { useTerritoryLayer } from './useTerritoryLayer'
 import { useRiversLayer } from './useRiversLayer'
 import { usePlaceNamesLayer } from './usePlaceNamesLayer'
 import type { MapViewHandle } from './MapView'
 import { useTimeLens } from '@/hooks/useTimeLens'
 import { yearToDisplay } from '@/lib/year'
+import { featureCentroid } from '@/lib/geo'
+import { AAA_POLISH } from '@/lib/flags'
 
 // SSR must be disabled: MapLibre uses browser canvas APIs not available in Node.
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
@@ -38,6 +43,27 @@ export function MapContainer() {
   useRiversLayer(mapRef)
   usePlaceNamesLayer(mapRef)
   const { previewYear } = useTimeLens(mapRef)
+
+  // AAA: fly to selected entity centroid ONLY when selection came from a panel.
+  // Map clicks (cursor already on target) and unsourced selections never fly.
+  useEffect(() => {
+    if (!AAA_POLISH) return
+    const unsub = useTimelineStore.subscribe((state, prev) => {
+      if (state.selectedEntity === prev.selectedEntity) return
+      if (!state.selectedEntity) return
+      const source = state._selectionSource
+      // Always clear the tag after observing it, regardless of fly outcome.
+      if (source !== 'panel') {
+        useTimelineStore.setState({ _selectionSource: null })
+        return
+      }
+      const center = featureCentroid(state.selectedEntity)
+      const targetZoom = Math.max(3, Math.min(state.viewport.zoom, 5))
+      mapRef.current?.flyTo(center, targetZoom)
+      useTimelineStore.setState({ _selectionSource: null })
+    })
+    return unsub
+  }, [])
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
@@ -95,6 +121,9 @@ export function MapContainer() {
           </motion.div>
         )}
       </AnimatePresence>
+      <AudioToggle />
+      <ParchmentDust />
+      <ViewportFrame />
     </div>
   )
 }

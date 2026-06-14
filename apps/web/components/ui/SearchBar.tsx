@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useTimelineStore } from '@/store/timeline'
+import { Touchable } from '@/components/ui/Touchable'
 import type { EntityFeature } from '@/types'
 
 export function SearchBar() {
@@ -21,6 +22,7 @@ export function SearchBar() {
   const showDropdown = open && trimmed.length > 0
 
   function select(entity: EntityFeature) {
+    useTimelineStore.getState().setSelectionSource('panel')
     setSelectedEntity(entity)
     setQuery('')
     setOpen(false)
@@ -71,25 +73,23 @@ export function SearchBar() {
               key={entity.properties.slug}
               role="option"
               aria-selected={false}
-              tabIndex={0}
-              onClick={() => select(entity)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  select(entity)
-                }
-              }}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors cursor-pointer"
             >
-              <div
-                className="w-3 h-3 rounded-sm flex-shrink-0"
-                style={{ backgroundColor: entity.properties.color }}
-                aria-hidden="true"
-              />
-              <span className="truncate">{entity.properties.name}</span>
-              <span className="text-white/30 text-xs flex-shrink-0 capitalize ml-auto">
-                {entity.properties.type}
-              </span>
+              <Touchable
+                onClick={() => select(entity)}
+                soundKey="open"
+                ariaLabel={entity.properties.name}
+                className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors w-full text-left"
+              >
+                <div
+                  className="w-3 h-3 rounded-sm flex-shrink-0"
+                  style={{ backgroundColor: entity.properties.color }}
+                  aria-hidden="true"
+                />
+                <span className="truncate">{entity.properties.name}</span>
+                <span className="text-white/30 text-xs flex-shrink-0 capitalize ml-auto">
+                  {entity.properties.type}
+                </span>
+              </Touchable>
             </li>
           ))}
         </ul>

@@ -15,6 +15,7 @@ import {
 } from '@/lib/year'
 import { clampSlider, decayVelocity, SLIDER_MAX, SLIDER_MIN } from '@/lib/easing'
 import { PlaybackControls } from './PlaybackControls'
+import { Touchable } from '@/components/ui/Touchable'
 
 const YEAR_MIN = SNAPSHOT_YEARS[0]
 const YEAR_MAX = SNAPSHOT_YEARS[SNAPSHOT_YEARS.length - 1]
@@ -155,20 +156,25 @@ export function TimelineSlider() {
             />
           ) : (
             <AnimatePresence mode="wait">
-              <motion.button
+              <motion.div
                 key={yearToDisplay(year)}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.18, ease: 'easeOut' }}
-                onClick={startEditing}
-                className="text-white text-3xl font-bold tracking-widest drop-shadow-lg hover:text-amber-300 transition-colors"
-                style={{ fontFamily: 'var(--font-cinzel), serif' }}
-                aria-label={`Current year: ${yearToDisplay(year)}. Click to jump to year.`}
-                title="Click to jump to year"
+                style={{ display: 'inline-block' }}
               >
-                {yearToDisplay(year)}
-              </motion.button>
+                <Touchable
+                  onClick={startEditing}
+                  className="text-white text-3xl font-bold tracking-widest drop-shadow-lg hover:text-amber-300 transition-colors"
+                  ariaLabel={`Current year: ${yearToDisplay(year)}. Click to jump to year.`}
+                  soundKey="click"
+                >
+                  <span style={{ fontFamily: 'var(--font-cinzel), serif' }}>
+                    {yearToDisplay(year)}
+                  </span>
+                </Touchable>
+              </motion.div>
             </AnimatePresence>
           )}
         </div>

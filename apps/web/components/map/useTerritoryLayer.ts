@@ -5,6 +5,7 @@ import { fetchWorldState } from '@/lib/api'
 import { snapshotCache } from '@/lib/cache'
 import { snapToSnapshot, SNAPSHOT_YEARS } from '@/lib/year'
 import type { MapViewHandle } from './MapView'
+import { AAA_POLISH } from '@/lib/flags'
 
 async function preloadAdjacent(year: number): Promise<void> {
   const snapped = snapToSnapshot(year)
@@ -101,4 +102,19 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
       abortRef.current?.abort()
     }
   }, [year, viewport, fetchAndUpdate])
+
+  const selectedSlug = useTimelineStore((s) => s.selectedEntity?.properties.slug ?? null)
+  useEffect(() => {
+    if (!AAA_POLISH || !selectedSlug) return
+    let raf = 0
+    const start = performance.now()
+    const tick = (t: number) => {
+      const elapsed = t - start
+      const opacity = 0.78 + 0.07 * Math.sin(elapsed / 600)
+      mapRef.current?.setShimmerOpacity(selectedSlug, opacity)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [mapRef, selectedSlug])
 }
