@@ -16,6 +16,7 @@ import { EraAtmosphere } from '@/components/ui/EraAtmosphere'
 import { AtmosphericOverlay } from '@/components/ui/AtmosphericOverlay'
 import { WhatElseExisted } from '@/components/ui/WhatElseExisted'
 import { DiscoveryEngine } from '@/components/ui/DiscoveryEngine'
+import { AudioToggle } from '@/components/ui/AudioToggle'
 import { ParchmentDust } from '@/components/fx/ParchmentDust'
 import { ViewportFrame } from './ViewportFrame'
 import { useTerritoryLayer } from './useTerritoryLayer'
@@ -97,6 +98,7 @@ export function MapContainer() {
           </motion.div>
         )}
       </AnimatePresence>
+      <AudioToggle />
       <ParchmentDust />
       <ViewportFrame />
     </div>
