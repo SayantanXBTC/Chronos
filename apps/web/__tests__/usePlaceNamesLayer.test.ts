@@ -34,6 +34,7 @@ function makeMapRef(updatePlaceNames?: (data: PlaceNamesResponse) => void) {
     flyTo: vi.fn() as MapViewHandle['flyTo'],
     showTimeLens: vi.fn() as MapViewHandle['showTimeLens'],
     hideTimeLens: vi.fn() as MapViewHandle['hideTimeLens'],
+    setShimmerOpacity: vi.fn() as MapViewHandle['setShimmerOpacity'],
   }
   return { current: handle }
 }

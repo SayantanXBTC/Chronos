@@ -24,6 +24,7 @@ export interface MapViewHandle {
   flyTo: (center: [number, number], zoom?: number) => void
   showTimeLens: (data: WorldStateResponse, previewYear: number) => void
   hideTimeLens: () => void
+  setShimmerOpacity: (slug: string | null, opacity: number) => void
 }
 
 import type { Viewport } from '@/store/timeline'
@@ -108,6 +109,21 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         map.setPaintProperty('time-lens-fill', 'fill-opacity', 0)
         map.setPaintProperty('time-lens-border', 'line-opacity', 0)
       } catch { /* layers may not exist yet */ }
+    },
+    setShimmerOpacity(slug, opacity) {
+      const map = mapRef.current
+      if (!map) return
+      try {
+        if (slug) {
+          map.setPaintProperty('territories-fill', 'fill-opacity', [
+            'case',
+            ['==', ['get', 'slug'], slug], opacity,
+            0.12,
+          ])
+        }
+      } catch {
+        /* layer not ready */
+      }
     },
   }))
 
