@@ -27,6 +27,7 @@ export interface MapViewHandle {
 }
 
 import type { Viewport } from '@/store/timeline'
+import { useTimelineStore } from '@/store/timeline'
 
 export interface MapViewProps {
   onEntitySelect: (entity: EntityFeature | null) => void
@@ -309,6 +310,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
           geometry: feature.geometry as GeoJSON.MultiPolygon,
           properties: props,
         }
+        useTimelineStore.setState({ _selectionSource: 'map' })
         onEntitySelectRef.current(entity)
       })
 
@@ -316,7 +318,10 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(
         const features = map.queryRenderedFeatures(e.point, {
           layers: ['territories-fill'],
         })
-        if (!features.length) onEntitySelectRef.current(null)
+        if (!features.length) {
+          useTimelineStore.setState({ _selectionSource: 'map' })
+          onEntitySelectRef.current(null)
+        }
       })
 
       // Apply initial era atmosphere
