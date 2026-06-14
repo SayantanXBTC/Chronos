@@ -5,12 +5,17 @@ import { motion, AnimatePresence } from 'motion/react'
 import { useTimelineStore } from '@/store/timeline'
 import { useStoryStore } from '@/store/story'
 import { computeDiscoveryPrompts } from '@/lib/discovery'
+import { OrnamentFrame } from '@/components/ui/OrnamentFrame'
+import { Touchable } from '@/components/ui/Touchable'
+import { AAA_POLISH } from '@/lib/flags'
+import { MOTION_HUD } from '@/lib/motion'
 
 export function DiscoveryEngine() {
   const year = useTimelineStore((s) => s.year)
   const entities = useTimelineStore((s) => s.currentEntities)
   const selectedEntity = useTimelineStore((s) => s.selectedEntity)
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
+  const setSelectionSource = useTimelineStore((s) => s.setSelectionSource)
   const activeStory = useStoryStore((s) => s.activeStory)
 
   const prompts = useMemo(
@@ -21,54 +26,46 @@ export function DiscoveryEngine() {
   const handlePrompt = useCallback(
     (slug: string) => {
       const entity = entities.find((e) => e.properties.slug === slug)
-      if (entity) setSelectedEntity(entity)
+      if (entity) {
+        setSelectionSource('panel')
+        setSelectedEntity(entity)
+      }
     },
-    [entities, setSelectedEntity]
+    [entities, setSelectedEntity, setSelectionSource]
   )
 
-  // Hide when entity selected, story running, or no prompts
   if (selectedEntity || activeStory || prompts.length === 0) return null
+  if (!AAA_POLISH) return null
 
   return (
     <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none">
       <AnimatePresence mode="popLayout">
         {prompts.map((prompt, i) => (
-          <motion.button
+          <motion.div
             key={prompt.id}
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1 - i * 0.2, y: 0, scale: 1 - i * 0.015 }}
+            animate={{ opacity: 1 - i * 0.18, y: 0, scale: 1 - i * 0.015 }}
             exit={{ opacity: 0, y: -6, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 28, delay: i * 0.05 }}
-            onClick={() => handlePrompt(prompt.slug)}
-            className="pointer-events-auto flex flex-col items-center px-4 py-2 rounded-xl backdrop-blur-md border transition-all"
-            style={{
-              background: 'rgba(16,10,4,0.82)',
-              borderColor: 'rgba(190,148,68,0.18)',
-              boxShadow: '0 8px 28px rgba(0,0,0,0.60)',
-              minWidth: '240px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(190,148,68,0.40)'
-              e.currentTarget.style.background = 'rgba(30,18,6,0.90)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(190,148,68,0.18)'
-              e.currentTarget.style.background = 'rgba(16,10,4,0.82)'
-            }}
+            transition={{ ...MOTION_HUD, delay: i * 0.05 }}
+            className="pointer-events-auto"
+            style={{ minWidth: 240 }}
           >
-            <span
-              className="font-im-fell italic text-[11px] mb-0.5"
-              style={{ color: 'var(--scroll-text-dim)' }}
-            >
-              {prompt.label}
-            </span>
-            <span
-              className="font-cinzel text-[11px] tracking-wide"
-              style={{ color: 'rgba(255,210,100,0.85)' }}
-            >
-              {prompt.cta}
-            </span>
-          </motion.button>
+            <OrnamentFrame density="mid">
+              <Touchable
+                onClick={() => handlePrompt(prompt.slug)}
+                soundKey="click"
+                className="w-full flex flex-col items-center"
+                ariaLabel={prompt.cta}
+              >
+                <span style={{ fontFamily: 'var(--font-garamond)', fontStyle: 'italic', fontSize: 11, color: 'var(--parchment-ink-muted)' }}>
+                  {prompt.label}
+                </span>
+                <span style={{ fontFamily: 'var(--font-cinzel)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--parchment-drop)' }}>
+                  {prompt.cta}
+                </span>
+              </Touchable>
+            </OrnamentFrame>
+          </motion.div>
         ))}
       </AnimatePresence>
     </div>
