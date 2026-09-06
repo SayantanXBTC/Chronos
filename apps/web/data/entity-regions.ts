@@ -31,6 +31,7 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'ottoman-empire':        'Middle East',
   'babylonian-empire':     'Middle East',
   'assyrian-empire':       'Middle East',
+  'akkadian-empire':       'Middle East',
   'timurid-empire':        'Middle East',
   'safavid-empire':        'Middle East',
   'mongol-empire':         'Central Asia',
@@ -46,7 +47,9 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'yuan-dynasty':          'East Asia',
   'japanese-empire':       'East Asia',
   'khmer-empire':          'East Asia',
+  'shang-dynasty':         'East Asia',
   // South Asia
+  'indus-valley-civilization': 'South Asia',
   'maurya-empire':         'South Asia',
   'gupta-empire':          'South Asia',
   'mughal-empire':         'South Asia',
@@ -56,7 +59,7 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'mali-empire':           'Africa',
   'songhai-empire':        'Africa',
   'ghana-empire':          'Africa',
-  'egyptian-empire':       'Africa',
+  'ancient-egypt':         'Africa',
   'axum':                  'Africa',
   'zulu-kingdom':          'Africa',
   // Americas

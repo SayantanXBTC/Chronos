@@ -39,4 +39,10 @@ export const ENTITY_META: Record<string, EntityMeta> = {
   'japanese-empire':       { peak_year: 1942, peak_label: 'Peak WWII territorial extent',             capital: { name: 'Tokyo',         lon: 139.69, lat: 35.69 } },
   'russian-empire':        { peak_year: 1895, peak_label: 'Peak territorial extent',                  capital: { name: 'Saint Petersburg', lon: 30.31, lat: 59.94 } },
   'french-empire':         { peak_year: 1920, peak_label: 'Peak — interwar colonial extent',          capital: { name: 'Paris',         lon: 2.35,   lat: 48.86 } },
+  'indus-valley-civilization': { peak_year: -2300, peak_label: 'Mature Harappan period',              capital: { name: 'Mohenjo-daro',  lon: 68.14,  lat: 27.33 } },
+  'ancient-egypt':         { peak_year: -1279, peak_label: 'New Kingdom under Ramesses II',           capital: { name: 'Thebes',        lon: 32.66,  lat: 25.70 } },
+  'akkadian-empire':       { peak_year: -2270, peak_label: 'Peak under Naram-Sin',                    capital: { name: 'Akkad',         lon: 44.10,  lat: 33.06 } },
+  'babylonian-empire':     { peak_year: -1750, peak_label: 'Peak under Hammurabi',                    capital: { name: 'Babylon',       lon: 44.42,  lat: 32.54 } },
+  'assyrian-empire':       { peak_year: -670,  peak_label: 'Peak under Esarhaddon',                   capital: { name: 'Nineveh',       lon: 43.15,  lat: 36.36 } },
+  'shang-dynasty':         { peak_year: -1200, peak_label: 'Late Shang period',                       capital: { name: 'Yin',           lon: 114.30, lat: 36.13 } },
 }

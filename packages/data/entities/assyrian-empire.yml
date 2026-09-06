@@ -1,0 +1,26 @@
+slug: assyrian-empire
+name: Assyrian Empire
+type: empire
+color: "#7b241c"
+year_start: -911
+year_end: -609
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: assyrian-empire/phase-1.geojson
+    year_start: -911
+    year_end: -700
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate
+  - geometry: assyrian-empire/phase-2.geojson
+    year_start: -700
+    year_end: -609
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate

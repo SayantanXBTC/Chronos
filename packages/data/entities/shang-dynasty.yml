@@ -1,0 +1,20 @@
+slug: shang-dynasty
+name: Shang Dynasty
+type: dynasty
+color: "#b9770e"
+year_start: -1600
+year_end: -1046
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: shang-dynasty/phase-1.geojson
+    year_start: -1600
+    year_end: -1046
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: estimated

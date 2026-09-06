@@ -1,0 +1,20 @@
+slug: akkadian-empire
+name: Akkadian Empire
+type: empire
+color: "#a04000"
+year_start: -2334
+year_end: -2154
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: akkadian-empire/phase-1.geojson
+    year_start: -2334
+    year_end: -2154
+    confidence: approximate
+    confidence_score: 0.4
+    date_precision: estimated

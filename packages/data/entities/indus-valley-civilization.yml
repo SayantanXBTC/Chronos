@@ -1,0 +1,26 @@
+slug: indus-valley-civilization
+name: Indus Valley Civilization
+type: confederation
+color: "#7f8c8d"
+year_start: -3300
+year_end: -1300
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: indus-valley-civilization/phase-1.geojson
+    year_start: -3300
+    year_end: -2600
+    confidence: approximate
+    confidence_score: 0.4
+    date_precision: estimated
+  - geometry: indus-valley-civilization/phase-2.geojson
+    year_start: -2600
+    year_end: -1300
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: estimated

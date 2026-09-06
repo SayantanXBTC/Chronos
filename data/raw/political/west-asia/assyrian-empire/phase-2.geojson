@@ -1,0 +1,33 @@
+{
+  "type": "Feature",
+  "properties": {},
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [
+            29.5,
+            29
+          ],
+          [
+            48,
+            29
+          ],
+          [
+            48,
+            38.5
+          ],
+          [
+            29.5,
+            38.5
+          ],
+          [
+            29.5,
+            29
+          ]
+        ]
+      ]
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+slug: ancient-egypt
+name: Ancient Egypt
+type: kingdom
+color: "#c9a227"
+year_start: -3100
+year_end: -305
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 10
+map_modes:
+  - political
+phases:
+  - geometry: ancient-egypt/phase-1.geojson
+    year_start: -3100
+    year_end: -1550
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: estimated
+  - geometry: ancient-egypt/phase-2.geojson
+    year_start: -1550
+    year_end: -305
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate
