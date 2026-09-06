@@ -33,4 +33,10 @@ export const ENTITY_META: Record<string, EntityMeta> = {
   'western-roman-empire':  { peak_year: 100,  peak_label: 'Peak Roman territorial control',         capital: { name: 'Ravenna',       lon: 12.20,  lat: 44.41 } },
   'eastern-roman-empire':  { peak_year: 395,  peak_label: 'Full Eastern Roman extent',              capital: { name: 'Constantinople',lon: 28.97,  lat: 41.01 } },
   'sasanian-empire':       { peak_year: 620,  peak_label: 'Peak under Khosrow II',                  capital: { name: 'Ctesiphon',     lon: 44.58,  lat: 33.09 } },
+  'british-empire':        { peak_year: 1920, peak_label: 'Peak — largest empire in history',        capital: { name: 'London',        lon: -0.13,  lat: 51.51 } },
+  'united-states':         { peak_year: 1945, peak_label: 'Post-WWII global superpower',             capital: { name: 'Washington, D.C.', lon: -77.04, lat: 38.91 } },
+  'qing-dynasty':          { peak_year: 1790, peak_label: "Peak under the Qianlong Emperor",          capital: { name: 'Beijing',       lon: 116.40, lat: 39.90 } },
+  'japanese-empire':       { peak_year: 1942, peak_label: 'Peak WWII territorial extent',             capital: { name: 'Tokyo',         lon: 139.69, lat: 35.69 } },
+  'russian-empire':        { peak_year: 1895, peak_label: 'Peak territorial extent',                  capital: { name: 'Saint Petersburg', lon: 30.31, lat: 59.94 } },
+  'french-empire':         { peak_year: 1920, peak_label: 'Peak — interwar colonial extent',          capital: { name: 'Paris',         lon: 2.35,   lat: 48.86 } },
 }

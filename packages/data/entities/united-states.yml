@@ -3,7 +3,7 @@ name: United States
 type: republic
 color: "#3c5ba8"
 year_start: 1776
-year_end: 2026
+year_end: null
 source_name: "Manual trace — approximate historical boundaries"
 source_license: "CC0"
 data_version: "2024-01"
@@ -26,7 +26,7 @@ phases:
     date_precision: approximate
   - geometry: united-states/phase-3.geojson
     year_start: 1848
-    year_end: 2026
+    year_end: null
     confidence: approximate
     confidence_score: 0.55
     date_precision: approximate

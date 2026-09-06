@@ -1,0 +1,32 @@
+slug: french-empire
+name: French Colonial Empire
+type: empire
+color: "#16697a"
+year_start: 1605
+year_end: 1962
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: french-empire/phase-1.geojson
+    year_start: 1605
+    year_end: 1763
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: french-empire/phase-2.geojson
+    year_start: 1763
+    year_end: 1914
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: french-empire/phase-3.geojson
+    year_start: 1914
+    year_end: 1962
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate

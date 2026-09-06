@@ -15,6 +15,7 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'sparta':                'Mediterranean',
   'british-empire':        'Europe',
   'french-empire':         'Europe',
+  'russian-empire':        'Europe',
   'holy-roman-empire':     'Europe',
   'spanish-empire':        'Europe',
   'portuguese-empire':     'Europe',
@@ -62,7 +63,7 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'aztec-empire':          'Americas',
   'inca-empire':           'Americas',
   'maya-civilization':     'Americas',
-  'usa-expansion':         'Americas',
+  'united-states':         'Americas',
 }
 
 /** Display order — roughly west to east */

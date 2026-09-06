@@ -1,0 +1,26 @@
+slug: russian-empire
+name: Russian Empire
+type: empire
+color: "#4b6f44"
+year_start: 1721
+year_end: 1917
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 10
+map_modes:
+  - political
+phases:
+  - geometry: russian-empire/phase-1.geojson
+    year_start: 1721
+    year_end: 1867
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: russian-empire/phase-2.geojson
+    year_start: 1867
+    year_end: 1917
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
