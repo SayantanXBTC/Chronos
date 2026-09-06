@@ -1,10 +1,7 @@
 import json
-import pytest
 from unittest.mock import AsyncMock
 
 from app.services.cache_service import CacheService, make_world_state_key
-
-pytestmark = pytest.mark.asyncio
 
 
 def test_cache_key_format():

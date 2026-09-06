@@ -1,6 +1,6 @@
 // apps/web/__tests__/useRiversLayer.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { useRiversLayer } from '@/components/map/useRiversLayer'
 import type { MapViewHandle } from '@/components/map/MapView'
 import type { RiversResponse } from '@/types'

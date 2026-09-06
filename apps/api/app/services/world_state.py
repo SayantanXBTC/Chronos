@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.utils.year import snap_to_snapshot
 
+
 def _build_snapshot_years() -> list[int]:
     years = []
     # -3000 to -1000 at 250-year intervals

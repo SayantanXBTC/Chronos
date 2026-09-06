@@ -135,7 +135,6 @@ export function TimelineSlider() {
 
   useEffect(() => {
     return () => stopInertia()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

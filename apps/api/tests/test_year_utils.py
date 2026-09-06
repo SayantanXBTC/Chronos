@@ -2,8 +2,6 @@ import pytest
 
 from app.utils.year import display_to_year, snap_to_snapshot, year_to_display
 
-pytestmark = pytest.mark.asyncio
-
 
 def test_year_to_display_bce():
     assert year_to_display(-264) == "264 BCE"

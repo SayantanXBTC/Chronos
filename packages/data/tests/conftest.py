@@ -12,13 +12,16 @@ TEST_DB_URL_ASYNC = "postgresql+asyncpg://history:history@localhost:5433/history
 def migrate_test_db():
     env = os.environ.copy()
     env["DATABASE_URL"] = TEST_DB_URL_ASYNC
-    result = subprocess.run(
-        ["python", "-m", "alembic", "upgrade", "head"],
-        cwd="apps/api",
-        env=env,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["python", "-m", "alembic", "upgrade", "head"],
+            cwd="apps/api",
+            env=env,
+            capture_output=True,
+            text=True,
+        )
+    except OSError as e:
+        pytest.skip(f"Could not run alembic to migrate test DB: {e}")
     if result.returncode != 0:
         pytest.skip(f"Could not migrate test DB: {result.stderr}")
 

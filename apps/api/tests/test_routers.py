@@ -35,6 +35,6 @@ async def test_events_stub(client):
 
 async def test_database_module_imports():
     """Verify database module loads without error (no connection needed)."""
-    from app.database import Base, AsyncSessionLocal, engine, get_db
+    from app.database import Base, engine
     assert Base is not None
     assert engine is not None

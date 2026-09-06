@@ -1,11 +1,11 @@
 import json
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cache import get_redis
 from app.database import get_db
 from app.services.rivers_service import RiversService
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -22,8 +22,8 @@ async def get_rivers(
     if raw is not None:
         try:
             return json.loads(raw)
-        except Exception:
-            pass
+        except json.JSONDecodeError:
+            pass  # treat corrupt cache entry as miss
 
     svc = RiversService(db=db)
     result = await svc.get_rivers()

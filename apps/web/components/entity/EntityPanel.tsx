@@ -35,7 +35,12 @@ export function EntityPanel() {
   const activeStory = useStoryStore((s) => s.activeStory)
 
   useEffect(() => {
+    // Synchronizes `detail` with an external system (the API) keyed on
+    // `entity`; the synchronous setDetail(null) calls clear stale data from
+    // the previous entity before the new fetch resolves, avoiding a flash of
+    // the wrong civilization's details while loading.
     if (!entity) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDetail(null)
       return
     }

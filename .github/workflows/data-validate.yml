@@ -25,7 +25,7 @@ jobs:
           cache: 'pip'
 
       - name: Install data pipeline dependencies
-        run: pip install -r packages/data/requirements.txt
+        run: pip install -e "./packages/data[dev]"
 
       - name: Run entity type audit
         run: python -m data audit-types
@@ -53,7 +53,7 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r packages/data/requirements.txt
+        run: pip install -e "./packages/data[dev]"
 
       - name: Run unit tests (no DB required)
         run: |

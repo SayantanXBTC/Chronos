@@ -3,9 +3,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from app.main import app
-from app.database import get_db
 from app.cache import get_redis
+from app.database import get_db
+from app.main import app
 
 
 def _make_mock_db():

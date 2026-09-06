@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 
 describe('AAA_POLISH flag', () => {
   const orig = process.env.NEXT_PUBLIC_AAA_POLISH

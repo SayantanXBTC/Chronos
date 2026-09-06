@@ -1,11 +1,12 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cache import get_redis
 from app.database import get_db
 from app.services.place_names_service import PlaceNamesService
-from app.services.cache_service import CacheService
 from app.utils.year import normalize_year
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -26,22 +27,19 @@ async def get_place_names(
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    cache = CacheService(redis=redis)
     tile_x = int(min_x // 10)
     tile_y = int(min_y // 10)
     cache_key = f"place_names:{year}:{zoom}:{tile_x}:{tile_y}"
 
     raw = await redis.get(cache_key)
     if raw is not None:
-        import json
         try:
             return json.loads(raw)
-        except Exception:
-            pass
+        except json.JSONDecodeError:
+            pass  # treat corrupt cache entry as miss
 
     svc = PlaceNamesService(db=db)
     result = await svc.get_place_names(year=year, bbox=(min_x, min_y, max_x, max_y), zoom=zoom)
 
-    import json
     await redis.set(cache_key, json.dumps(result), ex=86400)
     return result

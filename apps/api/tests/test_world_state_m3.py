@@ -1,8 +1,5 @@
 """M3-J: Tests for M3 additions to WorldStateService — 3-tier LOD, snapshot range."""
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-
-pytestmark = pytest.mark.asyncio
 
 
 def _make_row(**overrides):

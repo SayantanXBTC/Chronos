@@ -1,6 +1,7 @@
 """Tests verifying M2 additions to WorldStateService: confidence_type, source_name, importance."""
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 pytestmark = pytest.mark.asyncio
 

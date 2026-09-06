@@ -1,6 +1,7 @@
 """Tests for RiversService and GET /api/v1/rivers."""
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 pytestmark = pytest.mark.asyncio
 

@@ -1,6 +1,6 @@
 // apps/web/__tests__/usePlaceNamesLayer.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { usePlaceNamesLayer } from '@/components/map/usePlaceNamesLayer'
 import { useTimelineStore } from '@/store/timeline'
 import type { MapViewHandle } from '@/components/map/MapView'

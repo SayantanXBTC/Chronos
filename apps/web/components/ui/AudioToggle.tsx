@@ -9,6 +9,11 @@ export function AudioToggle() {
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
+    // Deliberately deferred: this component is server-rendered, and
+    // getAudioEnabled() reads localStorage — using it as the initial state
+    // would mismatch the server-rendered markup for anyone with audio
+    // already enabled. Render the SSR-safe default first, sync after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEnabled(getAudioEnabled())
   }, [])
 

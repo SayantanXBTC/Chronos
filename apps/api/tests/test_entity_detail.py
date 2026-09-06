@@ -3,6 +3,7 @@ import os
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
 from app.services.entity_service import EntityService
 
 
@@ -101,8 +102,10 @@ class TestGetEntityDetail:
 
 class TestEntityDetailRouter:
     def test_404_for_unknown_slug(self):
-        from fastapi.testclient import TestClient
         from unittest.mock import AsyncMock, patch
+
+        from fastapi.testclient import TestClient
+
         from app.main import app
 
         with patch("app.routers.entities.EntityService") as MockSvc:
@@ -113,8 +116,10 @@ class TestEntityDetailRouter:
         assert resp.status_code == 404
 
     def test_200_for_known_slug(self):
-        from fastapi.testclient import TestClient
         from unittest.mock import AsyncMock, patch
+
+        from fastapi.testclient import TestClient
+
         from app.main import app
 
         detail = {
@@ -140,6 +145,7 @@ class TestEntityDetailRouter:
 def test_roman_empire_detail_live():
     """Smoke test against live DB: roman-empire must have lineage predecessors."""
     import asyncio
+
     from app.database import async_session_factory
     from app.services.entity_service import EntityService
 

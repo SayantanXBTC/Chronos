@@ -41,7 +41,7 @@ function seedMotes(): Mote[] {
 
 export function ParchmentDust() {
   const reduced = useReducedMotion()
-  const motes = useMemo(seedMotes, [])
+  const motes = useMemo(() => seedMotes(), [])
 
   if (!AAA_POLISH || reduced) return null
 
