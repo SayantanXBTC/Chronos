@@ -38,7 +38,7 @@ export function DiscoveryEngine() {
   if (!AAA_POLISH) return null
 
   return (
-    <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none">
+    <div className="absolute bottom-56 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none">
       <AnimatePresence mode="popLayout">
         {prompts.map((prompt, i) => (
           <motion.div

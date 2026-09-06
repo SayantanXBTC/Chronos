@@ -287,4 +287,373 @@ export const ENTITY_FACTS: Record<string, EntityFacts> = {
       'The empire was formally dissolved after Japan’s surrender in 1945, during Emperor Shōwa’s reign.',
     ],
   },
+  'akkadian-empire': {
+    rulers: [
+      { name: 'Sargon of Akkad', years: 'c. 2334 – 2279 BCE', title: 'King' },
+      { name: 'Naram-Sin', years: 'c. 2254 – 2218 BCE', title: 'King' },
+    ],
+    facts: [
+      'It is generally considered the first empire in world history to unite multiple city-states under one central ruler.',
+      'Sargon’s dynasty lasted roughly 180 years before collapsing under invasion and possibly climate-driven drought.',
+      'Naram-Sin, Sargon’s grandson, was the first Mesopotamian king to declare himself a living god.',
+    ],
+  },
+  'assyrian-empire': {
+    rulers: [
+      { name: 'Tiglath-Pileser III', years: '745 – 727 BCE', title: 'King' },
+      { name: 'Sargon II', years: '722 – 705 BCE', title: 'King' },
+      { name: 'Esarhaddon', years: '681 – 669 BCE', title: 'King' },
+      { name: 'Ashurbanipal', years: '669 – 631 BCE', title: 'King' },
+    ],
+    facts: [
+      'Ashurbanipal’s library at Nineveh held an estimated 30,000 clay tablets — one of the first great libraries in history.',
+      'Assyria pioneered an organized road and postal relay system centuries before the Persian Royal Road.',
+      'Esarhaddon briefly conquered Egypt in 671 BCE, extending Assyrian control across the entire Fertile Crescent.',
+    ],
+  },
+  'babylonian-empire': {
+    rulers: [
+      { name: 'Hammurabi', years: '1792 – 1750 BCE', title: 'King' },
+      { name: 'Nebuchadnezzar II', years: '605 – 562 BCE', title: 'King' },
+    ],
+    facts: [
+      'Hammurabi’s Code, roughly 282 laws carved on a stone stele, is one of the earliest deciphered legal texts.',
+      'Nebuchadnezzar II conquered Jerusalem in 587 BCE and exiled much of its population to Babylon.',
+      'The empire fell to Cyrus the Great of Persia in 539 BCE, reportedly without a major battle.',
+    ],
+  },
+  'carthage': {
+    rulers: [
+      { name: 'Hamilcar Barca', years: '247 – 228 BCE', title: 'General' },
+      { name: 'Hannibal Barca', years: '221 – 202 BCE', title: 'General' },
+    ],
+    facts: [
+      'Founded by Phoenician settlers from Tyre around 814 BCE.',
+      'Hannibal famously marched an army — elephants included — across the Alps to invade Italy in 218 BCE.',
+      'Rome destroyed Carthage utterly in 146 BCE at the end of the Third Punic War.',
+    ],
+  },
+  'delhi-sultanate': {
+    rulers: [
+      { name: 'Qutb al-Din Aibak', years: '1206 – 1210', title: 'Sultan' },
+      { name: 'Iltutmish', years: '1211 – 1236', title: 'Sultan' },
+      { name: 'Muhammad bin Tughluq', years: '1325 – 1351', title: 'Sultan' },
+    ],
+    facts: [
+      'Began construction of the Qutb Minar, still the tallest brick minaret in the world.',
+      'Repelled repeated Mongol invasions of northern India in the 13th and 14th centuries.',
+      'Ended in 1526 when Babur defeated the last Sultan at the First Battle of Panipat, founding the Mughal Empire.',
+    ],
+  },
+  'eastern-roman-empire': {
+    rulers: [
+      { name: 'Constantine I', years: '324 – 337', title: 'Emperor' },
+      { name: 'Theodosius I', years: '379 – 395', title: 'Emperor' },
+      { name: 'Justinian I', years: '527 – 565', title: 'Emperor' },
+    ],
+    facts: [
+      'This is the same Roman state usually called the "Byzantine Empire" in later scholarship — its people always called themselves Romans.',
+      'Constantinople, its capital from 330, controlled the only land route between Europe and Asia at the Bosphorus.',
+      'It outlasted the Western Roman Empire by nearly a thousand years, falling to the Ottomans only in 1453.',
+    ],
+  },
+  'germanic-tribes': {
+    rulers: [
+      { name: 'Arminius', years: 'd. 21 CE', title: 'Chieftain' },
+      { name: 'Alaric I', years: '395 – 410', title: 'King of the Visigoths' },
+      { name: 'Clovis I', years: '481 – 511', title: 'King of the Franks' },
+    ],
+    facts: [
+      'Arminius destroyed three entire Roman legions at the Battle of the Teutoburg Forest in 9 CE, halting Rome’s expansion into Germania.',
+      'Alaric’s Visigoths sacked Rome in 410 — the first time the city had fallen to a foreign enemy in nearly 800 years.',
+      'Clovis’s conversion to Christianity in 496 shaped the religious future of Western Europe.',
+    ],
+  },
+  'ghana-empire': {
+    rulers: [
+      { name: 'Tunka Manin', years: 'c. 1068 (attested reign)', title: 'King' },
+    ],
+    facts: [
+      'Grew wealthy by controlling and taxing trans-Saharan trade in gold and salt.',
+      'Its capital, Koumbi Saleh, reportedly had separate quarters for the royal court and for Muslim merchants.',
+      'Declined under pressure from Almoravid incursions and prolonged drought in the 11th-12th centuries.',
+    ],
+  },
+  'golden-horde': {
+    rulers: [
+      { name: 'Batu Khan', years: '1227 – 1255', title: 'Khan' },
+      { name: 'Uzbeg Khan', years: '1313 – 1341', title: 'Khan' },
+    ],
+    facts: [
+      'Dominated the Russian principalities for over two centuries, exacting tribute in what Russian history calls the "Mongol Yoke."',
+      'Uzbeg Khan made Islam the khanate’s state religion in the early 14th century.',
+      'Fragmented in the 15th century into smaller khanates — Kazan, Crimea, Astrakhan — eventually absorbed by Russia.',
+    ],
+  },
+  'greek-city-states': {
+    rulers: [
+      { name: 'Pericles', years: '461 – 429 BCE', title: 'Statesman (Athens)' },
+      { name: 'Leonidas I', years: 'd. 480 BCE', title: 'King (Sparta)' },
+      { name: 'Themistocles', years: 'fl. 480 BCE', title: 'General (Athens)' },
+    ],
+    facts: [
+      'Athens pioneered direct democracy, where citizens voted directly on laws rather than through representatives.',
+      'Spartan society was organized almost entirely around military training from childhood (the agoge).',
+      'The Peloponnesian War between Athens and Sparta (431-404 BCE) lasted 27 years and exhausted both city-states.',
+    ],
+  },
+  'gupta-empire': {
+    rulers: [
+      { name: 'Chandragupta I', years: '320 – 335', title: 'Emperor' },
+      { name: 'Samudragupta', years: '335 – 375', title: 'Emperor' },
+      { name: 'Chandragupta II', years: '375 – 415', title: 'Emperor' },
+    ],
+    facts: [
+      'Often called classical India’s "Golden Age" for advances in mathematics, astronomy, and Sanskrit literature.',
+      'Indian mathematicians of this era developed the decimal place-value system and the concept of zero.',
+      'Declined under repeated invasions by the Huna (Hunnic) peoples in the late 5th century.',
+    ],
+  },
+  'holy-roman-empire': {
+    rulers: [
+      { name: 'Otto I', years: '962 – 973', title: 'Emperor' },
+      { name: 'Frederick Barbarossa', years: '1155 – 1190', title: 'Emperor' },
+      { name: 'Charles V', years: '1519 – 1556', title: 'Emperor' },
+    ],
+    facts: [
+      'Voltaire’s famous quip: it was "neither Holy, nor Roman, nor an Empire" — a loose patchwork of hundreds of semi-independent states.',
+      'Charles V ruled it alongside the Spanish Empire, briefly making him one of the most powerful men in history.',
+      'Dissolved in 1806 after Napoleon’s victories forced Emperor Francis II to abdicate the title.',
+    ],
+  },
+  'ilkhanate': {
+    rulers: [
+      { name: 'Hulagu Khan', years: '1256 – 1265', title: 'Ilkhan' },
+      { name: 'Ghazan Khan', years: '1295 – 1304', title: 'Ilkhan' },
+    ],
+    facts: [
+      'Hulagu’s sack of Baghdad in 1258 ended the Abbasid Caliphate and killed the last reigning caliph.',
+      'Ghazan Khan’s conversion to Islam in 1295 marked a major cultural turning point for the khanate.',
+      'Fostered a rich Perso-Mongol artistic and administrative tradition that influenced later Persianate empires.',
+    ],
+  },
+  'indus-valley-civilization': {
+    rulers: [],
+    facts: [
+      'No king lists or named rulers are known — unusually for a Bronze Age civilization, no palaces or clear seats of monarchy have been found.',
+      'Cities like Mohenjo-daro featured advanced urban planning: grid-pattern streets and covered drainage systems.',
+      'Its script has never been deciphered, so its language, government, and beliefs remain largely a mystery.',
+    ],
+  },
+  'khmer-empire': {
+    rulers: [
+      { name: 'Jayavarman II', years: '802 – 850', title: 'King' },
+      { name: 'Suryavarman II', years: '1113 – 1150', title: 'King' },
+      { name: 'Jayavarman VII', years: '1181 – 1218', title: 'King' },
+    ],
+    facts: [
+      'Suryavarman II built Angkor Wat, still the largest religious monument in the world.',
+      'The capital Angkor may have been the largest pre-industrial city on Earth, with up to a million residents.',
+      'Tree-ring and hydrological evidence suggests the empire’s collapse was hastened by severe drought and flooding.',
+    ],
+  },
+  'maurya-empire': {
+    rulers: [
+      { name: 'Chandragupta Maurya', years: '322 – 298 BCE', title: 'Emperor' },
+      { name: 'Ashoka the Great', years: '268 – 232 BCE', title: 'Emperor' },
+    ],
+    facts: [
+      'Ashoka’s edicts, carved into pillars and rock faces across the empire, are among the earliest deciphered Indian inscriptions.',
+      'After the bloody conquest of Kalinga, Ashoka renounced further military conquest and promoted Buddhism.',
+      'Its civil service and espionage network were described in the Arthashastra, an ancient treatise on statecraft.',
+    ],
+  },
+  'ming-dynasty': {
+    rulers: [
+      { name: 'Hongwu Emperor', years: '1368 – 1398', title: 'Emperor' },
+      { name: 'Yongle Emperor', years: '1402 – 1424', title: 'Emperor' },
+      { name: 'Wanli Emperor', years: '1572 – 1620', title: 'Emperor' },
+    ],
+    facts: [
+      'Admiral Zheng He led seven massive naval expeditions (1405-1433) reaching East Africa, decades before European exploration.',
+      'The Yongle Emperor built the Forbidden City in Beijing, completed in 1420.',
+      'Fell in 1644 to a combination of peasant rebellion and the invading Manchu armies that founded the Qing.',
+    ],
+  },
+  'numidia': {
+    rulers: [
+      { name: 'Masinissa', years: '202 – 148 BCE', title: 'King' },
+      { name: 'Jugurtha', years: '118 – 105 BCE', title: 'King' },
+    ],
+    facts: [
+      'Numidian cavalry was prized throughout the ancient Mediterranean, serving in armies on both sides of the Punic Wars.',
+      'Masinissa’s alliance with Rome against Carthage helped decide the outcome of the Second Punic War.',
+      'Annexed by Rome after Jugurtha’s defeat and betrayal in the Jugurthine War.',
+    ],
+  },
+  'parthian-empire': {
+    rulers: [
+      { name: 'Mithridates I', years: '171 – 132 BCE', title: 'King' },
+      { name: 'Orodes II', years: '57 – 37 BCE', title: 'King' },
+    ],
+    facts: [
+      'Crushed a Roman army under Crassus at the Battle of Carrhae in 53 BCE, one of Rome’s worst military disasters.',
+      'Famous for the "Parthian shot" — mounted archers firing backward while feigning retreat.',
+      'Controlled a key stretch of the Silk Road between the Roman and Chinese/Indian worlds.',
+    ],
+  },
+  'portuguese-empire': {
+    rulers: [
+      { name: 'Prince Henry the Navigator', years: 'd. 1460', title: 'Patron of Exploration' },
+      { name: 'Vasco da Gama', years: 'fl. 1498', title: 'Explorer' },
+      { name: 'Afonso de Albuquerque', years: '1509 – 1515', title: 'Governor of India' },
+    ],
+    facts: [
+      'The first global colonial empire, existing in some form for almost 600 years.',
+      'Vasco da Gama’s 1498 voyage opened the first European sea route to India, breaking the overland spice monopoly.',
+      'Its last colonial possession, Macau, wasn’t handed over until 1999.',
+    ],
+  },
+  'ptolemaic-egypt': {
+    rulers: [
+      { name: 'Ptolemy I Soter', years: '305 – 282 BCE', title: 'Pharaoh' },
+      { name: 'Cleopatra VII', years: '51 – 30 BCE', title: 'Pharaoh' },
+    ],
+    facts: [
+      'Founded the Library of Alexandria, the largest library of the ancient world.',
+      'The ruling dynasty was ethnically Greek/Macedonian — Cleopatra VII was reportedly the first Ptolemy to learn Egyptian.',
+      'Ended with Cleopatra’s death in 30 BCE, after which Egypt became a province of Rome.',
+    ],
+  },
+  'qin-dynasty': {
+    rulers: [
+      { name: 'Qin Shi Huang', years: '221 – 210 BCE', title: 'First Emperor' },
+    ],
+    facts: [
+      'Standardized writing, currency, and even cart-axle widths across a newly unified China.',
+      'Began connecting earlier defensive walls into what became the Great Wall of China.',
+      'Buried with the Terracotta Army — thousands of life-sized clay soldiers — discovered only in 1974.',
+    ],
+  },
+  'safavid-empire': {
+    rulers: [
+      { name: 'Ismail I', years: '1501 – 1524', title: 'Shah' },
+      { name: 'Abbas the Great', years: '1588 – 1629', title: 'Shah' },
+    ],
+    facts: [
+      'Established Twelver Shia Islam as Iran’s state religion, a legacy that continues today.',
+      'Abbas’s capital Isfahan was celebrated in a Persian saying as "half the world" for its beauty.',
+      'Fought near-constant wars with the Ottoman Empire over Mesopotamia and the Caucasus.',
+    ],
+  },
+  'sasanian-empire': {
+    rulers: [
+      { name: 'Ardashir I', years: '224 – 242', title: 'Shahanshah' },
+      { name: 'Khosrow I', years: '531 – 579', title: 'Shahanshah' },
+    ],
+    facts: [
+      'Revived Persian imperial traditions after centuries of Parthian rule.',
+      'Fought Rome and then Byzantium in a series of wars spanning over 400 years.',
+      'Both Sasanian Persia and Byzantium were left exhausted just before the Arab Muslim conquests of the 7th century.',
+    ],
+  },
+  'seleucid-empire': {
+    rulers: [
+      { name: 'Seleucus I Nicator', years: '305 – 281 BCE', title: 'King' },
+      { name: 'Antiochus III "the Great"', years: '222 – 187 BCE', title: 'King' },
+    ],
+    facts: [
+      'At its height stretched from Thrace in Europe to the borders of India.',
+      'Founded dozens of Greek-style cities across the Near East, many named Antioch or Seleucia.',
+      'Gradually lost territory to a rising Parthia in the east and an expanding Rome in the west.',
+    ],
+  },
+  'shang-dynasty': {
+    rulers: [
+      { name: 'Wu Ding', years: 'c. 1250 – 1192 BCE', title: 'King' },
+    ],
+    facts: [
+      'The earliest Chinese dynasty confirmed by archaeological and written evidence.',
+      'Oracle bone inscriptions from this period are the earliest known form of Chinese writing.',
+      'Renowned for elaborate bronze ritual vessels used in ancestor worship.',
+    ],
+  },
+  'song-dynasty': {
+    rulers: [
+      { name: 'Emperor Taizu', years: '960 – 976', title: 'Emperor' },
+      { name: 'Emperor Huizong', years: '1100 – 1126', title: 'Emperor' },
+    ],
+    facts: [
+      'Bi Sheng invented movable-type printing around the 1040s, centuries before Gutenberg.',
+      'Developed the world’s first government-issued paper currency.',
+      'Gunpowder weapons saw their first documented military use during this period.',
+    ],
+  },
+  'songhai-empire': {
+    rulers: [
+      { name: 'Sonni Ali', years: '1464 – 1492', title: 'King' },
+      { name: 'Askia Muhammad I', years: '1493 – 1528', title: 'King' },
+    ],
+    facts: [
+      'At its height, the largest empire in West African history.',
+      'Timbuktu’s Sankore institution was a major center of Islamic scholarship, attracting scholars from across the region.',
+      'Collapsed after a 1591 Moroccan invasion that used firearms against traditional Songhai cavalry and infantry.',
+    ],
+  },
+  'spanish-empire': {
+    rulers: [
+      { name: 'Isabella I & Ferdinand II', years: '1479 – 1516', title: 'Catholic Monarchs' },
+      { name: 'Charles V', years: '1516 – 1556', title: 'King' },
+      { name: 'Philip II', years: '1556 – 1598', title: 'King' },
+    ],
+    facts: [
+      'At its 16th-century peak it was described as "the empire on which the sun never sets" — a phrase later reused for Britain.',
+      'Silver from Potosí, in modern Bolivia, funded Spain’s wars across Europe for over a century.',
+      'Lost most of its American colonies to independence movements in the early 19th century.',
+    ],
+  },
+  'timurid-empire': {
+    rulers: [
+      { name: 'Timur (Tamerlane)', years: '1370 – 1405', title: 'Emir' },
+      { name: 'Ulugh Beg', years: '1409 – 1449', title: 'Sultan' },
+    ],
+    facts: [
+      'Timur’s campaigns were extraordinarily destructive — some estimates attribute up to 17 million deaths to his conquests.',
+      'His grandson Ulugh Beg built a major astronomical observatory in Samarkand and compiled a star catalog.',
+      'Considered an ancestor dynasty of the Mughals — founder Babur was Timur’s direct descendant.',
+    ],
+  },
+  'umayyad-caliphate': {
+    rulers: [
+      { name: 'Muawiya I', years: '661 – 680', title: 'Caliph' },
+      { name: 'Abd al-Malik', years: '685 – 705', title: 'Caliph' },
+    ],
+    facts: [
+      'At its peak, the largest empire the world had yet seen, stretching from Spain to Central Asia.',
+      'Abd al-Malik built the Dome of the Rock in Jerusalem in 691, one of Islam’s oldest surviving monuments.',
+      'Overthrown by the Abbasid Revolution in 750; one surviving prince fled to found a new emirate in Spain.',
+    ],
+  },
+  'western-roman-empire': {
+    rulers: [
+      { name: 'Honorius', years: '395 – 423', title: 'Emperor' },
+      { name: 'Romulus Augustulus', years: '475 – 476', title: 'Emperor' },
+    ],
+    facts: [
+      'The 395 CE split from the Eastern Empire was meant to be administrative, not permanent.',
+      'Sacked by the Visigoths under Alaric in 410 — the first time Rome had fallen to a foreign enemy in nearly 800 years.',
+      'Traditionally considered to have ended in 476 CE, when Odoacer deposed the boy-emperor Romulus Augustulus.',
+    ],
+  },
+  'zulu-kingdom': {
+    rulers: [
+      { name: 'Shaka Zulu', years: '1816 – 1828', title: 'King' },
+      { name: 'Cetshwayo', years: '1873 – 1879', title: 'King' },
+    ],
+    facts: [
+      'Shaka revolutionized southern African warfare with the short stabbing spear (iklwa) and new regimental tactics.',
+      'Decisively defeated a British invasion force at the Battle of Isandlwana in 1879 — one of the worst defeats of a modern army by a pre-industrial one.',
+      'Fell to superior British numbers and firepower later the same year, ending independent Zulu rule.',
+    ],
+  },
 }

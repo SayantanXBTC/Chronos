@@ -145,17 +145,21 @@ export function EntityPanel() {
 
           {entityFacts && (
             <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--parchment-border)', fontFamily: 'var(--font-garamond)' }}>
-              <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
-                Notable Rulers
-              </h3>
-              <ul className="space-y-1 mb-3">
-                {entityFacts.rulers.map((r) => (
-                  <li key={r.name} className="flex justify-between gap-2 text-sm" style={{ color: 'var(--parchment-ink-soft)' }}>
-                    <span className="truncate">{r.title} {r.name}</span>
-                    <span className="text-xs flex-shrink-0" style={{ color: 'var(--parchment-ink-muted)' }}>{r.years}</span>
-                  </li>
-                ))}
-              </ul>
+              {entityFacts.rulers.length > 0 && (
+                <>
+                  <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
+                    Notable Rulers
+                  </h3>
+                  <ul className="space-y-1 mb-3">
+                    {entityFacts.rulers.map((r) => (
+                      <li key={r.name} className="flex justify-between gap-2 text-sm" style={{ color: 'var(--parchment-ink-soft)' }}>
+                        <span className="truncate">{r.title} {r.name}</span>
+                        <span className="text-xs flex-shrink-0" style={{ color: 'var(--parchment-ink-muted)' }}>{r.years}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
               <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
                 Facts
               </h3>
