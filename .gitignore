@@ -22,6 +22,9 @@ node_modules/
 .venv/
 venv/
 
+# Native local dev services (Postgres data dir, Redis dir, pidfiles, logs)
+.local/
+
 # Logs
 *.log
 
