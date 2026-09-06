@@ -3,7 +3,7 @@ name: Numidia
 type: kingdom
 color: "#d35400"
 year_start: -202
-year_end: 46
+year_end: -46
 source_name: "Ancient World Mapping Center"
 source_url: "https://awmc.unc.edu/awmc/map_data/"
 source_license: "CC BY 4.0"
@@ -15,6 +15,6 @@ map_modes:
 phases:
   - geometry: numidia/phase-1.geojson
     year_start: -202
-    year_end: 46
+    year_end: -46
     confidence: approximate
     confidence_score: 0.55

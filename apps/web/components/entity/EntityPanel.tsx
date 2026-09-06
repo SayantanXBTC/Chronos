@@ -148,16 +148,22 @@ export function EntityPanel() {
               {entityFacts.rulers.length > 0 && (
                 <>
                   <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
-                    Notable Rulers
+                    Rulers
                   </h3>
-                  <ul className="space-y-1 mb-3">
+                  <ul className="space-y-1 mb-1.5 max-h-52 overflow-y-auto pr-1">
                     {entityFacts.rulers.map((r) => (
-                      <li key={r.name} className="flex justify-between gap-2 text-sm" style={{ color: 'var(--parchment-ink-soft)' }}>
+                      <li key={`${r.name}-${r.years}`} className="flex justify-between gap-2 text-sm" style={{ color: 'var(--parchment-ink-soft)' }}>
                         <span className="truncate">{r.title} {r.name}</span>
                         <span className="text-xs flex-shrink-0" style={{ color: 'var(--parchment-ink-muted)' }}>{r.years}</span>
                       </li>
                     ))}
                   </ul>
+                  {entityFacts.rulersNote && (
+                    <p className="text-xs italic mb-3" style={{ color: 'var(--parchment-ink-muted)' }}>
+                      {entityFacts.rulersNote}
+                    </p>
+                  )}
+                  {!entityFacts.rulersNote && <div className="mb-3" />}
                 </>
               )}
               <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
