@@ -1,0 +1,26 @@
+slug: kingdom-of-england
+name: Kingdom of England
+type: kingdom
+color: "#941b0c"
+year_start: 927
+year_end: 1707
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: kingdom-of-england/phase-1.geojson
+    year_start: 927
+    year_end: 1284
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate
+  - geometry: kingdom-of-england/phase-2.geojson
+    year_start: 1284
+    year_end: 1707
+    confidence: approximate
+    confidence_score: 0.6
+    date_precision: exact

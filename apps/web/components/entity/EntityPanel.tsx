@@ -7,6 +7,7 @@ import { fetchEntityDetail } from '@/lib/api'
 import { yearToDisplay } from '@/lib/year'
 import { LineageTree } from './LineageTree'
 import { ENTITY_META } from '@/data/entity-metadata'
+import { ENTITY_FACTS } from '@/data/rulers'
 import type { EntityDetail } from '@/types'
 import { generateJourneyStory } from '@/lib/journey'
 import { useStoryStore } from '@/store/story'
@@ -53,6 +54,7 @@ export function EntityPanel() {
   const { name, type, color, confidence_type, source_name } = entity.properties
   const confidenceLabel = CONFIDENCE_LABELS[confidence_type] ?? confidence_type
   const entityMeta = ENTITY_META[entity.properties.slug] ?? null
+  const entityFacts = ENTITY_FACTS[entity.properties.slug] ?? null
 
   const contemporaries = currentEntities.filter(
     (f) => f.properties.slug !== entity.properties.slug
@@ -139,6 +141,33 @@ export function EntityPanel() {
                 </div>
               )}
             </figure>
+          )}
+
+          {entityFacts && (
+            <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--parchment-border)', fontFamily: 'var(--font-garamond)' }}>
+              <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
+                Notable Rulers
+              </h3>
+              <ul className="space-y-1 mb-3">
+                {entityFacts.rulers.map((r) => (
+                  <li key={r.name} className="flex justify-between gap-2 text-sm" style={{ color: 'var(--parchment-ink-soft)' }}>
+                    <span className="truncate">{r.title} {r.name}</span>
+                    <span className="text-xs flex-shrink-0" style={{ color: 'var(--parchment-ink-muted)' }}>{r.years}</span>
+                  </li>
+                ))}
+              </ul>
+              <h3 style={{ fontFamily: 'var(--font-cinzel)', fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--parchment-label)' }} className="mb-2">
+                Facts
+              </h3>
+              <ul className="space-y-1.5">
+                {entityFacts.facts.map((fact, i) => (
+                  <li key={i} className="text-xs leading-relaxed flex gap-1.5" style={{ color: 'var(--parchment-ink-muted)' }}>
+                    <span aria-hidden="true">•</span>
+                    <span>{fact}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {detail && (

@@ -76,8 +76,7 @@ describe('EntityPanel', () => {
     vi.mocked(fetchEntityDetail).mockResolvedValue(mockDetail)
     useTimelineStore.setState({ selectedEntity: mockEntity })
     render(<EntityPanel />)
-    await waitFor(() => expect(screen.getByText(/27 BCE/)).toBeDefined())
-    expect(screen.getByText(/476 CE/)).toBeDefined()
+    await waitFor(() => expect(screen.getByText('27 BCE – 476 CE')).toBeDefined())
   })
 
   it('shows predecessor in lineage', async () => {
