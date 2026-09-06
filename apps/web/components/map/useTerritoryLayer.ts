@@ -5,7 +5,7 @@ import { fetchWorldState } from '@/lib/api'
 import { snapshotCache } from '@/lib/cache'
 import { snapToSnapshot, SNAPSHOT_YEARS } from '@/lib/year'
 import type { MapViewHandle } from './MapView'
-import { AAA_POLISH } from '@/lib/flags'
+import { useSettingsStore } from '@/store/settings'
 
 async function preloadAdjacent(year: number): Promise<void> {
   const snapped = snapToSnapshot(year)
@@ -38,6 +38,7 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
   const viewport = useTimelineStore((s) => s.viewport)
   const setLoading = useTimelineStore((s) => s.setLoading)
   const setError = useTimelineStore((s) => s.setError)
+  const visualPolish = useSettingsStore((s) => s.visualPolish)
 
   const abortRef = useRef<AbortController | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -105,7 +106,7 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
 
   const selectedSlug = useTimelineStore((s) => s.selectedEntity?.properties.slug ?? null)
   useEffect(() => {
-    if (!AAA_POLISH || !selectedSlug) return
+    if (!visualPolish || !selectedSlug) return
     let raf = 0
     const start = performance.now()
     const tick = (t: number) => {
@@ -116,5 +117,5 @@ export function useTerritoryLayer(mapRef: RefObject<MapViewHandle | null>): void
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [mapRef, selectedSlug])
+  }, [mapRef, selectedSlug, visualPolish])
 }

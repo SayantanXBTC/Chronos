@@ -8,7 +8,7 @@ import { yearToDisplay } from '@/lib/year'
 import type { EntityFeature } from '@/types'
 import { OrnamentFrame } from '@/components/ui/OrnamentFrame'
 import { Touchable } from '@/components/ui/Touchable'
-import { AAA_POLISH } from '@/lib/flags'
+import { useSettingsStore } from '@/store/settings'
 import { MOTION_HUD } from '@/lib/motion'
 
 export function WhatElseExisted() {
@@ -17,6 +17,7 @@ export function WhatElseExisted() {
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
   const setSelectionSource = useTimelineStore((s) => s.setSelectionSource)
   const year = useTimelineStore((s) => s.year)
+  const visualPolish = useSettingsStore((s) => s.visualPolish)
 
   const grouped = useMemo(() => {
     const groups: Record<string, EntityFeature[]> = {}
@@ -39,7 +40,7 @@ export function WhatElseExisted() {
   }
 
   if (entities.length === 0) return null
-  if (!AAA_POLISH) return null
+  if (!visualPolish) return null
 
   let displayYear = ''
   try { displayYear = yearToDisplay(year) } catch { displayYear = String(year) }

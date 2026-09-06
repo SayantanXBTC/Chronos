@@ -26,7 +26,8 @@ import type { MapViewHandle } from './MapView'
 import { useTimeLens } from '@/hooks/useTimeLens'
 import { yearToDisplay } from '@/lib/year'
 import { featureCentroid } from '@/lib/geo'
-import { AAA_POLISH } from '@/lib/flags'
+import { useSettingsStore } from '@/store/settings'
+import { SettingsPanel } from '@/components/ui/SettingsPanel'
 
 // SSR must be disabled: MapLibre uses browser canvas APIs not available in Node.
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
@@ -37,6 +38,7 @@ export function MapContainer() {
   const setViewport = useTimelineStore((s) => s.setViewport)
   const selectedSlug = useTimelineStore((s) => s.selectedEntity?.properties.slug ?? null)
   const year = useTimelineStore((s) => s.year)
+  const visualPolish = useSettingsStore((s) => s.visualPolish)
   const handleViewportChange = useCallback((v: Viewport) => setViewport(v), [setViewport])
 
   useTerritoryLayer(mapRef)
@@ -47,7 +49,7 @@ export function MapContainer() {
   // AAA: fly to selected entity centroid ONLY when selection came from a panel.
   // Map clicks (cursor already on target) and unsourced selections never fly.
   useEffect(() => {
-    if (!AAA_POLISH) return
+    if (!visualPolish) return
     const unsub = useTimelineStore.subscribe((state, prev) => {
       if (state.selectedEntity === prev.selectedEntity) return
       if (!state.selectedEntity) return
@@ -63,7 +65,7 @@ export function MapContainer() {
       useTimelineStore.setState({ _selectionSource: null })
     })
     return unsub
-  }, [])
+  }, [visualPolish])
 
   return (
     <div className="relative w-full h-full bg-zinc-900">
@@ -124,6 +126,7 @@ export function MapContainer() {
       <AudioToggle />
       <ParchmentDust />
       <ViewportFrame />
+      {!selectedSlug && <SettingsPanel />}
     </div>
   )
 }

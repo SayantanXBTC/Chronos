@@ -7,7 +7,7 @@ import { useStoryStore } from '@/store/story'
 import { computeDiscoveryPrompts } from '@/lib/discovery'
 import { OrnamentFrame } from '@/components/ui/OrnamentFrame'
 import { Touchable } from '@/components/ui/Touchable'
-import { AAA_POLISH } from '@/lib/flags'
+import { useSettingsStore } from '@/store/settings'
 import { MOTION_HUD } from '@/lib/motion'
 
 export function DiscoveryEngine() {
@@ -17,6 +17,7 @@ export function DiscoveryEngine() {
   const setSelectedEntity = useTimelineStore((s) => s.setSelectedEntity)
   const setSelectionSource = useTimelineStore((s) => s.setSelectionSource)
   const activeStory = useStoryStore((s) => s.activeStory)
+  const visualPolish = useSettingsStore((s) => s.visualPolish)
 
   const prompts = useMemo(
     () => computeDiscoveryPrompts(entities, year),
@@ -35,7 +36,7 @@ export function DiscoveryEngine() {
   )
 
   if (selectedEntity || activeStory || prompts.length === 0) return null
-  if (!AAA_POLISH) return null
+  if (!visualPolish) return null
 
   return (
     <div className="absolute bottom-56 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none">

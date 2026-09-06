@@ -1,9 +1,10 @@
 'use client'
 
-import { AAA_POLISH } from '@/lib/flags'
+import { useSettingsStore } from '@/store/settings'
 
 export function ViewportFrame() {
-  if (!AAA_POLISH) return null
+  const visualPolish = useSettingsStore((s) => s.visualPolish)
+  if (!visualPolish) return null
   return (
     <div
       aria-hidden="true"

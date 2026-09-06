@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { AAA_POLISH } from '@/lib/flags'
+import { useSettingsStore } from '@/store/settings'
 
 const COUNT = 12
 
@@ -40,10 +40,12 @@ function seedMotes(): Mote[] {
 }
 
 export function ParchmentDust() {
-  const reduced = useReducedMotion()
+  const systemReduced = useReducedMotion()
+  const visualPolish = useSettingsStore((s) => s.visualPolish)
+  const userReduced = useSettingsStore((s) => s.reducedMotion)
   const motes = useMemo(() => seedMotes(), [])
 
-  if (!AAA_POLISH || reduced) return null
+  if (!visualPolish || systemReduced || userReduced) return null
 
   return (
     <svg
