@@ -42,7 +42,7 @@ _PREDECESSORS_SQL = text("""
         WHERE is_primary = true
         ORDER BY entity_id, year_start DESC
     ) pen ON pen.entity_id = pe.id
-    WHERE el.child_entity_id = :entity_id::uuid
+    WHERE el.child_entity_id = :entity_id ::uuid
     ORDER BY el.year
 """)
 
@@ -61,7 +61,7 @@ _SUCCESSORS_SQL = text("""
         WHERE is_primary = true
         ORDER BY entity_id, year_start DESC
     ) cen ON cen.entity_id = ce.id
-    WHERE el.parent_entity_id = :entity_id::uuid
+    WHERE el.parent_entity_id = :entity_id ::uuid
     ORDER BY el.year
 """)
 
