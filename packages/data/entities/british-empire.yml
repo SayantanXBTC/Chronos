@@ -1,0 +1,38 @@
+slug: british-empire
+name: British Empire
+type: empire
+color: "#e75480"
+year_start: 1607
+year_end: 1997
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 10
+map_modes:
+  - political
+phases:
+  - geometry: british-empire/phase-1.geojson
+    year_start: 1607
+    year_end: 1783
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate
+  - geometry: british-empire/phase-2.geojson
+    year_start: 1783
+    year_end: 1914
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate
+  - geometry: british-empire/phase-3.geojson
+    year_start: 1914
+    year_end: 1947
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate
+  - geometry: british-empire/phase-4.geojson
+    year_start: 1947
+    year_end: 1997
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate

@@ -1,0 +1,32 @@
+slug: japanese-empire
+name: Japanese Empire
+type: empire
+color: "#96281b"
+year_start: 1868
+year_end: 1945
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: japanese-empire/phase-1.geojson
+    year_start: 1868
+    year_end: 1910
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate
+  - geometry: japanese-empire/phase-2.geojson
+    year_start: 1910
+    year_end: 1937
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: japanese-empire/phase-3.geojson
+    year_start: 1937
+    year_end: 1945
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate

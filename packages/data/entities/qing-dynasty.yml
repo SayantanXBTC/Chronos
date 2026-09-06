@@ -1,0 +1,32 @@
+slug: qing-dynasty
+name: Qing Dynasty
+type: dynasty
+color: "#f1c40f"
+year_start: 1644
+year_end: 1912
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 10
+map_modes:
+  - political
+phases:
+  - geometry: qing-dynasty/phase-1.geojson
+    year_start: 1644
+    year_end: 1683
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: qing-dynasty/phase-2.geojson
+    year_start: 1683
+    year_end: 1839
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: qing-dynasty/phase-3.geojson
+    year_start: 1839
+    year_end: 1912
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
