@@ -1,0 +1,20 @@
+slug: hittite-empire
+name: Hittite Empire
+type: empire
+color: "#8e5b3f"
+year_start: -1650
+year_end: -1178
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 6
+map_modes:
+  - political
+phases:
+  - geometry: hittite-empire/phase-1.geojson
+    year_start: -1650
+    year_end: -1178
+    confidence: approximate
+    confidence_score: 0.4
+    date_precision: estimated

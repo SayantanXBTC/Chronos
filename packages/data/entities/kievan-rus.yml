@@ -1,0 +1,20 @@
+slug: kievan-rus
+name: Kievan Rus'
+type: kingdom
+color: "#4a6fa5"
+year_start: 879
+year_end: 1240
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 7
+map_modes:
+  - political
+phases:
+  - geometry: kievan-rus/phase-1.geojson
+    year_start: 879
+    year_end: 1240
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: estimated

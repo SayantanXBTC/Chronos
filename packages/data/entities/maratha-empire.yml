@@ -1,0 +1,20 @@
+slug: maratha-empire
+name: Maratha Empire
+type: empire
+color: "#b35a00"
+year_start: 1674
+year_end: 1818
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 7
+map_modes:
+  - political
+phases:
+  - geometry: maratha-empire/phase-1.geojson
+    year_start: 1674
+    year_end: 1818
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate

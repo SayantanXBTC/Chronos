@@ -1,0 +1,20 @@
+slug: xia-dynasty
+name: Xia Dynasty
+type: dynasty
+color: "#5c4b3a"
+year_start: -2070
+year_end: -1600
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 4
+map_modes:
+  - political
+phases:
+  - geometry: xia-dynasty/phase-1.geojson
+    year_start: -2070
+    year_end: -1600
+    confidence: disputed
+    confidence_score: 0.2
+    date_precision: estimated

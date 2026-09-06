@@ -1,0 +1,20 @@
+slug: great-zimbabwe
+name: Kingdom of Great Zimbabwe
+type: kingdom
+color: "#6b4226"
+year_start: 1100
+year_end: 1450
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 4
+map_modes:
+  - political
+phases:
+  - geometry: great-zimbabwe/phase-1.geojson
+    year_start: 1100
+    year_end: 1450
+    confidence: approximate
+    confidence_score: 0.3
+    date_precision: estimated

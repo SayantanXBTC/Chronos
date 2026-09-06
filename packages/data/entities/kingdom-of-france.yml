@@ -1,0 +1,20 @@
+slug: kingdom-of-france
+name: Kingdom of France
+type: kingdom
+color: "#2a3d8f"
+year_start: 987
+year_end: 1792
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: kingdom-of-france/phase-1.geojson
+    year_start: 987
+    year_end: 1792
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate

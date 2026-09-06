@@ -1,0 +1,20 @@
+slug: minoan-mycenaean-greece
+name: Minoan & Mycenaean Greece
+type: confederation
+color: "#1f7a8c"
+year_start: -2700
+year_end: -1100
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 6
+map_modes:
+  - political
+phases:
+  - geometry: minoan-mycenaean-greece/phase-1.geojson
+    year_start: -2700
+    year_end: -1100
+    confidence: approximate
+    confidence_score: 0.35
+    date_precision: estimated

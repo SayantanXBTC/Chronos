@@ -1,0 +1,20 @@
+slug: axum
+name: Kingdom of Axum
+type: kingdom
+color: "#7c1d1d"
+year_start: 100
+year_end: 960
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 150
+importance: 5
+map_modes:
+  - political
+phases:
+  - geometry: axum/phase-1.geojson
+    year_start: 100
+    year_end: 960
+    confidence: approximate
+    confidence_score: 0.4
+    date_precision: estimated

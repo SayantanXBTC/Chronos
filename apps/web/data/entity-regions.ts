@@ -13,6 +13,7 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'carthage':              'Mediterranean',
   'athens':                'Mediterranean',
   'sparta':                'Mediterranean',
+  'minoan-mycenaean-greece': 'Mediterranean',
   'british-empire':        'Europe',
   'french-empire':         'Europe',
   'russian-empire':        'Europe',
@@ -23,6 +24,7 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'kingdom-of-england':    'Europe',
   'dutch-republic':        'Europe',
   'viking-expansion':      'Europe',
+  'kievan-rus':            'Europe',
   // Middle East / Central Asia
   'achaemenid-persia':     'Middle East',
   'sasanian-empire':       'Middle East',
@@ -34,6 +36,8 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'akkadian-empire':       'Middle East',
   'timurid-empire':        'Middle East',
   'safavid-empire':        'Middle East',
+  'hittite-empire':        'Middle East',
+  'elam':                  'Middle East',
   'mongol-empire':         'Central Asia',
   'golden-horde':          'Central Asia',
   'ilkhanate':             'Central Asia',
@@ -48,6 +52,8 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'japanese-empire':       'East Asia',
   'khmer-empire':          'East Asia',
   'shang-dynasty':         'East Asia',
+  'xia-dynasty':           'East Asia',
+  'srivijaya':             'East Asia',
   // South Asia
   'indus-valley-civilization': 'South Asia',
   'maurya-empire':         'South Asia',
@@ -62,6 +68,8 @@ export const ENTITY_REGIONS: Record<string, string> = {
   'ancient-egypt':         'Africa',
   'axum':                  'Africa',
   'zulu-kingdom':          'Africa',
+  'kingdom-of-kush':       'Africa',
+  'great-zimbabwe':        'Africa',
   // Americas
   'aztec-empire':          'Americas',
   'inca-empire':           'Americas',

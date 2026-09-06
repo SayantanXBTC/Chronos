@@ -1,0 +1,26 @@
+slug: kingdom-of-kush
+name: Kingdom of Kush
+type: kingdom
+color: "#c2914b"
+year_start: -1070
+year_end: 350
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 6
+map_modes:
+  - political
+phases:
+  - geometry: kingdom-of-kush/phase-1.geojson
+    year_start: -1070
+    year_end: -305
+    confidence: approximate
+    confidence_score: 0.4
+    date_precision: estimated
+  - geometry: kingdom-of-kush/phase-2.geojson
+    year_start: -305
+    year_end: 350
+    confidence: approximate
+    confidence_score: 0.4
+    date_precision: estimated

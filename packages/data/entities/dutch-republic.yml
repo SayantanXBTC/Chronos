@@ -1,0 +1,20 @@
+slug: dutch-republic
+name: Dutch Republic
+type: republic
+color: "#c65102"
+year_start: 1581
+year_end: 1795
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 100
+importance: 7
+map_modes:
+  - political
+phases:
+  - geometry: dutch-republic/phase-1.geojson
+    year_start: 1581
+    year_end: 1795
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
