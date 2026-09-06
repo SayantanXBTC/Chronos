@@ -1,0 +1,20 @@
+slug: safavid-empire
+name: Safavid Empire
+type: empire
+color: "#186a3b"
+year_start: 1507
+year_end: 1736
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: safavid-empire/phase-1.geojson
+    year_start: 1507
+    year_end: 1736
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate

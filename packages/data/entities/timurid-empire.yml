@@ -1,0 +1,20 @@
+slug: timurid-empire
+name: Timurid Empire
+type: empire
+color: "#a04000"
+year_start: 1370
+year_end: 1507
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 7
+map_modes:
+  - political
+phases:
+  - geometry: timurid-empire/phase-1.geojson
+    year_start: 1370
+    year_end: 1507
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate

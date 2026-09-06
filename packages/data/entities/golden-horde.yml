@@ -1,0 +1,20 @@
+slug: golden-horde
+name: Golden Horde
+type: nomadic_empire
+color: "#d4ac0d"
+year_start: 1260
+year_end: 1502
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: golden-horde/phase-1.geojson
+    year_start: 1260
+    year_end: 1502
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate

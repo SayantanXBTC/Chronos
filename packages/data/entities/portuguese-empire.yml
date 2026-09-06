@@ -1,0 +1,26 @@
+slug: portuguese-empire
+name: Portuguese Empire
+type: empire
+color: "#0e6655"
+year_start: 1415
+year_end: 1999
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: portuguese-empire/phase-1.geojson
+    year_start: 1415
+    year_end: 1500
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate
+  - geometry: portuguese-empire/phase-2.geojson
+    year_start: 1500
+    year_end: 1999
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate

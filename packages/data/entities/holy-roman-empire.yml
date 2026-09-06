@@ -1,0 +1,26 @@
+slug: holy-roman-empire
+name: Holy Roman Empire
+type: confederation
+color: "#f5b041"
+year_start: 962
+year_end: 1806
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: holy-roman-empire/phase-1.geojson
+    year_start: 962
+    year_end: 1500
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate
+  - geometry: holy-roman-empire/phase-2.geojson
+    year_start: 1500
+    year_end: 1806
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate

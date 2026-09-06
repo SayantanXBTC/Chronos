@@ -1,0 +1,20 @@
+slug: ilkhanate
+name: Ilkhanate
+type: nomadic_empire
+color: "#7d3c98"
+year_start: 1260
+year_end: 1335
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 250
+importance: 7
+map_modes:
+  - political
+phases:
+  - geometry: ilkhanate/phase-1.geojson
+    year_start: 1260
+    year_end: 1335
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate

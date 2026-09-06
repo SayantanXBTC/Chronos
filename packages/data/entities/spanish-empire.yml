@@ -1,0 +1,26 @@
+slug: spanish-empire
+name: Spanish Empire
+type: empire
+color: "#b7950b"
+year_start: 1492
+year_end: 1898
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: spanish-empire/phase-1.geojson
+    year_start: 1492
+    year_end: 1600
+    confidence: approximate
+    confidence_score: 0.45
+    date_precision: approximate
+  - geometry: spanish-empire/phase-2.geojson
+    year_start: 1600
+    year_end: 1898
+    confidence: approximate
+    confidence_score: 0.5
+    date_precision: approximate

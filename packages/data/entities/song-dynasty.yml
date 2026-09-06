@@ -1,0 +1,26 @@
+slug: song-dynasty
+name: Song Dynasty
+type: dynasty
+color: "#2874a6"
+year_start: 960
+year_end: 1279
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 8
+map_modes:
+  - political
+phases:
+  - geometry: song-dynasty/phase-1.geojson
+    year_start: 960
+    year_end: 1127
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate
+  - geometry: song-dynasty/phase-2.geojson
+    year_start: 1127
+    year_end: 1279
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate

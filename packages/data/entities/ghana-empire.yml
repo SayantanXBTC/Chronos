@@ -1,0 +1,20 @@
+slug: ghana-empire
+name: Ghana Empire
+type: empire
+color: "#784212"
+year_start: 300
+year_end: 1200
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 300
+importance: 7
+map_modes:
+  - political
+phases:
+  - geometry: ghana-empire/phase-1.geojson
+    year_start: 300
+    year_end: 1200
+    confidence: approximate
+    confidence_score: 0.35
+    date_precision: estimated

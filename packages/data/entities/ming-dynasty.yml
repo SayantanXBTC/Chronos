@@ -1,0 +1,20 @@
+slug: ming-dynasty
+name: Ming Dynasty
+type: dynasty
+color: "#c0392b"
+year_start: 1368
+year_end: 1644
+source_name: "Manual trace — approximate historical boundaries"
+source_license: "CC0"
+data_version: "2024-01"
+resolution_km: 200
+importance: 9
+map_modes:
+  - political
+phases:
+  - geometry: ming-dynasty/phase-1.geojson
+    year_start: 1368
+    year_end: 1644
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate

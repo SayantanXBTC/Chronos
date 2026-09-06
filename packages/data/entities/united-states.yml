@@ -26,6 +26,12 @@ phases:
     date_precision: approximate
   - geometry: united-states/phase-3.geojson
     year_start: 1848
+    year_end: 1867
+    confidence: approximate
+    confidence_score: 0.55
+    date_precision: approximate
+  - geometry: united-states/phase-4.geojson
+    year_start: 1867
     year_end: null
     confidence: approximate
     confidence_score: 0.55

@@ -14,11 +14,19 @@ map_modes:
 phases:
   - geometry: mongol-empire/phase-1.geojson
     year_start: 1206
+    year_end: 1240
+    confidence: approximate
+    confidence_score: 0.6
+    date_precision: approximate
+  - geometry: mongol-empire/phase-2.geojson
+    year_start: 1240
     year_end: 1260
     confidence: approximate
     confidence_score: 0.6
-  - geometry: mongol-empire/phase-2.geojson
+    date_precision: approximate
+  - geometry: mongol-empire/phase-3.geojson
     year_start: 1260
     year_end: 1368
     confidence: approximate
     confidence_score: 0.6
+    date_precision: approximate
